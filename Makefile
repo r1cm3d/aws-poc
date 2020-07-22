@@ -42,3 +42,4 @@ test: unit-test integration-test
 
 run:
 	@echo "\nRunning without building it"
+	@go run cmd/main.go
