@@ -27,6 +27,7 @@ build: clean fmt
 
 unit-test: build
 	@echo "\nRunning unit tests\n"
+	@go test ./...
 
 run-dep: clean
 	@echo "\nStarting localstack container and creating AWS local resources\n"
