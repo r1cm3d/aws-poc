@@ -13,6 +13,8 @@ lint:
 fmt:
 	@echo "\nFormatting scripts\n"
 	@shfmt -w scripts/*sh
+	@echo "\nFormattin go files\n"
+	@go fmt ./... 
 
 clean:
 	@echo "\nRemoving localstack container\n"
