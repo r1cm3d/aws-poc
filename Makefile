@@ -23,6 +23,7 @@ clean:
 
 build: clean fmt
 	@echo "\nBuilding application\n"
+	@go build cmd/main.go
 
 unit-test: build
 	@echo "\nRunning unit tests\n"
