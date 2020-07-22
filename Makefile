@@ -6,6 +6,10 @@ export
 all: run-dep build run
 	@echo "\nBuilding application from scratch and running it\n"
 
+lint:
+	@echo "\nApplying golint\n"
+	@golint ./...
+
 fmt:
 	@echo "\nFormatting scripts\n"
 	@shfmt -w scripts/*sh
