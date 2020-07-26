@@ -10,7 +10,7 @@ services:
       - SERVICES=s3,dynamodb,sqs
       - DEFAULT_REGION=us-east-1
       - DEBUG=1
-      - DATA_DIR=/tmp/localstack/data
-    volumes:
-      - './.localstack:/tmp/localstack'
-      - '/var/run/docker.sock:/var/run/docker.sock'
+#      - DATA_DIR=/tmp/localstack/data
+#    volumes:
+#      - './.localstack:/tmp/localstack'
+#      - '/var/run/docker.sock:/var/run/docker.sock'
