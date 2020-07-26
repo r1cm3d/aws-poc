@@ -4,6 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
+	"strconv"
 )
 
 // A Queue is an SQS queue which holds queue url in URL.
@@ -12,6 +13,13 @@ type Queue struct {
 	SQS sqsiface.SQSAPI
 	URL *string
 }
+
+// The DataType is a type of data used in Attributes and Message Attributes.
+const (
+	DataTypeString = "String"
+	DataTypeNumber = "Number"
+	DataTypeBinary = "Binary"
+)
 
 // New initializes Queue with queue name name.
 func New(s sqsiface.SQSAPI, name string) (*Queue, error) {
@@ -39,6 +47,54 @@ func (q *Queue) ChangeMessageVisibility(receiptHandle *string, visibilityTimeout
 	}
 	_, err := q.SQS.ChangeMessageVisibility(req)
 	return err
+}
+
+
+// MessageAttributes returns a SendMessageInput that changes MessageAttributes to attrs.
+// A string value in attrs sets to DataTypeString.
+// A []byte value in attrs sets to DataTypeBinary.
+// A int and int64 value in attrs sets to DataTypeNumber. Other types cause panicking.
+func MessageAttributes(attrs map[string]interface{}) SendMessageInput {
+	return func(req *sqs.SendMessageInput) {
+		if len(attrs) == 0 {
+			return
+		}
+
+		ret := make(map[string]*sqs.MessageAttributeValue)
+		for n, v := range attrs {
+			ret[n] = MessageAttributeValue(v)
+		}
+		req.MessageAttributes = ret
+	}
+}
+
+// MessageAttributeValue returns a appropriate sqs.MessageAttributeValue by type assersion of v.
+// Types except string, []byte, int64 and int cause panicking.
+func MessageAttributeValue(v interface{}) *sqs.MessageAttributeValue {
+	switch vv := v.(type) {
+	case string:
+		return &sqs.MessageAttributeValue{
+			DataType:    aws.String(DataTypeString),
+			StringValue: aws.String(vv),
+		}
+	case []byte:
+		return &sqs.MessageAttributeValue{
+			DataType:    aws.String(DataTypeBinary),
+			BinaryValue: vv,
+		}
+	case int64:
+		return &sqs.MessageAttributeValue{
+			DataType:    aws.String(DataTypeNumber),
+			StringValue: aws.String(strconv.FormatInt(vv, 10)),
+		}
+	case int:
+		return &sqs.MessageAttributeValue{
+			DataType:    aws.String(DataTypeNumber),
+			StringValue: aws.String(strconv.FormatInt(int64(vv), 10)),
+		}
+	default:
+		panic("sqs: unsupported type")
+	}
 }
 
 // SendMessage sends a message to SQS queue. opts are used to change parameters for a message.
