@@ -26,14 +26,8 @@ func setup() *Queue {
 func TestSendMessageIntegration(t *testing.T) {
 	skipShort(t)
 	q := setup()
-	attrs := map[string]interface{}{
-		"FirstAttribute":  "Some string",
-		"SecondAttribute": 666,
-	}
 
-	if _, err := q.SendMessage("Message Body", MessageAttributes(attrs)); err != nil {
-		log.Fatal(err)
-	}
+	sendMsg(q, "Payload")
 
 	log.Print("successed!")
 }
@@ -41,18 +35,22 @@ func TestSendMessageIntegration(t *testing.T) {
 func TestReceiveMessageIntegration(t *testing.T) {
 	skipShort(t)
 	q := setup()
-	attrs := map[string]interface{}{
-		"FirstAttribute":  "Some string",
-		"SecondAttribute": 666,
-	}
-	if _, err := q.SendMessage("Message Body", MessageAttributes(attrs)); err != nil {
-		log.Fatal(err)
-	}
+	sendMsg(q, "Message Body")
 
 	if msgs, _ := q.receiveMessage(); msgs != nil {
 		for _, msg := range msgs {
 			assert.NotZero(t, msg.Body)
 		}
+	}
+}
+
+func sendMsg(queue *Queue, body string) {
+	attrs := map[string]interface{}{
+		"FirstAttribute":  "Some string",
+		"SecondAttribute": 666,
+	}
+	if _, err := queue.SendMessage(body, MessageAttributes(attrs)); err != nil {
+		log.Fatal(err)
 	}
 }
 
