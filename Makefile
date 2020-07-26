@@ -13,7 +13,7 @@ lint:
 fmt:
 	@echo "\nFormatting scripts\n"
 	@shfmt -w scripts/*sh
-	@echo "\nFormattin go files\n"
+	@echo "\nFormatting go files\n"
 	@go fmt ./... 
 
 clean:
