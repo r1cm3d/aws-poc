@@ -2,6 +2,7 @@ package infra
 
 import (
 	"bufio"
+	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
@@ -9,10 +10,18 @@ import (
 )
 
 func loadConf() map[string]string {
-	prefix := "../../scripts/env/"
-	aws := loadFile(prefix + ".aws.env")
-	env := loadFile(prefix + ".env")
-	return merge(aws, env)
+	envDir := "../../scripts/env/"
+	files, err := ioutil.ReadDir(envDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var configs []map[string]string
+	for _, f := range files {
+		configs = append(configs, loadFile(envDir+f.Name()))
+	}
+
+	return merge(configs...)
 }
 
 func merge(ms ...map[string]string) map[string]string {
