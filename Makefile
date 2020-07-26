@@ -3,8 +3,7 @@
 include scripts/env/.env
 export
 
-all: run-dep build run
-	@echo "\nBuilding application from scratch and running it\n"
+all: test
 
 lint:
 	@echo "\nApplying golint\n"
@@ -41,6 +40,9 @@ integration-test: run-dep build
 test: unit-test integration-test
 	@echo "\nRunning tests\n"
 
-run:
+run: run-dep build run-local
+	@echo "\nRunning locally"
+
+run-local:
 	@echo "\nRunning without building it"
 	@go run cmd/main.go
