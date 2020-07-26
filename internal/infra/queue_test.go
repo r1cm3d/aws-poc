@@ -4,6 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
+	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"
 )
@@ -35,6 +36,24 @@ func TestSendMessageIntegration(t *testing.T) {
 	}
 
 	log.Print("successed!")
+}
+
+func TestReceiveMessageIntegration(t *testing.T) {
+	skipShort(t)
+	q := setup()
+	attrs := map[string]interface{}{
+		"FirstAttribute":  "Some string",
+		"SecondAttribute": 666,
+	}
+	if _, err := q.SendMessage("Message Body", MessageAttributes(attrs)); err != nil {
+		log.Fatal(err)
+	}
+
+	if msgs, _ := q.receiveMessage(); msgs != nil {
+		for _, msg := range msgs {
+			assert.NotZero(t, msg.Body)
+		}
+	}
 }
 
 func skipShort(t *testing.T) {
