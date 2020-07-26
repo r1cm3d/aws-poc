@@ -21,10 +21,10 @@ func TestGetValue(t *testing.T) {
 }
 
 func TestMerge(t *testing.T) {
-	m1 := map[string]string {
+	m1 := map[string]string{
 		"k1": "v1",
 	}
-	m2 := map[string]string {
+	m2 := map[string]string{
 		"k2": "v2",
 	}
 	exp := map[string]string{
