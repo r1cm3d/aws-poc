@@ -9,11 +9,12 @@ import (
 )
 
 func setup() *Queue {
+	env := loadConf()
 	s := sqs.New(session.Must(session.NewSession(&aws.Config{
-		Region:   aws.String("us-east-1"),
-		Endpoint: aws.String("http://localhost:4566"),
+		Region:   aws.String(env["REGION"]),
+		Endpoint: aws.String(env["ENDPOINT"]),
 	})))
-	q, err := New(s, "test-queue")
+	q, err := New(s, env["SQS_TEST_QUEUE"])
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -22,6 +23,7 @@ func setup() *Queue {
 }
 
 func TestSendMessageIntegration(t *testing.T) {
+	skipShort(t)
 	q := setup()
 	attrs := map[string]interface{}{
 		"ATTR1": "STRING!!",
@@ -33,4 +35,10 @@ func TestSendMessageIntegration(t *testing.T) {
 	}
 
 	log.Print("successed!")
+}
+
+func skipShort(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
 }
