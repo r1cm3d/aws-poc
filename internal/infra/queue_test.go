@@ -26,11 +26,11 @@ func TestSendMessageIntegration(t *testing.T) {
 	skipShort(t)
 	q := setup()
 	attrs := map[string]interface{}{
-		"ATTR1": "STRING!!",
-		"ATTR2": 12345,
+		"FirstAttribute":  "Some string",
+		"SecondAttribute": 666,
 	}
 
-	if _, err := q.SendMessage("MESSAGE BODY", MessageAttributes(attrs)); err != nil {
+	if _, err := q.SendMessage("Message Body", MessageAttributes(attrs)); err != nil {
 		log.Fatal(err)
 	}
 
