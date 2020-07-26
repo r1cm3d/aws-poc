@@ -18,7 +18,7 @@ type Handler interface {
 
 func Start(q *Queue, h Handler) {
 	for {
-		messages, err := q.ReceiveMessage(MaxNumberOfMessages(10))
+		messages, err := q.receiveMessage(maxNumberOfMessages(10))
 		if err != nil {
 			log.Println(err)
 			continue
@@ -52,5 +52,5 @@ func handleMessage(q *Queue, m *sqs.Message, h Handler) error {
 	if err != nil {
 		return err
 	}
-	return q.DeleteMessage(m.ReceiptHandle)
+	return q.deleteMessage(m.ReceiptHandle)
 }

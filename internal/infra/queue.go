@@ -26,6 +26,10 @@ func New(s sqsiface.SQSAPI, name string) (*Queue, error) {
 	}, nil
 }
 
+// The SendMessageInput type is an adapter to change a parameter in
+// sqs.SendMessageInput.
+type SendMessageInput func(req *sqs.SendMessageInput)
+
 // ChangeMessageVisibility changes a message visibility timeout.
 func (q *Queue) ChangeMessageVisibility(receiptHandle *string, visibilityTimeout int64) error {
 	req := &sqs.ChangeMessageVisibilityInput{
@@ -51,9 +55,15 @@ func (q *Queue) SendMessage(body string, opts ...SendMessageInput) (*sqs.SendMes
 	return q.SQS.SendMessage(req)
 }
 
-// ReceiveMessage receives messages from SQS queue.
-// opts are used to change parameters for a request.
-func (q *Queue) ReceiveMessage(opts ...ReceiveMessageInput) ([]*sqs.Message, error) {
+type receiveMessageInput func(req *sqs.ReceiveMessageInput)
+
+func maxNumberOfMessages(n int64) receiveMessageInput {
+	return func(req *sqs.ReceiveMessageInput) {
+		req.MaxNumberOfMessages = aws.Int64(n)
+	}
+}
+
+func (q *Queue) receiveMessage(opts ...receiveMessageInput) ([]*sqs.Message, error) {
 	req := &sqs.ReceiveMessageInput{
 		QueueUrl: q.URL,
 	}
@@ -69,8 +79,7 @@ func (q *Queue) ReceiveMessage(opts ...ReceiveMessageInput) ([]*sqs.Message, err
 	return resp.Messages, nil
 }
 
-// DeleteMessage deletes a message from SQS queue.
-func (q *Queue) DeleteMessage(receiptHandle *string) error {
+func (q *Queue) deleteMessage(receiptHandle *string) error {
 	_, err := q.SQS.DeleteMessage(&sqs.DeleteMessageInput{
 		QueueUrl:      q.URL,
 		ReceiptHandle: receiptHandle,
