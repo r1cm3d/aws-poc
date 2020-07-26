@@ -49,7 +49,6 @@ func (q *Queue) ChangeMessageVisibility(receiptHandle *string, visibilityTimeout
 	return err
 }
 
-
 // MessageAttributes returns a SendMessageInput that changes MessageAttributes to attrs.
 // A string value in attrs sets to DataTypeString.
 // A []byte value in attrs sets to DataTypeBinary.

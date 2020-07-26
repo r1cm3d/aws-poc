@@ -8,15 +8,21 @@ import (
 	"testing"
 )
 
-func TestSendMessageIntegration(t *testing.T) {
+func setup() *Queue {
 	s := sqs.New(session.Must(session.NewSession(&aws.Config{
-		Region: aws.String("us-east-1"),
+		Region:   aws.String("us-east-1"),
 		Endpoint: aws.String("http://localhost:4566"),
 	})))
 	q, err := New(s, "test-queue")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	return q
+}
+
+func TestSendMessageIntegration(t *testing.T) {
+	q := setup()
 	attrs := map[string]interface{}{
 		"ATTR1": "STRING!!",
 		"ATTR2": 12345,
