@@ -9,6 +9,7 @@ make run
 ```
 
 ## Prerequisites
+[![Go](https://img.shields.io/badge/Go-v1.14.2-blue)](https://golang.org/)
 [![Docker](https://img.shields.io/badge/Docker-19.03.9-blue)](https://www.docker.com/)
 [![Docker-compose](https://img.shields.io/badge/Docker--compose-1.25.5-blue)](https://github.com/docker/compose/releases)
 [![GNU Make](https://img.shields.io/badge/GNU%20Make-4.2.1-lightgrey)](https://www.gnu.org/software/make/)
