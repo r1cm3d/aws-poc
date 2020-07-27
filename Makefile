@@ -3,7 +3,7 @@
 include scripts/env/.env
 export
 
-all: test
+all: unit-test
 
 lint:
 	@echo "\nApplying golint\n"
