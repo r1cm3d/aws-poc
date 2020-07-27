@@ -6,16 +6,20 @@ import (
 	"sync"
 )
 
+// Handle is responsible to deal with message
 type Handle func(msg *sqs.Message) error
 
+// HandleMessage delegates message handling to Handle
 func (f Handle) HandleMessage(msg *sqs.Message) error {
 	return f(msg)
 }
 
+// Handler is an abstraction that handle sqs messages
 type Handler interface {
 	HandleMessage(msg *sqs.Message) error
 }
 
+// Start starts a worker giving a Queue and a Handler
 func Start(q *Queue, h Handler) {
 	for {
 		messages, err := q.receiveMessage(maxNumberOfMessages(10))
