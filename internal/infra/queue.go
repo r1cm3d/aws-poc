@@ -34,7 +34,7 @@ func New(s sqsiface.SQSAPI, name string) (*Queue, error) {
 	}, nil
 }
 
-// The SendMessageInput type is an adapter to change a parameter in
+// SendMessageInput type is an adapter to change a parameter in
 // sqs.SendMessageInput.
 type SendMessageInput func(req *sqs.SendMessageInput)
 
