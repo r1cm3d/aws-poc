@@ -2,7 +2,7 @@
 
 **TL;DR:**
 ```console
-make
+make run
 ```
 
 ## Prerequisites
@@ -49,12 +49,12 @@ make test
 ### Run
 #### Build all dependencies and run 
 ```sh
-make
+make run
 ```
 
 #### Just run without any build
 ```sh
-make run
+make run-local
 ```
 
 It will run `go run` without build AWS infrastructure locally.   
