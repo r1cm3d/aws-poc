@@ -36,3 +36,9 @@ func TestMerge(t *testing.T) {
 
 	assert.True(t, reflect.DeepEqual(exp, act))
 }
+
+func TestLoadConfigNotFound(t *testing.T) {
+	if _, err := loadFile("unreachblePath"); err == nil {
+		assert.Fail(t, "this test is supposed to fail")
+	}
+}

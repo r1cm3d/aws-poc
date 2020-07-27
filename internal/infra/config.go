@@ -18,7 +18,8 @@ func loadConf() map[string]string {
 
 	var configs []map[string]string
 	for _, f := range files {
-		configs = append(configs, loadFile(envDir+f.Name()))
+		fn, _ := loadFile(envDir+f.Name())
+		configs = append(configs, fn)
 	}
 
 	return merge(configs...)
@@ -34,10 +35,10 @@ func merge(ms ...map[string]string) map[string]string {
 	return res
 }
 
-func loadFile(path string) map[string]string {
+func loadFile(path string) (map[string]string, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer file.Close()
 
@@ -49,7 +50,7 @@ func loadFile(path string) map[string]string {
 		m[getKey(t)] = getValue(t)
 	}
 
-	return m
+	return m, nil
 }
 
 func getRegex(txt, regex string) string {
