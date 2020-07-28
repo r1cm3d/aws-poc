@@ -16,7 +16,7 @@ func loadConf(dir string) (map[string]string, error) {
 
 	var configs []map[string]string
 	for _, f := range files {
-		fn, _ := loadFile(dir+f.Name())
+		fn, _ := loadFile(dir + f.Name())
 		configs = append(configs, fn)
 	}
 
