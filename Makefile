@@ -26,7 +26,7 @@ build: clean fmt
 
 unit-test: build
 	@echo "\nRunning unit tests\n"
-	@go test -v -short ./...
+	@go test -cover -v -short ./...
 
 run-dep: clean
 	@echo "\nStarting localstack container and creating AWS local resources\n"
@@ -35,7 +35,7 @@ run-dep: clean
 
 integration-test: run-dep build
 	@echo "\nRunning integration tests\n"
-	@go test -v -run Integration ./...
+	@go test -cover -v -run Integration ./...
 
 test: unit-test integration-test
 	@echo "\nRunning tests\n"
