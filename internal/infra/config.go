@@ -3,26 +3,24 @@ package infra
 import (
 	"bufio"
 	"io/ioutil"
-	"log"
 	"os"
 	"regexp"
 	"strings"
 )
 
-func loadConf() map[string]string {
-	envDir := "../../scripts/env/"
-	files, err := ioutil.ReadDir(envDir)
+func loadConf(dir string) (map[string]string, error) {
+	files, err := ioutil.ReadDir(dir)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	var configs []map[string]string
 	for _, f := range files {
-		fn, _ := loadFile(envDir+f.Name())
+		fn, _ := loadFile(dir+f.Name())
 		configs = append(configs, fn)
 	}
 
-	return merge(configs...)
+	return merge(configs...), nil
 }
 
 func merge(ms ...map[string]string) map[string]string {

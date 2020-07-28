@@ -10,7 +10,7 @@ import (
 )
 
 func setup() *Queue {
-	env := loadConf()
+	env, _ := loadConf("../../scripts/env/")
 	s := sqs.New(session.Must(session.NewSession(&aws.Config{
 		Region:   aws.String(env["REGION"]),
 		Endpoint: aws.String(env["ENDPOINT"]),

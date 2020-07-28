@@ -39,6 +39,12 @@ func TestMerge(t *testing.T) {
 
 func TestLoadFileNotFound(t *testing.T) {
 	if _, err := loadFile("unreachablePath"); err == nil {
-		assert.Fail(t, "this test is supposed to fail")
+		assert.Fail(t, "expected an error when file is not found")
+	}
+}
+
+func TestLoadConfigNotFound(t *testing.T) {
+	if _, err := loadConf("unreachableDirectory"); err == nil {
+		assert.Fail(t, "expected an error when directory not exists")
 	}
 }
