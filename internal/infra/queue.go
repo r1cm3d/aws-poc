@@ -3,7 +3,6 @@ package infra
 import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/aws/aws-sdk-go/service/sqs/sqsiface"
 	"strconv"
 )
 
@@ -33,7 +32,7 @@ type sqsAdapter interface {
 }
 
 // New initializes Queue with queue name name.
-func New(s sqsiface.SQSAPI, name string) (*Queue, error) {
+func New(s sqsAdapter, name string) (*Queue, error) {
 	u, err := getQueueURL(s, name)
 	if err != nil {
 		return nil, err
