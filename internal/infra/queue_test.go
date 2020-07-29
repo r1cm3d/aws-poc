@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"errors"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
@@ -21,6 +22,31 @@ func setup() *Queue {
 	}
 
 	return q
+}
+
+type sqsMock struct{}
+
+func (s sqsMock) GetQueueUrl(*sqs.GetQueueUrlInput) (*sqs.GetQueueUrlOutput, error) {
+	return nil, errors.New("mocked error")
+}
+func (s sqsMock) ReceiveMessage(*sqs.ReceiveMessageInput) (*sqs.ReceiveMessageOutput, error) {
+	return nil, nil
+}
+func (s sqsMock) ChangeMessageVisibility(*sqs.ChangeMessageVisibilityInput) (*sqs.ChangeMessageVisibilityOutput, error) {
+	return nil, nil
+}
+func (s sqsMock) SendMessage(*sqs.SendMessageInput) (*sqs.SendMessageOutput, error) {
+	return nil, nil
+}
+func (s sqsMock) DeleteMessage(*sqs.DeleteMessageInput) (*sqs.DeleteMessageOutput, error) {
+	return nil, nil
+}
+
+func TestNewWithError(t *testing.T) {
+	_, err := New(sqsMock{}, "zambas")
+	if err == nil {
+		assert.Fail(t, "an error should be returned")
+	}
 }
 
 func TestSendMessageIntegration(t *testing.T) {
