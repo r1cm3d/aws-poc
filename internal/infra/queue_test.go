@@ -30,7 +30,7 @@ func (s sqsMock) GetQueueUrl(*sqs.GetQueueUrlInput) (*sqs.GetQueueUrlOutput, err
 	return nil, errors.New("mocked error")
 }
 func (s sqsMock) ReceiveMessage(*sqs.ReceiveMessageInput) (*sqs.ReceiveMessageOutput, error) {
-	return nil, nil
+	return nil, errors.New("mocked error")
 }
 func (s sqsMock) ChangeMessageVisibility(*sqs.ChangeMessageVisibilityInput) (*sqs.ChangeMessageVisibilityOutput, error) {
 	return nil, nil
@@ -56,6 +56,17 @@ func TestSendMessageIntegration(t *testing.T) {
 	sendMsg(q, "Payload")
 
 	log.Print("successed!")
+}
+
+func TestReceiveMessageError(t *testing.T) {
+	q := &Queue{
+		url: nil,
+		sqs: sqsMock{},
+	}
+
+	_, err := q.receiveMessage([]receiveMessageInput{}...); if err == nil {
+		assert.Fail(t,"an error should be returned")
+	}
 }
 
 func TestReceiveMessageIntegration(t *testing.T) {
