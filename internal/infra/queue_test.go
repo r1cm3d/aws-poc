@@ -10,6 +10,10 @@ import (
 	"testing"
 )
 
+const failMsg = "an error should be return"
+
+var mockedError = errors.New("mocked error")
+
 func setup() *Queue {
 	env, _ := loadConf("../../scripts/env/")
 	s := sqs.New(session.Must(session.NewSession(&aws.Config{
@@ -27,10 +31,10 @@ func setup() *Queue {
 type sqsMock struct{}
 
 func (s sqsMock) GetQueueUrl(*sqs.GetQueueUrlInput) (*sqs.GetQueueUrlOutput, error) {
-	return nil, errors.New("mocked error")
+	return nil, mockedError
 }
 func (s sqsMock) ReceiveMessage(*sqs.ReceiveMessageInput) (*sqs.ReceiveMessageOutput, error) {
-	return nil, errors.New("mocked error")
+	return nil, mockedError
 }
 func (s sqsMock) ChangeMessageVisibility(*sqs.ChangeMessageVisibilityInput) (*sqs.ChangeMessageVisibilityOutput, error) {
 	return nil, nil
@@ -43,9 +47,9 @@ func (s sqsMock) DeleteMessage(*sqs.DeleteMessageInput) (*sqs.DeleteMessageOutpu
 }
 
 func TestNewWithError(t *testing.T) {
-	_, err := New(sqsMock{}, "zambas")
+	_, err := New(sqsMock{}, "queueName")
 	if err == nil {
-		assert.Fail(t, "an error should be returned")
+		assert.Fail(t, failMsg)
 	}
 }
 
@@ -64,8 +68,9 @@ func TestReceiveMessageError(t *testing.T) {
 		sqs: sqsMock{},
 	}
 
-	_, err := q.receiveMessage([]receiveMessageInput{}...); if err == nil {
-		assert.Fail(t,"an error should be returned")
+	_, err := q.receiveMessage([]receiveMessageInput{}...)
+	if err == nil {
+		assert.Fail(t, failMsg)
 	}
 }
 
