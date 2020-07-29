@@ -7,11 +7,19 @@ import (
 	"strconv"
 )
 
-// A Queue is an SQS queue which holds queue url in URL.
+type sqsAdapter interface {
+	GetQueueUrl(*sqs.GetQueueUrlInput) (*sqs.GetQueueUrlOutput, error)
+	ReceiveMessage(*sqs.ReceiveMessageInput) (*sqs.ReceiveMessageOutput, error)
+	ChangeMessageVisibility(*sqs.ChangeMessageVisibilityInput) (*sqs.ChangeMessageVisibilityOutput, error)
+	SendMessage(*sqs.SendMessageInput) (*sqs.SendMessageOutput, error)
+	DeleteMessage(*sqs.DeleteMessageInput) (*sqs.DeleteMessageOutput, error)
+}
+
+// A Queue is an sqs queue which holds queue url in url.
 // Queue allows you to call actions without queue url for every call.
 type Queue struct {
-	SQS sqsiface.SQSAPI
-	URL *string
+	url *string
+	sqs sqsAdapter
 }
 
 // The DataType is a type of data used in Attributes and Message Attributes.
@@ -29,8 +37,8 @@ func New(s sqsiface.SQSAPI, name string) (*Queue, error) {
 	}
 
 	return &Queue{
-		SQS: s,
-		URL: u,
+		sqs: s,
+		url: u,
 	}, nil
 }
 
@@ -43,9 +51,9 @@ func (q *Queue) ChangeMessageVisibility(receiptHandle *string, visibilityTimeout
 	req := &sqs.ChangeMessageVisibilityInput{
 		ReceiptHandle:     receiptHandle,
 		VisibilityTimeout: aws.Int64(visibilityTimeout),
-		QueueUrl:          q.URL,
+		QueueUrl:          q.url,
 	}
-	_, err := q.SQS.ChangeMessageVisibility(req)
+	_, err := q.sqs.ChangeMessageVisibility(req)
 	return err
 }
 
@@ -96,18 +104,18 @@ func MessageAttributeValue(v interface{}) *sqs.MessageAttributeValue {
 	}
 }
 
-// SendMessage sends a message to SQS queue. opts are used to change parameters for a message.
+// SendMessage sends a message to sqs queue. opts are used to change parameters for a message.
 func (q *Queue) SendMessage(body string, opts ...SendMessageInput) (*sqs.SendMessageOutput, error) {
 	req := &sqs.SendMessageInput{
 		MessageBody: aws.String(body),
-		QueueUrl:    q.URL,
+		QueueUrl:    q.url,
 	}
 
 	for _, f := range opts {
 		f(req)
 	}
 
-	return q.SQS.SendMessage(req)
+	return q.sqs.SendMessage(req)
 }
 
 type receiveMessageInput func(req *sqs.ReceiveMessageInput)
@@ -120,14 +128,14 @@ func maxNumberOfMessages(n int64) receiveMessageInput {
 
 func (q *Queue) receiveMessage(opts ...receiveMessageInput) ([]*sqs.Message, error) {
 	req := &sqs.ReceiveMessageInput{
-		QueueUrl: q.URL,
+		QueueUrl: q.url,
 	}
 
 	for _, f := range opts {
 		f(req)
 	}
 
-	resp, err := q.SQS.ReceiveMessage(req)
+	resp, err := q.sqs.ReceiveMessage(req)
 	if err != nil {
 		return nil, err
 	}
@@ -135,14 +143,14 @@ func (q *Queue) receiveMessage(opts ...receiveMessageInput) ([]*sqs.Message, err
 }
 
 func (q *Queue) deleteMessage(receiptHandle *string) error {
-	_, err := q.SQS.DeleteMessage(&sqs.DeleteMessageInput{
-		QueueUrl:      q.URL,
+	_, err := q.sqs.DeleteMessage(&sqs.DeleteMessageInput{
+		QueueUrl:      q.url,
 		ReceiptHandle: receiptHandle,
 	})
 	return err
 }
 
-func getQueueURL(s sqsiface.SQSAPI, name string) (*string, error) {
+func getQueueURL(s sqsAdapter, name string) (*string, error) {
 	req := &sqs.GetQueueUrlInput{
 		QueueName: aws.String(name),
 	}
