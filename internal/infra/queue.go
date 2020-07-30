@@ -140,13 +140,13 @@ func (q *Queue) receiveMessage(opts ...receiveMessageInput) ([]*sqs.Message, err
 	return resp.Messages, nil
 }
 
-func (q *Queue) deleteMessage(receiptHandle *string) error {
-	_, err := q.sqs.DeleteMessage(&sqs.DeleteMessageInput{
-		QueueUrl:      q.url,
-		ReceiptHandle: receiptHandle,
-	})
-	return err
-}
+	func (q *Queue) deleteMessage(receiptHandle *string) error {
+		_, err := q.sqs.DeleteMessage(&sqs.DeleteMessageInput{
+			QueueUrl:      q.url,
+			ReceiptHandle: receiptHandle,
+		})
+		return err
+	}
 
 func getQueueURL(s sqsAdapter, name string) (*string, error) {
 	req := &sqs.GetQueueUrlInput{

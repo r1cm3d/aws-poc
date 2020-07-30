@@ -62,6 +62,16 @@ func TestSendMessageIntegration(t *testing.T) {
 	log.Print("successed!")
 }
 
+func TestMaxNumberOfMessages(t *testing.T) {
+	exp := int64(1)
+	f := maxNumberOfMessages(exp)
+	in := &sqs.ReceiveMessageInput{}
+
+	f(in)
+
+	assert.Equal(t, aws.Int64(exp), in.MaxNumberOfMessages)
+}
+
 func TestReceiveMessageError(t *testing.T) {
 	f := func (c *sqs.ReceiveMessageInput){
 
