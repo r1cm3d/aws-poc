@@ -79,7 +79,9 @@ func TestDeleteMessage(t *testing.T) {
 	}
 	s := "aReceiptHandle"
 
-	err := q.deleteMessage(&s); if err != nil {
+	err := q.deleteMessage(&s)
+
+	if err != nil {
 		assert.Fail(t, failMsg)
 	}
 }
@@ -94,6 +96,7 @@ func TestReceiveMessageError(t *testing.T) {
 	}
 
 	_, err := q.receiveMessage(f)
+
 	if err == nil {
 		assert.Fail(t, failMsg)
 	}
@@ -109,8 +112,8 @@ func TestReceiveMessageIntegration(t *testing.T) {
 	q := setup()
 	sendMsg(q, "Message Body")
 
-	if msgs, _ := q.receiveMessage(); msgs != nil {
-		for _, msg := range msgs {
+	if msg, _ := q.receiveMessage(); msg != nil {
+		for _, msg := range msg {
 			assert.NotZero(t, msg.Body)
 		}
 	}
