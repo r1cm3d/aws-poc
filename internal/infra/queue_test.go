@@ -14,20 +14,6 @@ const failMsg = "an error should be return"
 
 var mockedError = errors.New("mocked error")
 
-func setup() *Queue {
-	env, _ := loadConf("../../scripts/env/")
-	s := sqs.New(session.Must(session.NewSession(&aws.Config{
-		Region:   aws.String(env["REGION"]),
-		Endpoint: aws.String(env["ENDPOINT"]),
-	})))
-	q, err := New(s, env["SQS_TEST_QUEUE"])
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return q
-}
-
 type sqsMock struct{}
 
 func (s sqsMock) GetQueueUrl(*sqs.GetQueueUrlInput) (*sqs.GetQueueUrlOutput, error) {
@@ -44,6 +30,20 @@ func (s sqsMock) SendMessage(*sqs.SendMessageInput) (*sqs.SendMessageOutput, err
 }
 func (s sqsMock) DeleteMessage(*sqs.DeleteMessageInput) (*sqs.DeleteMessageOutput, error) {
 	return nil, nil
+}
+
+func setup() *Queue {
+	env, _ := loadConf("../../scripts/env/")
+	s := sqs.New(session.Must(session.NewSession(&aws.Config{
+		Region:   aws.String(env["REGION"]),
+		Endpoint: aws.String(env["ENDPOINT"]),
+	})))
+	q, err := New(s, env["SQS_TEST_QUEUE"])
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return q
 }
 
 func TestNewWithError(t *testing.T) {
