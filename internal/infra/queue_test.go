@@ -73,7 +73,7 @@ func TestMaxNumberOfMessages(t *testing.T) {
 }
 
 func TestReceiveMessageError(t *testing.T) {
-	f := func (c *sqs.ReceiveMessageInput){
+	f := func(c *sqs.ReceiveMessageInput) {
 
 	}
 	q := &Queue{
