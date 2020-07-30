@@ -63,15 +63,23 @@ func TestSendMessageIntegration(t *testing.T) {
 }
 
 func TestReceiveMessageError(t *testing.T) {
+	f := func (c *sqs.ReceiveMessageInput){
+
+	}
 	q := &Queue{
 		url: nil,
 		sqs: sqsMock{},
 	}
 
-	_, err := q.receiveMessage([]receiveMessageInput{}...)
+	_, err := q.receiveMessage(f)
 	if err == nil {
 		assert.Fail(t, failMsg)
 	}
+}
+
+func TestMessageAttributes(t *testing.T) {
+	f := MessageAttributes(map[string]interface{}{})
+	f(nil)
 }
 
 func TestReceiveMessageIntegration(t *testing.T) {
