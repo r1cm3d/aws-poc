@@ -46,6 +46,14 @@ func setup() *Queue {
 	return q
 }
 
+func mockQueue() *Queue {
+	return &Queue{
+		url: nil,
+		sqs: sqsMock{},
+	}
+
+}
+
 func TestNewWithError(t *testing.T) {
 	_, err := New(sqsMock{}, "queueName")
 	if err == nil {
@@ -73,10 +81,7 @@ func TestMaxNumberOfMessages(t *testing.T) {
 }
 
 func TestDeleteMessage(t *testing.T) {
-	q := &Queue{
-		url: nil,
-		sqs: sqsMock{},
-	}
+	q := mockQueue()
 	s := "aReceiptHandle"
 
 	err := q.deleteMessage(&s)
@@ -87,13 +92,8 @@ func TestDeleteMessage(t *testing.T) {
 }
 
 func TestReceiveMessageError(t *testing.T) {
-	f := func(c *sqs.ReceiveMessageInput) {
-
-	}
-	q := &Queue{
-		url: nil,
-		sqs: sqsMock{},
-	}
+	f := func(c *sqs.ReceiveMessageInput) {}
+	q := mockQueue()
 
 	_, err := q.receiveMessage(f)
 
