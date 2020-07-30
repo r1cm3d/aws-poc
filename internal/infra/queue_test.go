@@ -72,6 +72,18 @@ func TestMaxNumberOfMessages(t *testing.T) {
 	assert.Equal(t, aws.Int64(exp), in.MaxNumberOfMessages)
 }
 
+func TestDeleteMessage(t *testing.T) {
+	q := &Queue{
+		url: nil,
+		sqs: sqsMock{},
+	}
+	s := "aReceiptHandle"
+
+	err := q.deleteMessage(&s); if err != nil {
+		assert.Fail(t, failMsg)
+	}
+}
+
 func TestReceiveMessageError(t *testing.T) {
 	f := func(c *sqs.ReceiveMessageInput) {
 
