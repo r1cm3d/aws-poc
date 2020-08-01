@@ -62,6 +62,14 @@ func TestChangeMessageVisibility(t *testing.T) {
 	}
 }
 
+func TestMessageAttributeValue_Panic(t *testing.T) {
+	panicFunc := func() {
+		MessageAttributeValue(rune(1))
+	}
+
+	assert.Panics(t, panicFunc, failMsg)
+}
+
 func TestNewWithError(t *testing.T) {
 	_, err := New(sqsMock{}, "queueName")
 	if err == nil {
