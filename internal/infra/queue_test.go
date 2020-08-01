@@ -54,6 +54,14 @@ func mockQueue() *Queue {
 
 }
 
+func TestChangeMessageVisibility(t *testing.T) {
+	receiptHandle, visibilityTimeout, q := "receiptHandle", int64(10), mockQueue()
+
+	if err := q.ChangeMessageVisibility(&receiptHandle, visibilityTimeout); err != nil {
+		assert.Fail(t, failMsg)
+	}
+}
+
 func TestNewWithError(t *testing.T) {
 	_, err := New(sqsMock{}, "queueName")
 	if err == nil {
