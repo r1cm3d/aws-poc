@@ -73,7 +73,7 @@ func MessageAttributes(attrs map[string]interface{}) SendMessageInput {
 	}
 }
 
-// MessageAttributeValue returns a appropriate sqs.MessageAttributeValue by type assersion of v.
+// MessageAttributeValue returns a appropriate sqs.MessageAttributeValue by type assertion of v.
 // Types except string, []byte, int64 and int cause panicking.
 func MessageAttributeValue(v interface{}) *sqs.MessageAttributeValue {
 	switch vv := v.(type) {
