@@ -107,15 +107,6 @@ func TestNewWithError(t *testing.T) {
 	}
 }
 
-func TestSendMessageIntegration(t *testing.T) {
-	skipShort(t)
-	q := setup()
-
-	sendMsg(q, "Payload")
-
-	log.Print("successed!")
-}
-
 func TestMaxNumberOfMessages(t *testing.T) {
 	exp := int64(1)
 	f := maxNumberOfMessages(exp)
@@ -163,6 +154,15 @@ func TestReceiveMessageIntegration(t *testing.T) {
 			assert.NotZero(t, msg.Body)
 		}
 	}
+}
+
+func TestSendMessageIntegration(t *testing.T) {
+	skipShort(t)
+	q := setup()
+
+	sendMsg(q, "Payload")
+
+	log.Print("successed!")
 }
 
 func sendMsg(queue *Queue, body string) {
