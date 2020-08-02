@@ -73,15 +73,11 @@ func TestMessageAttributeValue_Panic(t *testing.T) {
 }
 
 func TestMessageAttributeValue(t *testing.T) {
-	s, b, i64, i := "string", [2]byte{0, 2}, int64(666), 42
+	s, i64, i := "string", int64(666), 42
 	m := map[interface{}]interface{}{
 		s: &sqs.MessageAttributeValue{
 			DataType:    aws.String(dataTypeString),
 			StringValue: aws.String(s),
-		},
-		b: sqs.MessageAttributeValue{
-			DataType:    aws.String(dataTypeBinary),
-			BinaryValue: b[:],
 		},
 		i64: &sqs.MessageAttributeValue{
 			DataType:    aws.String(dataTypeNumber),
@@ -92,12 +88,16 @@ func TestMessageAttributeValue(t *testing.T) {
 			StringValue: aws.String(strconv.FormatInt(int64(i), 10)),
 		},
 	}
+	b := &sqs.MessageAttributeValue{
+		DataType:    aws.String(dataTypeBinary),
+		BinaryValue: []byte{0},
+	}
 
 	for in, out := range m {
 		act := MessageAttributeValue(in)
-
 		assert.True(t, reflect.DeepEqual(act, out))
 	}
+	assert.True(t, reflect.DeepEqual(b, MessageAttributeValue([]byte{0})))
 }
 
 func TestNewWithError(t *testing.T) {
