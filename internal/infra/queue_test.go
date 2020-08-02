@@ -162,7 +162,7 @@ func TestSendMessageIntegration(t *testing.T) {
 
 	sendMsg(q, "Payload")
 
-	log.Print("succeeded!")
+	t.Log("succeeded!")
 }
 
 func sendMsg(queue *Queue, body string) {
