@@ -7,6 +7,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/stretchr/testify/assert"
 	"log"
+	"reflect"
+	"strconv"
 	"testing"
 )
 
@@ -68,6 +70,34 @@ func TestMessageAttributeValue_Panic(t *testing.T) {
 	}
 
 	assert.Panics(t, panicFunc, failMsg)
+}
+
+func TestMessageAttributeValue(t *testing.T) {
+	s, b, i64, i := "string", [2]byte{0, 2}, int64(666), 42
+	m := map[interface{}]interface{}{
+		s: &sqs.MessageAttributeValue{
+			DataType:    aws.String(dataTypeString),
+			StringValue: aws.String(s),
+		},
+		b: sqs.MessageAttributeValue{
+			DataType:    aws.String(dataTypeBinary),
+			BinaryValue: b[:],
+		},
+		i64: &sqs.MessageAttributeValue{
+			DataType:    aws.String(dataTypeNumber),
+			StringValue: aws.String(strconv.FormatInt(i64, 10)),
+		},
+		i: &sqs.MessageAttributeValue{
+			DataType:    aws.String(dataTypeNumber),
+			StringValue: aws.String(strconv.FormatInt(int64(i), 10)),
+		},
+	}
+
+	for in, out := range m {
+		act := MessageAttributeValue(in)
+
+		assert.True(t, reflect.DeepEqual(act, out))
+	}
 }
 
 func TestNewWithError(t *testing.T) {
