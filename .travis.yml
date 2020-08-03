@@ -5,6 +5,7 @@ env:
 
 go:
   - "1.14"
+  - tip
 
 script:
   - go test -race -coverprofile=coverage.txt -covermode=atomic
