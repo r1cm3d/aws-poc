@@ -40,8 +40,12 @@ integration-test: run-dep build
 test: unit-test integration-test
 	@echo "\nRunning tests\n"
 
+codecov: run-dep
+	@echo "\nRunning Codecov\n"
+
 run: run-dep build run-local
 	@echo "\nRunning locally"
+	@go test -race -coverprofile=coverage.txt -covermode=atomic -cover ./...
 
 run-local:
 	@echo "\nRunning without building it"
