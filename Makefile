@@ -30,8 +30,8 @@ unit-test: build
 
 run-dep: clean
 	@echo "\nStarting localstack container and creating AWS local resources\n"
-	@docker-compose up -d #&& \
-	#cd scripts && bash init-aws-rs.sh
+	@docker-compose up -d && \
+	cd scripts && bash init-aws-rs.sh
 
 integration-test: run-dep build
 	@echo "\nRunning integration tests\n"
