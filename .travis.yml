@@ -2,6 +2,9 @@ language: go
 
 env:
   - DOCKER_COMPOSE_VERSION=1.4.2
+  - REGION="us-east-1"
+  - ENDPOINT="http://localhost:4566"
+  - BUCKET="balde"
 
 go:
   - "1.14"
