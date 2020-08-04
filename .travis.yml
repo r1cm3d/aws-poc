@@ -7,7 +7,7 @@ go:
   - "1.14"
 
 script:
-  - make run-dep
+  - docker-compose up -d
   - make codecov
 
 after_success:
