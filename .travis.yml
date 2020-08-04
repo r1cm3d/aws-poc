@@ -1,7 +1,7 @@
 language: go
 
 env:
-  - DOCKER_COMPOSE_VERSION=1.25.5 AWS_ACCESS_KEY="someKey" AWS_SECRET_KEY="secretKey" AWS_REGIO="sa-east-1"
+  - DOCKER_COMPOSE_VERSION=1.25.5
 
 go:
   - "1.14"
