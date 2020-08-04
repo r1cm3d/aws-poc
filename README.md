@@ -1,6 +1,7 @@
 # aws-poc 
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/ricardomedeirosdacostajunior/aws-poc)](https://goreportcard.com/report/github.com/ricardomedeirosdacostajunior/aws-poc)
+![Codecov](https://img.shields.io/codecov/c/github/ricardomedeirosdacostajunior/aws-poc)
 ![Travis (.org)](https://img.shields.io/travis/ricardomedeirosdacostajunior/aws-poc)
 ![GitHub](https://img.shields.io/github/license/ricardomedeirosdacostajunior/aws-poc)
 
