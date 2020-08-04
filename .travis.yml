@@ -1,7 +1,7 @@
 language: go
 
 env:
-  - DOCKER_COMPOSE_VERSION=1.4.2
+  - DOCKER_COMPOSE_VERSION=1.4.2 AWS_ACCESS_KEY="someKey" AWS_SECRET_KEY="secretKey" AWS_REGIO="sa-east-1"
 
 go:
   - "1.14"
@@ -20,4 +20,3 @@ before_install:
   - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
   - unzip awscliv2.zip
   - sudo ./aws/install
-  - mkdir -p $HOME/.aws && touch $HOME/.aws/credentials
