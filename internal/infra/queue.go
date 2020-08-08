@@ -23,6 +23,8 @@ type Queue struct {
 // sqs.SendMessageInput.
 type SendMessageInput func(req *sqs.SendMessageInput)
 
+type receiveMessageInput func(req *sqs.ReceiveMessageInput)
+
 type sqsAdapter interface {
 	GetQueueUrl(*sqs.GetQueueUrlInput) (*sqs.GetQueueUrlOutput, error)
 	ReceiveMessage(*sqs.ReceiveMessageInput) (*sqs.ReceiveMessageOutput, error)
@@ -31,7 +33,7 @@ type sqsAdapter interface {
 	DeleteMessage(*sqs.DeleteMessageInput) (*sqs.DeleteMessageOutput, error)
 }
 
-// New initializes Queue with queue name name.
+// New initializes Queue with queue name.
 func New(s sqsAdapter, name string) (*Queue, error) {
 	u, err := getQueueURL(s, name)
 	if err != nil {
@@ -115,8 +117,6 @@ func (q *Queue) SendMessage(body string, opts ...SendMessageInput) (*sqs.SendMes
 
 	return q.sqs.SendMessage(req)
 }
-
-type receiveMessageInput func(req *sqs.ReceiveMessageInput)
 
 func maxNumberOfMessages(n int64) receiveMessageInput {
 	return func(req *sqs.ReceiveMessageInput) {

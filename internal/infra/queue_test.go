@@ -7,12 +7,16 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/stretchr/testify/assert"
 	"log"
+	"os"
 	"reflect"
 	"strconv"
 	"testing"
 )
 
-const failMsg = "an error should be return"
+const (
+	failMsg = "an error should be return"
+	queueName = "testQueue"
+)
 
 var mockedError = errors.New("mocked error")
 
@@ -34,13 +38,24 @@ func (s sqsMock) DeleteMessage(*sqs.DeleteMessageInput) (*sqs.DeleteMessageOutpu
 	return nil, nil
 }
 
-func setup() *Queue {
+func newSession() *sqs.SQS {
 	env, _ := loadConf("../../scripts/env/")
-	s := sqs.New(session.Must(session.NewSession(&aws.Config{
+	return sqs.New(session.Must(session.NewSession(&aws.Config{
 		Region:   aws.String(env["REGION"]),
 		Endpoint: aws.String(env["ENDPOINT"]),
 	})))
-	q, err := New(s, env["SQS_TEST_QUEUE"])
+}
+
+func setup() *Queue {
+	s := newSession()
+	_, err := s.CreateQueue(&sqs.CreateQueueInput{
+		QueueName: aws.String(queueName),
+		Attributes: map[string]*string{
+			"DelaySeconds":           aws.String("60"),
+			"MessageRetentionPeriod": aws.String("86400"),
+		},
+	})
+	q, err := New(s, queueName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -48,12 +63,29 @@ func setup() *Queue {
 	return q
 }
 
+func teardown() {
+	s := newSession()
+	url, _ := getQueueURL(s, queueName)
+	_, err := s.DeleteQueue(&sqs.DeleteQueueInput{
+		QueueUrl: url,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func mockQueue() *Queue {
 	return &Queue{
 		url: nil,
 		sqs: sqsMock{},
 	}
+}
 
+func TestMain(m *testing.M) {
+	setup()
+	code := m.Run()
+	teardown()
+	os.Exit(code)
 }
 
 func TestChangeMessageVisibility(t *testing.T) {
