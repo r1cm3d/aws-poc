@@ -7,14 +7,13 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/stretchr/testify/assert"
 	"log"
-	"os"
 	"reflect"
 	"strconv"
 	"testing"
 )
 
 const (
-	failMsg = "an error should be return"
+	failMsg   = "an error should be return"
 	queueName = "testQueue"
 )
 
@@ -79,13 +78,6 @@ func mockQueue() *Queue {
 		url: nil,
 		sqs: sqsMock{},
 	}
-}
-
-func TestMain(m *testing.M) {
-	setup()
-	code := m.Run()
-	teardown()
-	os.Exit(code)
 }
 
 func TestChangeMessageVisibility(t *testing.T) {
@@ -179,6 +171,7 @@ func TestMessageAttributes(t *testing.T) {
 func TestReceiveMessageIntegration(t *testing.T) {
 	skipShort(t)
 	q := setup()
+	defer teardown()
 	sendMsg(q, "Message Body")
 
 	if msg, _ := q.receiveMessage(); msg != nil {
@@ -191,6 +184,7 @@ func TestReceiveMessageIntegration(t *testing.T) {
 func TestSendMessageIntegration(t *testing.T) {
 	skipShort(t)
 	q := setup()
+	defer teardown()
 
 	sendMsg(q, "Payload")
 
