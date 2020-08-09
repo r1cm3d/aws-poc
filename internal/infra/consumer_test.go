@@ -8,9 +8,9 @@ import (
 	"testing"
 )
 
-type errHandler struct {}
-type okHandler struct {}
-type fakeQueue struct {}
+type errHandler struct{}
+type okHandler struct{}
+type fakeQueue struct{}
 
 var err = errors.New("sambarilove")
 
@@ -24,6 +24,10 @@ func (m okHandler) HandleMessage(_ *sqs.Message) error {
 
 func (q fakeQueue) deleteMessage(_ *string) error {
 	return nil
+}
+
+func (q fakeQueue) receiveMessage(_ ...receiveMessageInput) ([]*sqs.Message, error) {
+	return nil, err
 }
 
 func TestHandleMessage_Error(t *testing.T) {
@@ -40,4 +44,12 @@ func TestHandleMessage(t *testing.T) {
 	act := handleMessage(q, m, h)
 
 	assert.True(t, act == nil)
+}
+
+func TestStart(t *testing.T) {
+	q, h, d := &fakeQueue{}, okHandler{}, make(chan bool)
+
+	go Start(q, h, d)
+
+	assert.True(t, <-d)
 }

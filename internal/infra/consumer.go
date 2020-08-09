@@ -8,7 +8,8 @@ import (
 
 // Handle is responsible to deal with message
 type Handle func(msg *sqs.Message) error
-type eraser interface{
+type consumer interface {
+	receiveMessage(opts ...receiveMessageInput) ([]*sqs.Message, error)
 	deleteMessage(receiptHandle *string) error
 }
 
@@ -23,20 +24,21 @@ type Handler interface {
 }
 
 // Start starts a worker giving a Queue and a Handler
-func Start(q *Queue, h Handler) {
+func Start(c consumer, h Handler, done chan bool) {
 	for {
-		messages, err := q.receiveMessage(maxNumberOfMessages(10))
+		messages, err := c.receiveMessage(maxNumberOfMessages(10))
 		if err != nil {
 			log.Println(err)
+			done <- true
 			continue
 		}
 		if len(messages) > 0 {
-			run(q, h, messages)
+			run(c, h, messages)
 		}
 	}
 }
 
-func run(q *Queue, h Handler, messages []*sqs.Message) {
+func run(c consumer, h Handler, messages []*sqs.Message) {
 	numMessages := len(messages)
 
 	var wg sync.WaitGroup
@@ -44,7 +46,7 @@ func run(q *Queue, h Handler, messages []*sqs.Message) {
 	for i := range messages {
 		go func(m *sqs.Message) {
 			defer wg.Done()
-			if err := handleMessage(q, m, h); err != nil {
+			if err := handleMessage(c, m, h); err != nil {
 				log.Println(err)
 			}
 		}(messages[i])
@@ -53,11 +55,11 @@ func run(q *Queue, h Handler, messages []*sqs.Message) {
 	wg.Wait()
 }
 
-func handleMessage(e eraser, m *sqs.Message, h Handler) error {
+func handleMessage(c consumer, m *sqs.Message, h Handler) error {
 	var err error
 	err = h.HandleMessage(m)
 	if err != nil {
 		return err
 	}
-	return e.deleteMessage(m.ReceiptHandle)
+	return c.deleteMessage(m.ReceiptHandle)
 }
