@@ -8,6 +8,9 @@ import (
 
 // Handle is responsible to deal with message
 type Handle func(msg *sqs.Message) error
+type eraser interface{
+	deleteMessage(receiptHandle *string) error
+}
 
 // HandleMessage delegates message handling to Handle
 func (f Handle) HandleMessage(msg *sqs.Message) error {
@@ -50,11 +53,11 @@ func run(q *Queue, h Handler, messages []*sqs.Message) {
 	wg.Wait()
 }
 
-func handleMessage(q *Queue, m *sqs.Message, h Handler) error {
+func handleMessage(e eraser, m *sqs.Message, h Handler) error {
 	var err error
 	err = h.HandleMessage(m)
 	if err != nil {
 		return err
 	}
-	return q.deleteMessage(m.ReceiptHandle)
+	return e.deleteMessage(m.ReceiptHandle)
 }
