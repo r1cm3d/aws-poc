@@ -24,7 +24,7 @@ type poller interface {
 func Start(w worker, errors, success chan int) {
 	for {
 		var e, s int
-		messages, err := w.consumer.receiveMessage(maxNumberOfMessages(10))
+		messages, err := w.receiveMessage(maxNumberOfMessages(10))
 		if err != nil {
 			log.Println(err)
 			e++
@@ -32,7 +32,7 @@ func Start(w worker, errors, success chan int) {
 			continue
 		}
 		if len(messages) > 0 {
-			w.poller.run(w, w, messages)
+			w.run(w, w, messages)
 			s++
 			success <- s
 		}
