@@ -6,9 +6,9 @@ import (
 )
 
 type worker struct {
-	handler  handler
-	consumer consumer
-	poller   poller
+	handler
+	consumer
+	poller
 }
 type handler interface {
 	handleMessage(msg *sqs.Message) error
@@ -32,7 +32,7 @@ func Start(w worker, errors, success chan int) {
 			continue
 		}
 		if len(messages) > 0 {
-			w.poller.run(w.consumer, w.handler, messages)
+			w.poller.run(w, w, messages)
 			s++
 			success <- s
 		}
