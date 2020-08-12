@@ -8,8 +8,8 @@ import (
 	"testing"
 )
 
-type errHandler struct{}
-type okHandler struct{}
+type errHandler func(*sqs.Message) error
+type okHandler func(*sqs.Message) error
 type fakeErrQueue struct{}
 type fakeOkQueue struct{}
 type fakePoller struct{}
