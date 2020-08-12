@@ -1,4 +1,4 @@
-package infra
+package sqs
 
 import (
 	"github.com/stretchr/testify/assert"

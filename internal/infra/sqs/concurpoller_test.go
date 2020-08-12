@@ -1,4 +1,4 @@
-package infra
+package sqs
 
 import (
 	"github.com/aws/aws-sdk-go/aws"

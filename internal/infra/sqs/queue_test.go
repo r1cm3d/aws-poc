@@ -1,4 +1,4 @@
-package infra
+package sqs
 
 import (
 	"errors"
@@ -38,7 +38,7 @@ func (s sqsMock) DeleteMessage(*sqs.DeleteMessageInput) (*sqs.DeleteMessageOutpu
 }
 
 func newSession() *sqs.SQS {
-	env, _ := loadConf("../../scripts/env/")
+	env, _ := loadConf("../../../scripts/env/")
 	return sqs.New(session.Must(session.NewSession(&aws.Config{
 		Region:   aws.String(env["REGION"]),
 		Endpoint: aws.String(env["ENDPOINT"]),
