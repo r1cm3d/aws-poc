@@ -54,6 +54,9 @@ func setup() *Queue {
 			"MessageRetentionPeriod": aws.String("86400"),
 		},
 	})
+	if err != nil {
+		panic(err)
+	}
 	q, err := New(s, queueName)
 	if err != nil {
 		log.Fatal(err)
