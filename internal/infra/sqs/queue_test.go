@@ -17,15 +17,15 @@ const (
 	queueName = "testQueue"
 )
 
-var mockedError = errors.New("mocked error")
+var errMock = errors.New("mocked error")
 
 type sqsMock struct{}
 
 func (s sqsMock) GetQueueUrl(*sqs.GetQueueUrlInput) (*sqs.GetQueueUrlOutput, error) {
-	return nil, mockedError
+	return nil, errMock
 }
 func (s sqsMock) ReceiveMessage(*sqs.ReceiveMessageInput) (*sqs.ReceiveMessageOutput, error) {
-	return nil, mockedError
+	return nil, errMock
 }
 func (s sqsMock) ChangeMessageVisibility(*sqs.ChangeMessageVisibilityInput) (*sqs.ChangeMessageVisibilityOutput, error) {
 	return nil, nil
