@@ -21,6 +21,7 @@ type poller interface {
 	run(consumer, handler, []*sqs.Message)
 }
 
+// Start starts worker passed as argument and errors and success through channels
 func Start(w worker, errors, success chan int) {
 	for {
 		var e, s int
