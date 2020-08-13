@@ -5,7 +5,7 @@
 ![Codecov](https://img.shields.io/codecov/c/github/ricardomedeirosdacostajunior/aws-poc)
 ![Travis (.org)](https://img.shields.io/travis/ricardomedeirosdacostajunior/aws-poc)
 ![GitHub](https://img.shields.io/github/license/ricardomedeirosdacostajunior/aws-poc)
-![GitHub commit activity](https://img.shields.io/github/commit-activity/w/ricardomedeirosdacostajunior/aws-poc)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/ricardomedeirosdacostajunior/aws-poc)
 [![GitHub issues](https://img.shields.io/github/issues/ricardomedeirosdacostajunior/aws-poc?color=green)](https://github.com/ricardomedeirosdacostajunior/aws-poc/issues?q=is%3Aopen+is%3Aissue)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/ricardomedeirosdacostajunior/aws-poc?color=red)](https://github.com/ricardomedeirosdacostajunior/aws-poc/issues?q=is%3Aissue+is%3Aclosed)
 [![Twitter Follow](https://img.shields.io/twitter/follow/RMedeirosCosta?style=social)](https://twitter.com/RMedeirosCosta)
