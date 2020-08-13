@@ -1,9 +1,14 @@
 # aws-poc 
 
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/ricardomedeirosdacostajunior/aws-poc)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ricardomedeirosdacostajunior/aws-poc)](https://goreportcard.com/report/github.com/ricardomedeirosdacostajunior/aws-poc)
 ![Codecov](https://img.shields.io/codecov/c/github/ricardomedeirosdacostajunior/aws-poc)
 ![Travis (.org)](https://img.shields.io/travis/ricardomedeirosdacostajunior/aws-poc)
 ![GitHub](https://img.shields.io/github/license/ricardomedeirosdacostajunior/aws-poc)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/w/ricardomedeirosdacostajunior/aws-poc)
+[![GitHub issues](https://img.shields.io/github/issues/ricardomedeirosdacostajunior/aws-poc?color=green)](https://github.com/ricardomedeirosdacostajunior/aws-poc/issues?q=is%3Aopen+is%3Aissue)
+[![GitHub closed issues](https://img.shields.io/github/issues-closed/ricardomedeirosdacostajunior/aws-poc?color=red)](https://github.com/ricardomedeirosdacostajunior/aws-poc/issues?q=is%3Aissue+is%3Aclosed)
+[![Twitter Follow](https://img.shields.io/twitter/follow/RMedeirosCosta?style=social)](https://twitter.com/RMedeirosCosta)
 
 **TL;DR:**
 ```console
@@ -11,7 +16,6 @@ make run
 ```
 
 ## Prerequisites
-[![Go](https://img.shields.io/badge/Go-v1.14.2-blue)](https://golang.org/)
 [![Docker](https://img.shields.io/badge/Docker-19.03.9-blue)](https://www.docker.com/)
 [![Docker-compose](https://img.shields.io/badge/Docker--compose-1.25.5-blue)](https://github.com/docker/compose/releases)
 [![GNU Make](https://img.shields.io/badge/GNU%20Make-4.2.1-lightgrey)](https://www.gnu.org/software/make/)
