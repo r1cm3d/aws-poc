@@ -17,15 +17,15 @@ type Item struct {
 type errMarshal struct{}
 type errPutItem struct{}
 
-func (m errMarshal) MarshalMap(_ interface{}) (map[string]*dynamodb.AttributeValue, error) {
+func (m errMarshal) marshalMap(_ interface{}) (map[string]*dynamodb.AttributeValue, error) {
 	return nil, errors.New("error on marshalMap")
 }
 
-func (m errPutItem) MarshalMap(_ interface{}) (map[string]*dynamodb.AttributeValue, error) {
+func (m errPutItem) marshalMap(_ interface{}) (map[string]*dynamodb.AttributeValue, error) {
 	return nil, nil
 }
 
-func (m errPutItem) PutItem(_ *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
+func (m errPutItem) putItem(_ *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
 	return nil, errors.New("error on put item")
 }
 
