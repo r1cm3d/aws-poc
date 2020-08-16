@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+const tableName = "MasterChargebackError"
+
 func setup() {
 	env, _ := infra.LoadDefaultConf()
 	sess := session.Must(session.NewSession(&aws.Config{
@@ -19,7 +21,7 @@ func setup() {
 	}))
 	svc := dynamodb.New(sess)
 
-	tableName := "Movies"
+	tableName := tableName
 
 	input := &dynamodb.CreateTableInput{
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
@@ -76,7 +78,7 @@ func teardown() {
 	}))
 	svc := dynamodb.New(sess)
 
-	tableName := "Movies"
+	tableName := tableName
 
 	input := &dynamodb.DeleteTableInput{
 		TableName: aws.String(tableName),
