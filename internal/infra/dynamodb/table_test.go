@@ -11,15 +11,15 @@ import (
 	"time"
 )
 
-const tableName = "MasterChargebackError"
-
 var (
-	disputeId    = aws.String("dispute_id")
-	timestamp    = aws.String("timestamp")
-	hashKeyType  = aws.String("HASH")
-	rangeKeyType = aws.String("RANGE")
-	numberType   = aws.String("N")
-	stringType   = aws.String("S")
+	tableName     = aws.String("MasterChargebackError")
+	disputeId     = aws.String("dispute_id")
+	timestamp     = aws.String("timestamp")
+	hashKeyType   = aws.String("HASH")
+	rangeKeyType  = aws.String("RANGE")
+	numberType    = aws.String("N")
+	stringType    = aws.String("S")
+	payPerRequest = aws.String("PAY_PER_REQUEST")
 )
 
 func setup() {
@@ -53,11 +53,8 @@ func setup() {
 				KeyType:       rangeKeyType,
 			},
 		},
-		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
-			ReadCapacityUnits:  aws.Int64(10),
-			WriteCapacityUnits: aws.Int64(10),
-		},
-		TableName: aws.String(tableName),
+		BillingMode: payPerRequest,
+		TableName:   tableName,
 	}
 
 	_, err := svc.CreateTable(input)
@@ -90,7 +87,7 @@ func teardown() {
 	tableName := tableName
 
 	input := &dynamodb.DeleteTableInput{
-		TableName: aws.String(tableName),
+		TableName: tableName,
 	}
 	_, err := svc.DeleteTable(input)
 	if err != nil {
