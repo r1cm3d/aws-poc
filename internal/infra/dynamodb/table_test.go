@@ -5,7 +5,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"log"
 	"testing"
-	"time"
 )
 
 func TestPut(t *testing.T) {
@@ -53,8 +52,6 @@ func setup() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-
-	time.Sleep(5 * time.Second)
 
 	fmt.Println("created the table", tableName)
 }
