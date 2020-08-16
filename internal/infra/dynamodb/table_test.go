@@ -30,8 +30,6 @@ func setup() {
 	}))
 	svc := dynamodb.New(sess)
 
-	tableName := tableName
-
 	input := &dynamodb.CreateTableInput{
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
 			{
@@ -59,12 +57,10 @@ func setup() {
 
 	_, err := svc.CreateTable(input)
 	if err != nil {
-		fmt.Println("Got error calling CreateTable:")
-		fmt.Println(err.Error())
-		log.Fatal(err)
+		log.Fatal(err.Error())
 	}
 
-	fmt.Println("Created the table", tableName)
+	fmt.Println("created the table", tableName)
 }
 
 func TestCreateAndDeleteIntegration(t *testing.T) {
@@ -84,23 +80,19 @@ func teardown() {
 	}))
 	svc := dynamodb.New(sess)
 
-	tableName := tableName
-
 	input := &dynamodb.DeleteTableInput{
 		TableName: tableName,
 	}
 	_, err := svc.DeleteTable(input)
 	if err != nil {
-		fmt.Println("Got error calling CreateTable:")
-		fmt.Println(err.Error())
-		log.Fatal(err)
+		log.Fatal(err.Error())
 	}
 
-	fmt.Println("Deleted the table", tableName)
+	fmt.Println("deleted the table", tableName)
 }
 
 func skipShort(t *testing.T) {
 	if testing.Short() {
-		t.Skip("Skipping integration test")
+		t.Skip("skipping integration test")
 	}
 }
