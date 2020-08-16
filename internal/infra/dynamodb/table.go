@@ -8,11 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
-type Item struct {
-	DisputeId int
-	Timestamp string
-}
-
 var (
 	tableName     = aws.String("MasterChargebackError")
 	disputeId     = aws.String("DisputeId")
@@ -24,6 +19,26 @@ var (
 	payPerRequest = aws.String("PAY_PER_REQUEST")
 )
 
+type marshaller interface {
+	MarshalMap(in interface{}) (map[string]*dynamodb.AttributeValue, error)
+}
+
+type awsMarshaller struct{}
+
+func (m awsMarshaller) MarshalMap(in interface{}) (map[string]*dynamodb.AttributeValue, error) {
+	return dynamodbattribute.MarshalMap(in)
+}
+
+type table struct {
+	marshaller
+}
+
+func newTable() table {
+	return table{
+		awsMarshaller{},
+	}
+}
+
 func svc() (svc *dynamodb.DynamoDB) {
 	env, _ := infra.LoadDefaultConf()
 	sess := session.Must(session.NewSession(&aws.Config{
@@ -34,10 +49,10 @@ func svc() (svc *dynamodb.DynamoDB) {
 	return
 }
 
-func put(i interface{}) error {
+func (t table) put(i interface{}) error {
 	svc := svc()
 
-	av, err := dynamodbattribute.MarshalMap(i)
+	av, err := t.MarshalMap(i)
 	if err != nil {
 		return err
 	}

@@ -8,17 +8,22 @@ import (
 	"testing"
 )
 
+type Item struct {
+	DisputeId int
+	Timestamp string
+}
+
 func TestPut(t *testing.T) {
 	skipShort(t)
 	setup()
 	defer teardown()
-
 	i := Item{
 		DisputeId: 666,
 		Timestamp: "2020-04-17T17:19:19.831Z",
 	}
+	table := newTable()
 
-	err := put(i)
+	err := table.put(i)
 	assert.Nil(t, err)
 }
 
