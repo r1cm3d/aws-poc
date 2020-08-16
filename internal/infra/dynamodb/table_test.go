@@ -22,13 +22,27 @@ var (
 	payPerRequest = aws.String("PAY_PER_REQUEST")
 )
 
-func setup() {
+func TestCreateAndDeleteIntegration(t *testing.T) {
+	skipShort(t)
+	setup()
+
+	time.Sleep(5 * time.Second)
+
+	teardown()
+}
+
+func svc() (svc *dynamodb.DynamoDB) {
 	env, _ := infra.LoadDefaultConf()
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region:   aws.String(env["REGION"]),
 		Endpoint: aws.String(env["ENDPOINT"]),
 	}))
-	svc := dynamodb.New(sess)
+	svc = dynamodb.New(sess)
+	return
+}
+
+func setup() {
+	svc := svc()
 
 	input := &dynamodb.CreateTableInput{
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
@@ -63,22 +77,8 @@ func setup() {
 	fmt.Println("created the table", tableName)
 }
 
-func TestCreateAndDeleteIntegration(t *testing.T) {
-	skipShort(t)
-	setup()
-
-	time.Sleep(5 * time.Second)
-
-	teardown()
-}
-
 func teardown() {
-	env, _ := infra.LoadDefaultConf()
-	sess := session.Must(session.NewSession(&aws.Config{
-		Region:   aws.String(env["REGION"]),
-		Endpoint: aws.String(env["ENDPOINT"]),
-	}))
-	svc := dynamodb.New(sess)
+	svc := svc()
 
 	input := &dynamodb.DeleteTableInput{
 		TableName: tableName,
