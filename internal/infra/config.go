@@ -1,4 +1,4 @@
-package sqs
+package infra
 
 import (
 	"bufio"
@@ -8,7 +8,8 @@ import (
 	"strings"
 )
 
-func loadConf(dir string) (map[string]string, error) {
+// LoadConf load env files according dir string passed as argument and set them into a map
+func LoadConf(dir string) (map[string]string, error) {
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return nil, err

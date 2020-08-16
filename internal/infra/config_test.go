@@ -1,4 +1,4 @@
-package sqs
+package infra
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -44,7 +44,7 @@ func TestLoadFileNotFound(t *testing.T) {
 }
 
 func TestLoadConfigNotFound(t *testing.T) {
-	if _, err := loadConf("unreachableDirectory"); err == nil {
+	if _, err := LoadConf("unreachableDirectory"); err == nil {
 		assert.Fail(t, "expected an error when directory not exists")
 	}
 }
