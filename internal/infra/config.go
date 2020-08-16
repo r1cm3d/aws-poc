@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+const defaultConfigDir = "../../../scripts/env/"
+
 // LoadConf load env files according dir string passed as argument and set them into a map
 func LoadConf(dir string) (map[string]string, error) {
 	files, err := ioutil.ReadDir(dir)
@@ -22,6 +24,11 @@ func LoadConf(dir string) (map[string]string, error) {
 	}
 
 	return merge(configs...), nil
+}
+
+// LoadDefaultConf load env files according default configuration directory
+func LoadDefaultConf() (map[string]string, error) {
+	return LoadConf(defaultConfigDir)
 }
 
 func merge(ms ...map[string]string) map[string]string {

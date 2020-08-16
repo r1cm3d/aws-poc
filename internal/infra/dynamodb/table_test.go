@@ -12,7 +12,7 @@ import (
 )
 
 func setup() {
-	env, _ := infra.LoadConf("../../../scripts/env/")
+	env, _ := infra.LoadDefaultConf()
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region:   aws.String(env["REGION"]),
 		Endpoint: aws.String(env["ENDPOINT"]),
@@ -68,9 +68,8 @@ func TestCreateAndDeleteIntegration(t *testing.T) {
 	teardown()
 }
 
-
 func teardown() {
-	env, _ := infra.LoadConf("../../../scripts/env/")
+	env, _ := infra.LoadDefaultConf()
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region:   aws.String(env["REGION"]),
 		Endpoint: aws.String(env["ENDPOINT"]),
