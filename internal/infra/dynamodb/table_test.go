@@ -1,44 +1,24 @@
 package dynamodb
 
 import (
-	"aws-poc/internal/infra"
 	"fmt"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"log"
 	"testing"
 	"time"
 )
 
-var (
-	tableName     = aws.String("MasterChargebackError")
-	disputeId     = aws.String("dispute_id")
-	timestamp     = aws.String("timestamp")
-	hashKeyType   = aws.String("HASH")
-	rangeKeyType  = aws.String("RANGE")
-	numberType    = aws.String("N")
-	stringType    = aws.String("S")
-	payPerRequest = aws.String("PAY_PER_REQUEST")
-)
-
-func TestCreateAndDeleteIntegration(t *testing.T) {
+func TestPut(t *testing.T) {
 	skipShort(t)
 	setup()
+	defer teardown()
 
-	time.Sleep(5 * time.Second)
+	i := Item{
+		DisputeId: 666,
+		Timestamp: "2020-04-17T17:19:19.831Z",
+	}
 
-	teardown()
-}
-
-func svc() (svc *dynamodb.DynamoDB) {
-	env, _ := infra.LoadDefaultConf()
-	sess := session.Must(session.NewSession(&aws.Config{
-		Region:   aws.String(env["REGION"]),
-		Endpoint: aws.String(env["ENDPOINT"]),
-	}))
-	svc = dynamodb.New(sess)
-	return
+	put(i)
 }
 
 func setup() {
@@ -73,6 +53,8 @@ func setup() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+
+	time.Sleep(5 * time.Second)
 
 	fmt.Println("created the table", tableName)
 }
