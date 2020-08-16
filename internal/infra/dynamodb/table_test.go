@@ -13,6 +13,15 @@ import (
 
 const tableName = "MasterChargebackError"
 
+var (
+	disputeId    = aws.String("dispute_id")
+	timestamp    = aws.String("timestamp")
+	hashKeyType  = aws.String("HASH")
+	rangeKeyType = aws.String("RANGE")
+	numberType   = aws.String("N")
+	stringType   = aws.String("S")
+)
+
 func setup() {
 	env, _ := infra.LoadDefaultConf()
 	sess := session.Must(session.NewSession(&aws.Config{
@@ -26,22 +35,22 @@ func setup() {
 	input := &dynamodb.CreateTableInput{
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
 			{
-				AttributeName: aws.String("Year"),
-				AttributeType: aws.String("N"),
+				AttributeName: disputeId,
+				AttributeType: numberType,
 			},
 			{
-				AttributeName: aws.String("Title"),
-				AttributeType: aws.String("S"),
+				AttributeName: timestamp,
+				AttributeType: stringType,
 			},
 		},
 		KeySchema: []*dynamodb.KeySchemaElement{
 			{
-				AttributeName: aws.String("Year"),
-				KeyType:       aws.String("HASH"),
+				AttributeName: disputeId,
+				KeyType:       hashKeyType,
 			},
 			{
-				AttributeName: aws.String("Title"),
-				KeyType:       aws.String("RANGE"),
+				AttributeName: timestamp,
+				KeyType:       rangeKeyType,
 			},
 		},
 		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
