@@ -1,6 +1,7 @@
 package dynamodb
 
 import (
+	"errors"
 	"fmt"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/stretchr/testify/assert"
@@ -13,7 +14,13 @@ type Item struct {
 	Timestamp string
 }
 
-func TestPut(t *testing.T) {
+type errMarshaller struct{}
+
+func (m errMarshaller) MarshalMap(_ interface{}) (map[string]*dynamodb.AttributeValue, error) {
+	return nil, errors.New("error on marshalMap")
+}
+
+func TestPutIntegration(t *testing.T) {
 	skipShort(t)
 	setup()
 	defer teardown()
@@ -25,6 +32,16 @@ func TestPut(t *testing.T) {
 
 	err := table.put(i)
 	assert.Nil(t, err)
+}
+
+func TestPut_MarshalMapError(t *testing.T) {
+	table := table{
+		errMarshaller{},
+	}
+
+	err := table.put(nil)
+
+	assert.NotNil(t, err)
 }
 
 func setup() {
