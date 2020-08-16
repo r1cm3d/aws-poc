@@ -43,25 +43,19 @@ func TestPutIntegration(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestPut_MarshalMapError(t *testing.T) {
-	table := table{
+func TestPut_Error(t *testing.T) {
+	tables := [2]table{{
 		marshaller: errMarshal{},
-	}
-
-	err := table.put(nil)
-
-	assert.NotNil(t, err)
-}
-
-func TestPut_PutItemError(t *testing.T) {
-	table := table{
+	}, {
 		marshaller: errPutItem{},
 		persistent: errPutItem{},
+	}}
+
+	for _, ta := range tables {
+		err := ta.put(nil)
+
+		assert.NotNil(t, err)
 	}
-
-	err := table.put(nil)
-
-	assert.NotNil(t, err)
 }
 
 func setup() {
