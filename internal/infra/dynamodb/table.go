@@ -34,7 +34,7 @@ func svc() (svc *dynamodb.DynamoDB) {
 	return
 }
 
-func put(i Item) error {
+func put(i interface{}) error {
 	svc := svc()
 
 	av, err := dynamodbattribute.MarshalMap(i)
