@@ -23,20 +23,29 @@ type marshaller interface {
 	MarshalMap(in interface{}) (map[string]*dynamodb.AttributeValue, error)
 }
 
-type awsMarshaller struct{}
+type persistent interface {
+	PutItem(input *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error)
+}
 
-func (m awsMarshaller) MarshalMap(in interface{}) (map[string]*dynamodb.AttributeValue, error) {
+type awsTable struct{}
+
+func (m awsTable) MarshalMap(in interface{}) (map[string]*dynamodb.AttributeValue, error) {
 	return dynamodbattribute.MarshalMap(in)
+}
+
+func (m awsTable) PutItem(input *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
+	svc := svc()
+	return svc.PutItem(input)
 }
 
 type table struct {
 	marshaller
+	persistent
 }
 
 func newTable() table {
-	return table{
-		awsMarshaller{},
-	}
+	awsTable := awsTable{}
+	return table{marshaller: awsTable, persistent: awsTable}
 }
 
 func svc() (svc *dynamodb.DynamoDB) {
@@ -50,8 +59,6 @@ func svc() (svc *dynamodb.DynamoDB) {
 }
 
 func (t table) put(i interface{}) error {
-	svc := svc()
-
 	av, err := t.MarshalMap(i)
 	if err != nil {
 		return err
@@ -62,7 +69,7 @@ func (t table) put(i interface{}) error {
 		TableName: tableName,
 	}
 
-	_, err = svc.PutItem(input)
+	_, err = t.PutItem(input)
 	if err != nil {
 		return err
 	}

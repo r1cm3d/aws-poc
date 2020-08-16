@@ -14,10 +14,19 @@ type Item struct {
 	Timestamp string
 }
 
-type errMarshaller struct{}
+type errMarshal struct{}
+type errPutItem struct{}
 
-func (m errMarshaller) MarshalMap(_ interface{}) (map[string]*dynamodb.AttributeValue, error) {
+func (m errMarshal) MarshalMap(_ interface{}) (map[string]*dynamodb.AttributeValue, error) {
 	return nil, errors.New("error on marshalMap")
+}
+
+func (m errPutItem) MarshalMap(_ interface{}) (map[string]*dynamodb.AttributeValue, error) {
+	return nil, nil
+}
+
+func (m errPutItem) PutItem(_ *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
+	return nil, errors.New("error on put item")
 }
 
 func TestPutIntegration(t *testing.T) {
@@ -36,7 +45,18 @@ func TestPutIntegration(t *testing.T) {
 
 func TestPut_MarshalMapError(t *testing.T) {
 	table := table{
-		errMarshaller{},
+		marshaller: errMarshal{},
+	}
+
+	err := table.put(nil)
+
+	assert.NotNil(t, err)
+}
+
+func TestPut_PutItemError(t *testing.T) {
+	table := table{
+		marshaller: errPutItem{},
+		persistent: errPutItem{},
 	}
 
 	err := table.put(nil)
