@@ -3,6 +3,7 @@ package dynamodb
 import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"
 )
@@ -17,7 +18,8 @@ func TestPut(t *testing.T) {
 		Timestamp: "2020-04-17T17:19:19.831Z",
 	}
 
-	put(i)
+	err := put(i)
+	assert.Nil(t, err)
 }
 
 func setup() {
