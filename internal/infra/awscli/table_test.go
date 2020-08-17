@@ -1,4 +1,4 @@
-package dynamodb
+package awscli
 
 import (
 	"errors"
@@ -31,8 +31,8 @@ func (m errPutItem) putItem(_ *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, 
 
 func TestPutIntegration(t *testing.T) {
 	skipShort(t)
-	setup()
-	defer teardown()
+	setupTable()
+	defer cleanupTable()
 	i := Item{
 		DisputeId: 666,
 		Timestamp: "2020-04-17T17:19:19.831Z",
@@ -58,7 +58,7 @@ func TestPut_Error(t *testing.T) {
 	}
 }
 
-func setup() {
+func setupTable() {
 	svc := svc()
 
 	input := &dynamodb.CreateTableInput{
@@ -94,7 +94,7 @@ func setup() {
 	fmt.Println("created the table", tableName)
 }
 
-func teardown() {
+func cleanupTable() {
 	svc := svc()
 
 	input := &dynamodb.DeleteTableInput{
@@ -106,10 +106,4 @@ func teardown() {
 	}
 
 	fmt.Println("deleted the table", tableName)
-}
-
-func skipShort(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
 }

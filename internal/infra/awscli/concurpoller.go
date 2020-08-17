@@ -1,4 +1,4 @@
-package sqs
+package awscli
 
 import (
 	"github.com/aws/aws-sdk-go/service/sqs"

@@ -1,4 +1,4 @@
-package sqs
+package awscli
 
 import (
 	"errors"

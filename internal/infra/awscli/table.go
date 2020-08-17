@@ -1,4 +1,4 @@
-package dynamodb
+package awscli
 
 import (
 	"aws-poc/internal/infra"
