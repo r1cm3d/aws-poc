@@ -2,21 +2,48 @@ package awscli
 
 import (
 	"aws-poc/internal/infra"
-	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"log"
+	"os"
 	"testing"
 )
 
-const bucketName = "bucket"
+const (
+	bucketName = "bucket"
+	key = "kellyKey"
+)
 
 func TestUploadIntegration(t *testing.T) {
 	skipShort(t)
 	setupBucket()
-	fmt.Println("test bucket")
-	cleanupBucket()
+	defer cleanupBucket()
+
+	env, _ := infra.LoadDefaultConf()
+	sess := session.Must(session.NewSession(&aws.Config{
+		Region:   aws.String(env["REGION"]),
+		Endpoint: aws.String(env["ENDPOINT"]),
+		S3ForcePathStyle: aws.Bool(true),
+	}))
+
+	file, err := os.Open("../../../scripts/env/.env")
+	if err != nil {
+		log.Fatal("enable to open file")
+	}
+
+	defer file.Close()
+
+	uploader := s3manager.NewUploader(sess)
+	_, err = uploader.Upload(&s3manager.UploadInput{
+		Bucket: aws.String(bucketName),
+		Key: aws.String(key),
+		Body: file,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func setupBucket() {
@@ -52,6 +79,14 @@ func cleanupBucket() {
 
 	svc := s3.New(sess)
 
+	_, err = svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(bucketName), Key: aws.String(key)})
+	if err != nil {
+		log.Fatal("unable to delete object from bucket")
+	}
+	err = svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(key),
+	})
 	_, err = svc.DeleteBucket(&s3.DeleteBucketInput{
 		Bucket: aws.String(bucketName),
 	})
