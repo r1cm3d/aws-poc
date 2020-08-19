@@ -74,7 +74,39 @@ func TestListIntegration(t *testing.T) {
 	if err != nil {
 		t.Errorf("error on List = %v", err)
 	}
+}
 
+func TestGetIntegration(t *testing.T) {
+	skipShort(t)
+	setupBucket()
+	defer cleanupBucket()
+
+	env, _ := infra.LoadDefaultConf()
+	sess := session.Must(session.NewSession(&aws.Config{
+		Region:           aws.String(env["REGION"]),
+		Endpoint:         aws.String(env["ENDPOINT"]),
+		S3ForcePathStyle: aws.Bool(true),
+	}))
+
+	file, err := os.Open("../../../scripts/env/.env")
+	if err != nil {
+		log.Fatal("enable to open file")
+	}
+	defer file.Close()
+
+	s3cli := S3cli{
+		sess,
+	}
+
+	err = s3cli.Upload(bucketName, key, file)
+	if err != nil {
+		t.Errorf("error on Upload = %v", err)
+	}
+
+	err = s3cli.Get(bucketName, key)
+	if err != nil {
+		t.Errorf("error on get = %v", err)
+	}
 }
 
 func setupBucket() {
@@ -132,4 +164,6 @@ func cleanupBucket() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	_ = os.Remove(key)
 }

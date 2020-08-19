@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"io"
+	"os"
 )
 
 type S3cli struct {
@@ -40,4 +41,25 @@ func (s S3cli) List(bucket, key string) error {
 	}
 
 	return err
+}
+
+func (s S3cli) Get(bucket, key string) error {
+	file, err := os.Create(key)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	downloader := s3manager.NewDownloader(s.session)
+	numBytes, err := downloader.Download(file,
+		&s3.GetObjectInput{
+			Bucket: aws.String(bucket),
+			Key:    aws.String(key),
+		})
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Downloaded", file.Name(), numBytes, "bytes")
+	return nil
 }
