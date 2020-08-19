@@ -13,7 +13,7 @@ import (
 
 const (
 	bucketName = "bucket"
-	key = "kellyKey"
+	key        = "kellyKey"
 )
 
 func TestUploadIntegration(t *testing.T) {
@@ -23,8 +23,8 @@ func TestUploadIntegration(t *testing.T) {
 
 	env, _ := infra.LoadDefaultConf()
 	sess := session.Must(session.NewSession(&aws.Config{
-		Region:   aws.String(env["REGION"]),
-		Endpoint: aws.String(env["ENDPOINT"]),
+		Region:           aws.String(env["REGION"]),
+		Endpoint:         aws.String(env["ENDPOINT"]),
 		S3ForcePathStyle: aws.Bool(true),
 	}))
 
@@ -38,8 +38,8 @@ func TestUploadIntegration(t *testing.T) {
 	uploader := s3manager.NewUploader(sess)
 	_, err = uploader.Upload(&s3manager.UploadInput{
 		Bucket: aws.String(bucketName),
-		Key: aws.String(key),
-		Body: file,
+		Key:    aws.String(key),
+		Body:   file,
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -49,8 +49,8 @@ func TestUploadIntegration(t *testing.T) {
 func setupBucket() {
 	env, _ := infra.LoadDefaultConf()
 	sess := session.Must(session.NewSession(&aws.Config{
-		Region:   aws.String(env["REGION"]),
-		Endpoint: aws.String(env["ENDPOINT"]),
+		Region:           aws.String(env["REGION"]),
+		Endpoint:         aws.String(env["ENDPOINT"]),
 		S3ForcePathStyle: aws.Bool(true),
 	}))
 
@@ -72,8 +72,8 @@ func setupBucket() {
 func cleanupBucket() {
 	env, _ := infra.LoadDefaultConf()
 	sess, _ := session.NewSession(&aws.Config{
-		Region:   aws.String(env["REGION"]),
-		Endpoint: aws.String(env["ENDPOINT"]),
+		Region:           aws.String(env["REGION"]),
+		Endpoint:         aws.String(env["ENDPOINT"]),
 		S3ForcePathStyle: aws.Bool(true),
 	})
 
