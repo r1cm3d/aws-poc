@@ -5,7 +5,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"log"
 	"os"
 	"testing"
@@ -32,18 +31,50 @@ func TestUploadIntegration(t *testing.T) {
 	if err != nil {
 		log.Fatal("enable to open file")
 	}
-
 	defer file.Close()
 
-	uploader := s3manager.NewUploader(sess)
-	_, err = uploader.Upload(&s3manager.UploadInput{
-		Bucket: aws.String(bucketName),
-		Key:    aws.String(key),
-		Body:   file,
-	})
-	if err != nil {
-		log.Fatal(err)
+	s3cli := S3cli{
+		sess,
 	}
+
+	err = s3cli.Upload(bucketName, key, file)
+	if err != nil {
+		t.Errorf("error on Upload = %v", err)
+	}
+}
+
+func TestListIntegration(t *testing.T) {
+	skipShort(t)
+	setupBucket()
+	defer cleanupBucket()
+
+	env, _ := infra.LoadDefaultConf()
+	sess := session.Must(session.NewSession(&aws.Config{
+		Region:           aws.String(env["REGION"]),
+		Endpoint:         aws.String(env["ENDPOINT"]),
+		S3ForcePathStyle: aws.Bool(true),
+	}))
+
+	file, err := os.Open("../../../scripts/env/.env")
+	if err != nil {
+		log.Fatal("enable to open file")
+	}
+	defer file.Close()
+
+	s3cli := S3cli{
+		sess,
+	}
+
+	err = s3cli.Upload(bucketName, key, file)
+	if err != nil {
+		t.Errorf("error on Upload = %v", err)
+	}
+
+	err = s3cli.List(bucketName, key)
+	if err != nil {
+		t.Errorf("error on List = %v", err)
+	}
+
 }
 
 func setupBucket() {
