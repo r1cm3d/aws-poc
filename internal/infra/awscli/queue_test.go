@@ -38,7 +38,7 @@ func (s sqsMock) DeleteMessage(*sqs.DeleteMessageInput) (*sqs.DeleteMessageOutpu
 	return nil, nil
 }
 
-func newSession() *sqs.SQS {
+func newSQS() *sqs.SQS {
 	env, _ := infra.LoadDefaultConf()
 	return sqs.New(session.Must(session.NewSession(&aws.Config{
 		Region:   aws.String(env["REGION"]),
@@ -47,7 +47,7 @@ func newSession() *sqs.SQS {
 }
 
 func setup() *Queue {
-	s := newSession()
+	s := newSQS()
 	_, err := s.CreateQueue(&sqs.CreateQueueInput{
 		QueueName: aws.String(queueName),
 		Attributes: map[string]*string{
@@ -67,7 +67,7 @@ func setup() *Queue {
 }
 
 func teardown() {
-	s := newSession()
+	s := newSQS()
 	url, _ := getQueueURL(s, queueName)
 	_, err := s.DeleteQueue(&sqs.DeleteQueueInput{
 		QueueUrl: url,

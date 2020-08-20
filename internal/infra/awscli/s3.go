@@ -25,7 +25,7 @@ func (s S3cli) Upload(bucket, key string, file io.Reader) (err error) {
 	return
 }
 
-func (s S3cli) List(bucket, key string) error {
+func (s S3cli) List(bucket, _ string) error {
 	svc := s3.New(s.session)
 	resp, err := svc.ListObjectsV2(&s3.ListObjectsV2Input{Bucket: aws.String(bucket)})
 	if err != nil {
