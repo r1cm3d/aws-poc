@@ -12,6 +12,7 @@ import (
 const (
 	bucketName = "bucket"
 	key        = "kellyKey"
+	filename   = "../../../scripts/env/.env"
 )
 
 func TestUploadIntegration(t *testing.T) {
@@ -22,7 +23,7 @@ func TestUploadIntegration(t *testing.T) {
 	env, _ := infra.LoadDefaultConf()
 	sess := newSessionWithS3ForcePathStyle(env["REGION"], env["ENDPOINT"])
 
-	file, err := os.Open("../../../scripts/env/.env")
+	file, err := os.Open(filename)
 	if err != nil {
 		log.Fatal("enable to open file")
 	}
@@ -46,7 +47,7 @@ func TestListIntegration(t *testing.T) {
 	env, _ := infra.LoadDefaultConf()
 	sess := newSessionWithS3ForcePathStyle(env["REGION"], env["ENDPOINT"])
 
-	file, err := os.Open("../../../scripts/env/.env")
+	file, err := os.Open(filename)
 	if err != nil {
 		log.Fatal("enable to open file")
 	}
