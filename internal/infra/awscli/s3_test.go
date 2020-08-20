@@ -1,7 +1,6 @@
 package awscli
 
 import (
-	"aws-poc/internal/infra"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"log"
@@ -20,8 +19,7 @@ func TestUploadIntegration(t *testing.T) {
 	setupBucket()
 	defer cleanupBucket()
 
-	env, _ := infra.LoadDefaultConf()
-	sess := newSessionWithS3ForcePathStyle(env["REGION"], env["ENDPOINT"])
+	sess := newLocalSessionWithS3ForcePathStyle()
 
 	file, err := os.Open(filename)
 	if err != nil {
@@ -44,8 +42,7 @@ func TestListIntegration(t *testing.T) {
 	setupBucket()
 	defer cleanupBucket()
 
-	env, _ := infra.LoadDefaultConf()
-	sess := newSessionWithS3ForcePathStyle(env["REGION"], env["ENDPOINT"])
+	sess := newLocalSessionWithS3ForcePathStyle()
 
 	file, err := os.Open(filename)
 	if err != nil {
@@ -73,7 +70,6 @@ func TestGetIntegration(t *testing.T) {
 	setupBucket()
 	defer cleanupBucket()
 
-	env, _ := infra.LoadDefaultConf()
 	file, err := os.Open("../../../scripts/env/.env")
 	if err != nil {
 		log.Fatal("enable to open file")
@@ -81,7 +77,7 @@ func TestGetIntegration(t *testing.T) {
 	defer file.Close()
 
 	s3cli := S3cli{
-		newSessionWithS3ForcePathStyle(env["REGION"], env["ENDPOINT"]),
+		newLocalSessionWithS3ForcePathStyle(),
 	}
 
 	err = s3cli.Upload(bucketName, key, file)
@@ -96,8 +92,7 @@ func TestGetIntegration(t *testing.T) {
 }
 
 func setupBucket() {
-	env, _ := infra.LoadDefaultConf()
-	sess := newSessionWithS3ForcePathStyle(env["REGION"], env["ENDPOINT"])
+	sess := newLocalSessionWithS3ForcePathStyle()
 
 	svc := s3.New(sess)
 	_, err := svc.CreateBucket(&s3.CreateBucketInput{Bucket: aws.String(bucketName)})
@@ -115,8 +110,7 @@ func setupBucket() {
 }
 
 func cleanupBucket() {
-	env, _ := infra.LoadDefaultConf()
-	sess := newSessionWithS3ForcePathStyle(env["REGION"], env["ENDPOINT"])
+	sess := newLocalSessionWithS3ForcePathStyle()
 
 	svc := s3.New(sess)
 

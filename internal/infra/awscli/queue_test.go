@@ -1,7 +1,6 @@
 package awscli
 
 import (
-	"aws-poc/internal/infra"
 	"errors"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/sqs"
@@ -38,8 +37,7 @@ func (s sqsMock) DeleteMessage(*sqs.DeleteMessageInput) (*sqs.DeleteMessageOutpu
 }
 
 func newSQS() *sqs.SQS {
-	env, _ := infra.LoadDefaultConf()
-	return sqs.New(newSession(env["REGION"], env["ENDPOINT"]))
+	return sqs.New(newLocalSession())
 }
 
 func setup() *Queue {

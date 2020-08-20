@@ -1,6 +1,9 @@
 package awscli
 
 import (
+	"aws-poc/internal/infra"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"testing"
 )
 
@@ -8,6 +11,18 @@ const (
 	region   = "sa-east-1"
 	endpoint = "http://localhost:1234"
 )
+
+func newLocalSession() (sess *session.Session) {
+	env, _ := infra.LoadDefaultConf()
+	sess = newSession(env["REGION"], env["ENDPOINT"])
+	return
+}
+
+func newLocalSessionWithS3ForcePathStyle() (sess *session.Session) {
+	sess = newLocalSession()
+	sess.Config.S3ForcePathStyle = aws.Bool(true)
+	return
+}
 
 func TestNewSession(t *testing.T) {
 	exp := newSession(region, endpoint)
