@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	region = "sa-east-1"
+	region   = "sa-east-1"
 	endpoint = "http://localhost:1234"
 )
 
@@ -33,4 +33,3 @@ func TestNewSessionWithS3ForcePathStyle(t *testing.T) {
 		t.Errorf("S3ForcePathStyle exp: true, got: %v", *exp.Config.S3ForcePathStyle)
 	}
 }
-
