@@ -3,7 +3,6 @@ package awscli
 import (
 	"aws-poc/internal/infra"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
@@ -50,10 +49,7 @@ func newTable() table {
 
 func svc() (svc *dynamodb.DynamoDB) {
 	env, _ := infra.LoadDefaultConf()
-	sess := session.Must(session.NewSession(&aws.Config{
-		Region:   aws.String(env["REGION"]),
-		Endpoint: aws.String(env["ENDPOINT"]),
-	}))
+	sess := newSession(env["REGION"], env["ENDPOINT"])
 	svc = dynamodb.New(sess)
 	return
 }

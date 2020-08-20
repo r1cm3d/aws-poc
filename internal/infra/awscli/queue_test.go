@@ -4,7 +4,6 @@ import (
 	"aws-poc/internal/infra"
 	"errors"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/stretchr/testify/assert"
 	"log"
@@ -40,10 +39,7 @@ func (s sqsMock) DeleteMessage(*sqs.DeleteMessageInput) (*sqs.DeleteMessageOutpu
 
 func newSQS() *sqs.SQS {
 	env, _ := infra.LoadDefaultConf()
-	return sqs.New(session.Must(session.NewSession(&aws.Config{
-		Region:   aws.String(env["REGION"]),
-		Endpoint: aws.String(env["ENDPOINT"]),
-	})))
+	return sqs.New(newSession(env["REGION"], env["ENDPOINT"]))
 }
 
 func setup() *Queue {

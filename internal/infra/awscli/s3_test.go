@@ -3,7 +3,6 @@ package awscli
 import (
 	"aws-poc/internal/infra"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"log"
 	"os"
@@ -21,11 +20,7 @@ func TestUploadIntegration(t *testing.T) {
 	defer cleanupBucket()
 
 	env, _ := infra.LoadDefaultConf()
-	sess := session.Must(session.NewSession(&aws.Config{
-		Region:           aws.String(env["REGION"]),
-		Endpoint:         aws.String(env["ENDPOINT"]),
-		S3ForcePathStyle: aws.Bool(true),
-	}))
+	sess := newSessionWithS3ForcePathStyle(env["REGION"], env["ENDPOINT"])
 
 	file, err := os.Open("../../../scripts/env/.env")
 	if err != nil {
@@ -49,11 +44,7 @@ func TestListIntegration(t *testing.T) {
 	defer cleanupBucket()
 
 	env, _ := infra.LoadDefaultConf()
-	sess := session.Must(session.NewSession(&aws.Config{
-		Region:           aws.String(env["REGION"]),
-		Endpoint:         aws.String(env["ENDPOINT"]),
-		S3ForcePathStyle: aws.Bool(true),
-	}))
+	sess := newSessionWithS3ForcePathStyle(env["REGION"], env["ENDPOINT"])
 
 	file, err := os.Open("../../../scripts/env/.env")
 	if err != nil {
@@ -82,12 +73,6 @@ func TestGetIntegration(t *testing.T) {
 	defer cleanupBucket()
 
 	env, _ := infra.LoadDefaultConf()
-	sess := session.Must(session.NewSession(&aws.Config{
-		Region:           aws.String(env["REGION"]),
-		Endpoint:         aws.String(env["ENDPOINT"]),
-		S3ForcePathStyle: aws.Bool(true),
-	}))
-
 	file, err := os.Open("../../../scripts/env/.env")
 	if err != nil {
 		log.Fatal("enable to open file")
@@ -95,7 +80,7 @@ func TestGetIntegration(t *testing.T) {
 	defer file.Close()
 
 	s3cli := S3cli{
-		sess,
+		newSessionWithS3ForcePathStyle(env["REGION"], env["ENDPOINT"]),
 	}
 
 	err = s3cli.Upload(bucketName, key, file)
@@ -111,11 +96,7 @@ func TestGetIntegration(t *testing.T) {
 
 func setupBucket() {
 	env, _ := infra.LoadDefaultConf()
-	sess := session.Must(session.NewSession(&aws.Config{
-		Region:           aws.String(env["REGION"]),
-		Endpoint:         aws.String(env["ENDPOINT"]),
-		S3ForcePathStyle: aws.Bool(true),
-	}))
+	sess := newSessionWithS3ForcePathStyle(env["REGION"], env["ENDPOINT"])
 
 	svc := s3.New(sess)
 	_, err := svc.CreateBucket(&s3.CreateBucketInput{Bucket: aws.String(bucketName)})
@@ -134,11 +115,7 @@ func setupBucket() {
 
 func cleanupBucket() {
 	env, _ := infra.LoadDefaultConf()
-	sess, _ := session.NewSession(&aws.Config{
-		Region:           aws.String(env["REGION"]),
-		Endpoint:         aws.String(env["ENDPOINT"]),
-		S3ForcePathStyle: aws.Bool(true),
-	})
+	sess := newSessionWithS3ForcePathStyle(env["REGION"], env["ENDPOINT"])
 
 	svc := s3.New(sess)
 
