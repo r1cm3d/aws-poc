@@ -11,3 +11,12 @@ func newSession(region, endpoint string) *session.Session {
 		Endpoint: aws.String(endpoint),
 	}))
 }
+
+func newSessionWithS3ForcePathStyle(region, endpoint string) *session.Session {
+	return session.Must(session.NewSession(&aws.Config{
+		Region:   aws.String(region),
+		Endpoint: aws.String(endpoint),
+		S3ForcePathStyle: aws.Bool(true),
+	}))
+}
+
