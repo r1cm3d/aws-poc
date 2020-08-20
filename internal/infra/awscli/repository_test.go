@@ -37,14 +37,14 @@ func TestPutIntegration(t *testing.T) {
 		DisputeId: 666,
 		Timestamp: "2020-04-17T17:19:19.831Z",
 	}
-	table := newTable()
+	table := newRepository()
 
 	err := table.put(i)
 	assert.Nil(t, err)
 }
 
 func TestPut_Error(t *testing.T) {
-	tables := [2]table{{
+	tables := [2]repository{{
 		marshaller: errMarshal{},
 	}, {
 		marshaller: errPutItem{},
@@ -91,7 +91,7 @@ func setupTable() {
 		log.Fatal(err.Error())
 	}
 
-	fmt.Println("created the table", tableName)
+	fmt.Println("created the repository", tableName)
 }
 
 func cleanupTable() {
@@ -105,5 +105,5 @@ func cleanupTable() {
 		log.Fatal(err.Error())
 	}
 
-	fmt.Println("deleted the table", tableName)
+	fmt.Println("deleted the repository", tableName)
 }
