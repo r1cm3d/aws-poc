@@ -1,7 +1,6 @@
 package awscli
 
 import (
-	"errors"
 	"fmt"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/stretchr/testify/assert"
@@ -14,21 +13,6 @@ type Item struct {
 	Timestamp string
 }
 
-type errMarshal struct{}
-type errPutItem struct{}
-
-func (m errMarshal) marshalMap(_ interface{}) (map[string]*dynamodb.AttributeValue, error) {
-	return nil, errors.New("error on marshalMap")
-}
-
-func (m errPutItem) marshalMap(_ interface{}) (map[string]*dynamodb.AttributeValue, error) {
-	return nil, nil
-}
-
-func (m errPutItem) putItem(_ *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
-	return nil, errors.New("error on put item")
-}
-
 func TestPutIntegration(t *testing.T) {
 	skipShort(t)
 	setupTable()
@@ -37,30 +21,13 @@ func TestPutIntegration(t *testing.T) {
 		DisputeId: 666,
 		Timestamp: "2020-04-17T17:19:19.831Z",
 	}
-	table := newRepository()
+	table := newRepository(newLocalSession())
 
 	err := table.put(i)
 	assert.Nil(t, err)
 }
 
-func TestPut_Error(t *testing.T) {
-	tables := [2]repository{{
-		marshaller: errMarshal{},
-	}, {
-		marshaller: errPutItem{},
-		persistent: errPutItem{},
-	}}
-
-	for _, ta := range tables {
-		err := ta.put(nil)
-
-		assert.NotNil(t, err)
-	}
-}
-
 func setupTable() {
-	svc := svc()
-
 	input := &dynamodb.CreateTableInput{
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
 			{
@@ -86,6 +53,8 @@ func setupTable() {
 		TableName:   tableName,
 	}
 
+	r := newRepository(newLocalSession())
+	svc := r.svc()
 	_, err := svc.CreateTable(input)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -95,7 +64,8 @@ func setupTable() {
 }
 
 func cleanupTable() {
-	svc := svc()
+	r := newRepository(newLocalSession())
+	svc := r.svc()
 
 	input := &dynamodb.DeleteTableInput{
 		TableName: tableName,

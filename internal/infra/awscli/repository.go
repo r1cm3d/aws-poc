@@ -3,6 +3,7 @@ package awscli
 import (
 	"aws-poc/internal/infra"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
@@ -18,44 +19,23 @@ var (
 	payPerRequest = aws.String("PAY_PER_REQUEST")
 )
 
-type marshaller interface {
-	marshalMap(in interface{}) (map[string]*dynamodb.AttributeValue, error)
-}
-
-type persistent interface {
-	putItem(input *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error)
-}
-
-type awsRepository struct{}
-
-func (m awsRepository) marshalMap(in interface{}) (map[string]*dynamodb.AttributeValue, error) {
-	return dynamodbattribute.MarshalMap(in)
-}
-
-func (m awsRepository) putItem(input *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
-	svc := svc()
-	return svc.PutItem(input)
-}
-
 type repository struct {
-	marshaller
-	persistent
+	sess *session.Session
 }
 
-func newRepository() repository {
-	awsRepository	 := awsRepository{}
-	return repository{marshaller: awsRepository, persistent: awsRepository}
+func newRepository(sess *session.Session) repository {
+	return repository{sess: sess}
 }
 
-func svc() (svc *dynamodb.DynamoDB) {
+func (r repository) svc() (svc *dynamodb.DynamoDB) {
 	env, _ := infra.LoadDefaultConf()
 	sess := newSession(env["REGION"], env["ENDPOINT"])
 	svc = dynamodb.New(sess)
 	return
 }
 
-func (t repository) put(i interface{}) error {
-	av, err := t.marshalMap(i)
+func (r repository) put(i interface{}) error {
+	av, err := dynamodbattribute.MarshalMap(i)
 	if err != nil {
 		return err
 	}
@@ -65,7 +45,8 @@ func (t repository) put(i interface{}) error {
 		TableName: tableName,
 	}
 
-	_, err = t.putItem(input)
+	svc := r.svc()
+	_, err = svc.PutItem(input)
 	if err != nil {
 		return err
 	}
