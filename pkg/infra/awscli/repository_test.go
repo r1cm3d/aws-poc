@@ -69,8 +69,7 @@ func cleanupTable() {
 	input := &dynamodb.DeleteTableInput{
 		TableName: tableName,
 	}
-	_, err := svc.DeleteTable(input)
-	if err != nil {
+	if _, err := svc.DeleteTable(input); err != nil {
 		log.Fatal(err.Error())
 	}
 
