@@ -63,10 +63,10 @@ func setup() *Queue {
 func teardown() {
 	s := newSQS()
 	url, _ := getQueueURL(s, queueName)
-	_, err := s.DeleteQueue(&sqs.DeleteQueueInput{
+	input := &sqs.DeleteQueueInput{
 		QueueUrl: url,
-	})
-	if err != nil {
+	}
+	if _, err := s.DeleteQueue(input); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -123,8 +123,7 @@ func TestMessageAttributeValue(t *testing.T) {
 }
 
 func TestNewWithError(t *testing.T) {
-	_, err := New(sqsMock{}, "queueName")
-	if err == nil {
+	if _, err := New(sqsMock{}, "queueName"); err == nil {
 		assert.Fail(t, failMsg)
 	}
 }
@@ -143,9 +142,7 @@ func TestDeleteMessage(t *testing.T) {
 	q := mockQueue()
 	s := "aReceiptHandle"
 
-	err := q.deleteMessage(&s)
-
-	if err != nil {
+	if err := q.deleteMessage(&s); err != nil {
 		assert.Fail(t, failMsg)
 	}
 }
@@ -154,9 +151,7 @@ func TestReceiveMessageError(t *testing.T) {
 	f := func(c *sqs.ReceiveMessageInput) {}
 	q := mockQueue()
 
-	_, err := q.receiveMessage(f)
-
-	if err == nil {
+	if _, err := q.receiveMessage(f); err == nil {
 		assert.Fail(t, failMsg)
 	}
 }
