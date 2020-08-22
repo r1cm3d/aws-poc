@@ -55,8 +55,7 @@ func setupTable() {
 
 	r := newRepository(newLocalSession())
 	svc := r.svc()
-	_, err := svc.CreateTable(input)
-	if err != nil {
+	if _, err := svc.CreateTable(input); err != nil {
 		log.Fatal(err.Error())
 	}
 
