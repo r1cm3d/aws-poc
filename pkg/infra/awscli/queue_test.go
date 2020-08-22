@@ -42,14 +42,14 @@ func newSQS() *sqs.SQS {
 
 func setup() *Queue {
 	s := newSQS()
-	_, err := s.CreateQueue(&sqs.CreateQueueInput{
+	input := &sqs.CreateQueueInput{
 		QueueName: aws.String(queueName),
 		Attributes: map[string]*string{
 			"DelaySeconds":           aws.String("60"),
 			"MessageRetentionPeriod": aws.String("86400"),
 		},
-	})
-	if err != nil {
+	}
+	if _, err := s.CreateQueue(input); err != nil {
 		panic(err)
 	}
 	q, err := New(s, queueName)
