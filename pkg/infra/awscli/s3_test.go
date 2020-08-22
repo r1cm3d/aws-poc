@@ -111,29 +111,31 @@ func setupBucket() {
 
 func cleanupBucket() {
 	sess := newLocalSessionWithS3ForcePathStyle()
-
 	svc := s3.New(sess)
-
-	_, err = svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(bucketName), Key: aws.String(key)})
-	if err != nil {
+	doi := &s3.DeleteObjectInput{Bucket: aws.String(bucketName), Key: aws.String(key)}
+	if _, err := svc.DeleteObject(doi); err != nil {
 		log.Fatal("unable to delete object from bucket")
 	}
-	err = svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
+
+	hoi := &s3.HeadObjectInput{
 		Bucket: aws.String(bucketName),
 		Key:    aws.String(key),
-	})
-	_, err = svc.DeleteBucket(&s3.DeleteBucketInput{
-		Bucket: aws.String(bucketName),
-	})
-	if err != nil {
+	}
+	if err := svc.WaitUntilObjectNotExists(hoi); err != nil {
 		log.Fatal(err)
 	}
 
-	err = svc.WaitUntilBucketNotExists(&s3.HeadBucketInput{
+	dbi := &s3.DeleteBucketInput{
 		Bucket: aws.String(bucketName),
-	})
+	}
+	if _, err := svc.DeleteBucket(dbi); err != nil {
+		log.Fatal(err)
+	}
 
-	if err != nil {
+	hbi := &s3.HeadBucketInput{
+		Bucket: aws.String(bucketName),
+	}
+	if err := svc.WaitUntilBucketNotExists(hbi); err != nil {
 		log.Fatal(err)
 	}
 
