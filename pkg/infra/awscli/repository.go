@@ -46,8 +46,7 @@ func (r repository) put(i interface{}) error {
 	}
 
 	svc := r.svc()
-	_, err = svc.PutItem(input)
-	if err != nil {
+	if _, err = svc.PutItem(input); err != nil {
 		return err
 	}
 
