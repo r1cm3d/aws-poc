@@ -61,7 +61,7 @@ func TestChangeMessageVisibility(t *testing.T) {
 	receiptHandle, visibilityTimeout, q := "receiptHandle", int64(10), mockQueue()
 
 	if err := q.ChangeMessageVisibility(&receiptHandle, visibilityTimeout); err != nil {
-		assert.Fail(t, failMsg)
+		t.Error(failMsg)
 	}
 }
 
@@ -70,7 +70,24 @@ func TestMessageAttributeValue_Panic(t *testing.T) {
 		MessageAttributeValue(rune(1))
 	}
 
-	assert.Panics(t, panicFunc, failMsg)
+	if ok := panicked(panicFunc); !ok {
+		t.Error("function should panic")
+	}
+}
+
+func panicked(f func()) (ok bool) {
+
+	ok = false
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				ok = true
+			}
+		}()
+		f()
+	}()
+
+	return
 }
 
 func TestMessageAttributeValue(t *testing.T) {
@@ -103,7 +120,7 @@ func TestMessageAttributeValue(t *testing.T) {
 
 func TestNewWithError(t *testing.T) {
 	if _, err := New(sqsMock{}, "queueName"); err == nil {
-		assert.Fail(t, failMsg)
+		t.Error(failMsg)
 	}
 }
 
