@@ -7,7 +7,7 @@ services:
       - '4563-4599:4563-4599'
       - '8055:8080'
     environment:
-      - SERVICES=s3,dynamodb,sqs
+      - SERVICES=iam,s3,dynamodb,sqs
       - DEFAULT_REGION=us-east-1
       - DEBUG=1
       - DATA_DIR=/tmp/localstack/data
