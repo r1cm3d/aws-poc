@@ -3,7 +3,6 @@ package awscli
 import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/stretchr/testify/assert"
 	"log"
 	"reflect"
 	"strconv"
@@ -96,11 +95,17 @@ func TestMessageAttributeValue(t *testing.T) {
 		BinaryValue: []byte{0},
 	}
 
-	for in, out := range m {
-		act := MessageAttributeValue(in)
-		assert.True(t, reflect.DeepEqual(act, out))
+	for in, want := range m {
+		got := MessageAttributeValue(in)
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("want: %d; got: %d", want, got)
+		}
 	}
-	assert.True(t, reflect.DeepEqual(b, MessageAttributeValue([]byte{0})))
+
+	got := MessageAttributeValue([]byte{0})
+	if !reflect.DeepEqual(got, b) {
+		t.Errorf("want: %d; got: %d", b, got)
+	}
 }
 
 func TestNewWithError(t *testing.T) {
@@ -128,7 +133,7 @@ func TestDeleteMessage(t *testing.T) {
 	s := "aReceiptHandle"
 
 	if err := q.deleteMessage(&s); err != nil {
-		assert.Fail(t, failMsg)
+		t.Error(failMsg)
 	}
 }
 
@@ -137,7 +142,7 @@ func TestReceiveMessageError(t *testing.T) {
 	q := mockQueue()
 
 	if _, err := q.receiveMessage(f); err == nil {
-		assert.Fail(t, failMsg)
+		t.Error(failMsg)
 	}
 }
 
@@ -148,13 +153,16 @@ func TestMessageAttributes(t *testing.T) {
 
 func TestReceiveMessageIntegration(t *testing.T) {
 	skipShort(t)
-	q := setup()
+	q, body := setup(), "Message Body"
 	defer teardown()
-	sendMsg(q, "Message Body")
+	sendMsg(q, body)
 
-	if msg, _ := q.receiveMessage(); msg != nil {
-		for _, msg := range msg {
-			assert.NotZero(t, msg.Body)
+	if messages, _ := q.receiveMessage(); messages != nil {
+		for _, msg := range messages {
+			got := *msg.Body
+			if body != got {
+				t.Errorf("want: %s; got: %s", body, got)
+			}
 		}
 	}
 }
