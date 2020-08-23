@@ -12,13 +12,16 @@ lint:
 fmt:
 	@echo "\nFormatting scripts\n"
 	@shfmt -w scripts/*sh
+	@echo "\nFormatting terraform files"
+	@terraform fmt terraform/
 	@echo "\nFormatting go files\n"
-	@go fmt ./... 
+	@go fmt ./...
 
 clean:
 	@echo "\nRemoving localstack container\n"
-	@(docker rm -f aws && \
- 	  rm -rf .localstack) 2>/dev/null | true
+	(@docker rm -f aws || \
+	  rm -rf .localstack || \
+	  rm terraform/*tfstate*) 2>/dev/null | true
 
 build: clean fmt
 	@echo "\nBuilding application\n"
@@ -30,8 +33,11 @@ unit-test: build
 
 run-dep: clean
 	@echo "\nStarting localstack container and creating AWS local resources\n"
-	@docker-compose up -d && \
-	cd scripts && bash init-aws-rs.sh
+	@docker-compose up -d
+	cd terraform && \
+	terraform init && \
+	terraform plan && \
+	terraform apply -auto-approve
 
 integration-test: run-dep build
 	@echo "\nRunning integration tests\n"
