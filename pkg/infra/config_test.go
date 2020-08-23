@@ -1,7 +1,6 @@
 package infra
 
 import (
-	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
 )
@@ -9,15 +8,15 @@ import (
 const line = `SQS_TEST_QUEUE='test-queue'`
 
 func TestGetKey(t *testing.T) {
-	act := getKey(line)
-
-	assert.Equal(t, "SQS_TEST_QUEUE", act)
+	if got := getKey(line); got != "SQS_TEST_QUEUE" {
+		t.Errorf("want SQS_TEST_QUEUE; got: %s", got)
+	}
 }
 
 func TestGetValue(t *testing.T) {
-	act := getValue(line)
-
-	assert.Equal(t, "test-queue", act)
+	if got := getValue(line); got != "test-queue" {
+		t.Errorf("want test-queue; got: %s", got)
+	}
 }
 
 func TestMerge(t *testing.T) {
@@ -27,24 +26,24 @@ func TestMerge(t *testing.T) {
 	m2 := map[string]string{
 		"k2": "v2",
 	}
-	exp := map[string]string{
+	want := map[string]string{
 		"k1": "v1",
 		"k2": "v2",
 	}
 
-	act := merge(m1, m2)
-
-	assert.True(t, reflect.DeepEqual(exp, act))
+	if got := merge(m1, m2); reflect.DeepEqual(got, want) {
+		t.Errorf("want %v; got: %v", want, got)
+	}
 }
 
 func TestLoadFileNotFound(t *testing.T) {
 	if _, err := loadFile("unreachablePath"); err == nil {
-		assert.Fail(t, "expected an error when file is not found")
+		t.Error("expected an error when file is not found")
 	}
 }
 
 func TestLoadConfigNotFound(t *testing.T) {
 	if _, err := LoadConf("unreachableDirectory"); err == nil {
-		assert.Fail(t, "expected an error when directory not exists")
+		t.Error("expected an error when directory not exists")
 	}
 }
