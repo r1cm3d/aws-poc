@@ -3,7 +3,6 @@ package awscli
 import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"
 )
@@ -23,8 +22,9 @@ func TestPutIntegration(t *testing.T) {
 	}
 	table := newRepository(newLocalSession())
 
-	err := table.put(i)
-	assert.Nil(t, err)
+	if err := table.put(i); err != nil {
+		t.Errorf("put fails: %d", err)
+	}
 }
 
 func setupTable() {
