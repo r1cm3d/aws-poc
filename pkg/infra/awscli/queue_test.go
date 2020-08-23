@@ -70,24 +70,9 @@ func TestMessageAttributeValue_Panic(t *testing.T) {
 		MessageAttributeValue(rune(1))
 	}
 
-	if ok := panicked(panicFunc); !ok {
+	if !panicked(panicFunc) {
 		t.Error("function should panic")
 	}
-}
-
-func panicked(f func()) (ok bool) {
-
-	ok = false
-	func() {
-		defer func() {
-			if r := recover(); r != nil {
-				ok = true
-			}
-		}()
-		f()
-	}()
-
-	return
 }
 
 func TestMessageAttributeValue(t *testing.T) {
@@ -194,4 +179,16 @@ func skipShort(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test")
 	}
+}
+
+func panicked(f func()) (ok bool) {
+	ok = false
+	defer func() {
+		if r := recover(); r != nil {
+			ok = true
+		}
+	}()
+	f()
+
+	return
 }
