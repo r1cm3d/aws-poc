@@ -20,7 +20,6 @@ fmt:
 clean:
 	@echo "\nRemoving localstack container\n"
 	(@docker rm -f aws || \
-	  rm -rf .localstack || \
 	  rm terraform/*tfstate*) 2>/dev/null | true
 
 build: clean fmt
@@ -33,7 +32,7 @@ unit-test: build
 
 run-dep: clean
 	@echo "\nStarting localstack container and creating AWS local resources\n"
-	@docker-compose up -d
+	@docker-compose up -d --force-recreate
 	cd terraform && \
 	terraform init && \
 	terraform plan && \
