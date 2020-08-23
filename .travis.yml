@@ -4,7 +4,7 @@ env:
   - DOCKER_COMPOSE_VERSION=1.25.5
 
 go:
-  - "1.14"
+  - "1.15"
 
 script:
   - make codecov
