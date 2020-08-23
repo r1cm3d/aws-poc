@@ -70,7 +70,7 @@ func TestMessageAttributeValue_Panic(t *testing.T) {
 		MessageAttributeValue(rune(1))
 	}
 
-	if !panicked(panicFunc) {
+	if !panic(panicFunc) {
 		t.Error("function should panic")
 	}
 }
@@ -181,7 +181,7 @@ func skipShort(t *testing.T) {
 	}
 }
 
-func panicked(f func()) (ok bool) {
+func panic(f func()) (ok bool) {
 	ok = false
 	defer func() {
 		if r := recover(); r != nil {
