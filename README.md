@@ -20,7 +20,7 @@ make run
 [![Docker-compose](https://img.shields.io/badge/Docker--compose-1.25.5-blue)](https://github.com/docker/compose/releases)
 [![GNU Make](https://img.shields.io/badge/GNU%20Make-4.2.1-lightgrey)](https://www.gnu.org/software/make/)
 [![GNU Bash](https://img.shields.io/badge/GNU%20Bash-4.2.1-lightgrey)](https://www.gnu.org/software/bash/)
-[![aws-cli](https://img.shields.io/badge/aws--cli-1.18.95-yellow)](https://github.com/aws/aws-cli)
+[![terraform](https://img.shields.io/badge/terraform-0.13.0-blueviolet)](https://github.com/hashicorp/terraform)
 [![shfmt](https://img.shields.io/badge/shfmt-v3.1.0-lightgrey)](https://github.com/mvdan/sh)
 
 ## Table of Contents
