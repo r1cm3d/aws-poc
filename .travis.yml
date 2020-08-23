@@ -2,7 +2,6 @@ language: go
 
 env:
   - DOCKER_COMPOSE_VERSION=1.25.5
-  - TERRAFORM_VERSION=
 
 go:
   - "1.15"
