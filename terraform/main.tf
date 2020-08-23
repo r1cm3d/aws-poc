@@ -20,7 +20,7 @@ variable "project" {
 }
 
 resource "aws_iam_user" "aws-poc" {
-  name = "aws-poc"
+  name = "aws_poc"
   tags = {
     project = var.project
     env     = var.account
@@ -54,6 +54,42 @@ resource "aws_iam_policy" "aws_poc_sqs_policy" {
                 "${module.chargeback_status_sqs_queue.this_sqs_queue_arn}",
                 "${module.chargeback_update_sqs_queue.this_sqs_queue_arn}",
                 "${module.chargeback_sqs_queue.this_sqs_queue_arn}"
+            ]
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_policy_attachment" "dynamo_policy_attach" {
+  name = "aws-poc-dynamo-attachment"
+  users = [
+  aws_iam_user.aws-poc.name]
+  policy_arn = aws_iam_policy.aws_poc_dynamo_policy.arn
+}
+
+
+resource "aws_iam_policy" "aws_poc_dynamo_policy" {
+  name = "aws-poc-dynamo-policy"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "dynamodb",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:Scan",
+                "dynamodb:Query",
+                "dynamodb:DescribeTable",
+                "dynamodb:GetItem",
+                "dynamodb:GetRecords",
+                "dynamodb:PutItem"
+            ],
+            "Resource": [
+                "${aws_dynamodb_table.chargeback-table.arn}",
+                "${aws_dynamodb_table.claim-table.arn}"
             ]
         }
     ]
