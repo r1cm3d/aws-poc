@@ -2,9 +2,9 @@
 
 . env/.aws.env
 
-#for t in json/*_table.json; do
-#	aws dynamodb create-table \
-#		--region "$REGION" \
-#		--cli-input-json "file://$t" \
-#		--endpoint-url "$ENDPOINT" 2>/dev/null
-#done
+for t in json/*_table.json; do
+	aws dynamodb create-table \
+		--region "$REGION" \
+		--cli-input-json "file://$t" \
+		--endpoint-url "$ENDPOINT" 2>/dev/null
+done
