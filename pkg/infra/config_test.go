@@ -31,7 +31,7 @@ func TestMerge(t *testing.T) {
 		"k2": "v2",
 	}
 
-	if got := merge(m1, m2); reflect.DeepEqual(got, want) {
+	if got := merge(m1, m2); !reflect.DeepEqual(got, want) {
 		t.Errorf("want %v; got: %v", want, got)
 	}
 }
