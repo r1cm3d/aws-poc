@@ -70,7 +70,7 @@ func TestMessageAttributeValue_Panic(t *testing.T) {
 		MessageAttributeValue(rune(1))
 	}
 
-	if !panic(panicFunc) {
+	if !didPanic(panicFunc) {
 		t.Error("function should panic")
 	}
 }
@@ -116,7 +116,11 @@ func TestMaxNumberOfMessages(t *testing.T) {
 
 	f(in)
 
-	assert.Equal(t, aws.Int64(exp), in.MaxNumberOfMessages)
+	got := *in.MaxNumberOfMessages
+
+	if exp != got {
+		t.Errorf("want: %d; got: %d", exp, got)
+	}
 }
 
 func TestDeleteMessage(t *testing.T) {
@@ -181,7 +185,7 @@ func skipShort(t *testing.T) {
 	}
 }
 
-func panic(f func()) (ok bool) {
+func didPanic(f func()) (ok bool) {
 	ok = false
 	defer func() {
 		if r := recover(); r != nil {
