@@ -12,7 +12,7 @@ func TestHandleMessage_Error(t *testing.T) {
 
 	act := cp.handleMessage(nil, errHandler(nil), nil)
 
-	assert.Equal(t, err, act)
+	assert.Equal(t, errMock, act)
 }
 
 func TestHandleMessage(t *testing.T) {

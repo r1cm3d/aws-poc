@@ -11,11 +11,28 @@ type okHandler func(*sqs.Message) error
 type fakeErrQueue struct{}
 type fakeOkQueue struct{}
 type fakePoller struct{}
+type sqsMock struct{}
 
-var err = errors.New("sambarilove")
+var errMock = errors.New("mocked error")
+
+func (s sqsMock) GetQueueUrl(*sqs.GetQueueUrlInput) (*sqs.GetQueueUrlOutput, error) {
+	return nil, errMock
+}
+func (s sqsMock) ReceiveMessage(*sqs.ReceiveMessageInput) (*sqs.ReceiveMessageOutput, error) {
+	return nil, errMock
+}
+func (s sqsMock) ChangeMessageVisibility(*sqs.ChangeMessageVisibilityInput) (*sqs.ChangeMessageVisibilityOutput, error) {
+	return nil, nil
+}
+func (s sqsMock) SendMessage(*sqs.SendMessageInput) (*sqs.SendMessageOutput, error) {
+	return nil, nil
+}
+func (s sqsMock) DeleteMessage(*sqs.DeleteMessageInput) (*sqs.DeleteMessageOutput, error) {
+	return nil, nil
+}
 
 func (m errHandler) handleMessage(_ *sqs.Message) error {
-	return err
+	return errMock
 }
 
 func (m okHandler) handleMessage(_ *sqs.Message) error {
@@ -27,7 +44,7 @@ func (q fakeErrQueue) deleteMessage(_ *string) error {
 }
 
 func (q fakeErrQueue) receiveMessage(_ ...receiveMessageInput) ([]*sqs.Message, error) {
-	return nil, err
+	return nil, errMock
 }
 
 func (q fakeOkQueue) deleteMessage(_ *string) error {
@@ -39,4 +56,3 @@ func (q fakeOkQueue) receiveMessage(_ ...receiveMessageInput) ([]*sqs.Message, e
 }
 
 func (p fakePoller) run(consumer, handler, []*sqs.Message) {}
-

@@ -1,7 +1,6 @@
 package awscli
 
 import (
-	"errors"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/sqs"
 	"github.com/stretchr/testify/assert"
@@ -15,26 +14,6 @@ const (
 	failMsg   = "an error should be return"
 	queueName = "testQueue"
 )
-
-var errMock = errors.New("mocked error")
-
-type sqsMock struct{}
-
-func (s sqsMock) GetQueueUrl(*sqs.GetQueueUrlInput) (*sqs.GetQueueUrlOutput, error) {
-	return nil, errMock
-}
-func (s sqsMock) ReceiveMessage(*sqs.ReceiveMessageInput) (*sqs.ReceiveMessageOutput, error) {
-	return nil, errMock
-}
-func (s sqsMock) ChangeMessageVisibility(*sqs.ChangeMessageVisibilityInput) (*sqs.ChangeMessageVisibilityOutput, error) {
-	return nil, nil
-}
-func (s sqsMock) SendMessage(*sqs.SendMessageInput) (*sqs.SendMessageOutput, error) {
-	return nil, nil
-}
-func (s sqsMock) DeleteMessage(*sqs.DeleteMessageInput) (*sqs.DeleteMessageOutput, error) {
-	return nil, nil
-}
 
 func newSQS() *sqs.SQS {
 	return sqs.New(newLocalSession())
