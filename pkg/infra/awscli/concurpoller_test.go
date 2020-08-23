@@ -3,24 +3,23 @@ package awscli
 import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/sqs"
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestHandleMessage_Error(t *testing.T) {
 	cp := concurPoller{}
 
-	act := cp.handleMessage(nil, errHandler(nil), nil)
-
-	assert.Equal(t, errMock, act)
+	if got := cp.handleMessage(nil, errHandler(nil), nil); got != errMock {
+		t.Errorf("want: %d; got: %d", errMock, got)
+	}
 }
 
 func TestHandleMessage(t *testing.T) {
-	cp := concurPoller{}
+	cp, msg := concurPoller{}, &sqs.Message{ReceiptHandle: aws.String("receipt")}
 
-	act := cp.handleMessage(fakeErrQueue{}, okHandler(nil), &sqs.Message{ReceiptHandle: aws.String("receipt")})
-
-	assert.True(t, act == nil)
+	if err := cp.handleMessage(fakeErrQueue{}, okHandler(nil), msg); err != nil {
+		t.Error("should not return an error at handleMessage")
+	}
 }
 
 func TestRun(t *testing.T) {
