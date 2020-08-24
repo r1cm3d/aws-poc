@@ -36,7 +36,7 @@ run-dep: clean
 	@echo "\nWaiting until localstack be ready"
 	@sleep 6
 	@echo "\nApplying terraform scripts"
-	cd terraform && \
+	-cd terraform && \
 	terraform init && \
 	terraform plan && \
 	terraform apply -auto-approve
