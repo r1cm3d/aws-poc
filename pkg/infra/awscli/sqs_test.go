@@ -6,14 +6,17 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
-type errHandler func(*sqs.Message) error
-type okHandler func(*sqs.Message) error
+type errHandler func(string) error
+type okHandler func(string) error
 type fakeErrQueue struct{}
 type fakeOkQueue struct{}
 type fakePoller struct{}
 type sqsMock struct{}
 
-var errMock = errors.New("mocked error")
+var (
+	errMock       = errors.New("mocked error")
+	mockedMessage = &sqs.Message{Body: aws.String(""), ReceiptHandle: aws.String("receipt")}
+)
 
 func (s sqsMock) GetQueueUrl(*sqs.GetQueueUrlInput) (*sqs.GetQueueUrlOutput, error) {
 	return nil, errMock
@@ -31,11 +34,11 @@ func (s sqsMock) DeleteMessage(*sqs.DeleteMessageInput) (*sqs.DeleteMessageOutpu
 	return nil, nil
 }
 
-func (m errHandler) handleMessage(_ *sqs.Message) error {
+func (m errHandler) handleMessage(_ string) error {
 	return errMock
 }
 
-func (m okHandler) handleMessage(_ *sqs.Message) error {
+func (m okHandler) handleMessage(_ string) error {
 	return nil
 }
 

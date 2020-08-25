@@ -27,7 +27,7 @@ func (p concurPoller) run(c consumer, h handler, messages []*sqs.Message) {
 }
 
 func (p concurPoller) handleMessage(c consumer, h handler, m *sqs.Message) error {
-	if err := h.handleMessage(m); err != nil {
+	if err := h.handleMessage(*m.Body); err != nil {
 		return err
 	}
 	return c.deleteMessage(m.ReceiptHandle)
