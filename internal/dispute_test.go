@@ -3,6 +3,7 @@ package internal
 import (
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestMapFromJson(t *testing.T) {
@@ -31,6 +32,7 @@ func TestMapFromJson(t *testing.T) {
 		CardId:              "3123",
 		Tenant:              "pismo.io",
 		DisputeAmount:       32.32,
+		TransactionDate:     Date(time.Date(2012, 04, 23, 0, 0, 0, 0, time.UTC)),
 		LocalCurrencyCode:   "USD",
 		TextMessage:         "this is a test message",
 		DocumentIndicator:   true,
