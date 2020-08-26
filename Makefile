@@ -45,7 +45,7 @@ integration-test: run-dep build
 	@echo "\nRunning integration tests\n"
 	@go test -cover -v -run Integration ./...
 
-test: unit-test integration-test
+test: fmt unit-test run-dep integration-test
 	@echo "\nRunning tests\n"
 
 codecov: run-dep
