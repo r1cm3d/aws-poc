@@ -11,7 +11,7 @@ type worker struct {
 	poller
 }
 type handler interface {
-	handleMessage(body string) error
+	handleMessage(cid, body string) error
 }
 type consumer interface {
 	receiveMessage(opts ...receiveMessageInput) ([]*sqs.Message, error)

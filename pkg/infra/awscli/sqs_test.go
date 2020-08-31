@@ -34,11 +34,11 @@ func (s sqsMock) DeleteMessage(*sqs.DeleteMessageInput) (*sqs.DeleteMessageOutpu
 	return nil, nil
 }
 
-func (m errHandler) handleMessage(_ string) error {
+func (m errHandler) handleMessage(_, _ string) error {
 	return errMock
 }
 
-func (m okHandler) handleMessage(_ string) error {
+func (m okHandler) handleMessage(_, _ string) error {
 	return nil
 }
 
