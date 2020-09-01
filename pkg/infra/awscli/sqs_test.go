@@ -15,7 +15,8 @@ type sqsMock struct{}
 
 var (
 	errMock       = errors.New("mocked error")
-	mockedMessage = &sqs.Message{Body: aws.String(""), ReceiptHandle: aws.String("receipt")}
+	attr          = map[string]*sqs.MessageAttributeValue{"cid": {StringValue: aws.String("2ce488cd-e6b0-4fea-a960-31256018cf08")}}
+	mockedMessage = &sqs.Message{MessageAttributes: attr, Body: aws.String(""), ReceiptHandle: aws.String("receipt")}
 )
 
 func (s sqsMock) GetQueueUrl(*sqs.GetQueueUrlInput) (*sqs.GetQueueUrlOutput, error) {
