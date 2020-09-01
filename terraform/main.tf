@@ -51,7 +51,6 @@ resource "aws_iam_policy" "aws_poc_sqs_policy" {
             ],
             "Resource": [
                 "${module.disputes_sqs_queue.this_sqs_queue_arn}",
-                "${module.chargeback_status_sqs_queue.this_sqs_queue_arn}",
                 "${module.chargeback_update_sqs_queue.this_sqs_queue_arn}",
                 "${module.chargeback_sqs_queue.this_sqs_queue_arn}"
             ]

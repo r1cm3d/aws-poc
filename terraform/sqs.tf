@@ -9,17 +9,6 @@ module "disputes_sqs_queue" {
   }
 }
 
-module "chargeback_status_sqs_queue" {
-  source = "./modules//sqs"
-  name   = "ChargebackStatus"
-
-  tags = {
-    Name    = "chargeback_status_sqs_queue"
-    project = var.project
-    env     = var.account
-  }
-}
-
 module "chargeback_sqs_queue" {
   source = "./modules//sqs"
   name   = "Chargeback"
