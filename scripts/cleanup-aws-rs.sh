@@ -5,9 +5,8 @@
 function run() {
 	for f in "$1"*; do
 		echo "executing $f"
-		eval "sh $f"
+		eval "bash $f"
 	done
 }
 
-run "delete"
-run "create"
+run "delete-tables"

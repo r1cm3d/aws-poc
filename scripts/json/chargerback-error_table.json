@@ -1,5 +1,5 @@
 {
-  "TableName": "MasterChargebackError",
+  "TableName": "ChargebackError",
   "KeySchema": [
     {
       "AttributeName": "Dispute_ID",
