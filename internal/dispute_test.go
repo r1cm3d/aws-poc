@@ -7,6 +7,7 @@ import (
 )
 
 func TestMapFromJson(t *testing.T) {
+	svc := disputeSvc{}
 	json := `{
   "correlationId": "7658c09d-a8c3-47f4-b584-922641ab3416",
   "disputeId": 611,
@@ -39,7 +40,7 @@ func TestMapFromJson(t *testing.T) {
 		IsPartialChargeback: false,
 	}
 
-	got, err := mapFromJson(json)
+	got, err := svc.mapFromJson(json)
 
 	if err != nil {
 		t.Error("mapFromJson() error should not be returned")
@@ -50,9 +51,20 @@ func TestMapFromJson(t *testing.T) {
 }
 
 func TestMapFromJson_Error(t *testing.T) {
-	_, err := mapFromJson("json")
+	svc := disputeSvc{}
+
+	_, err := svc.mapFromJson("json")
 
 	if err == nil {
 		t.Error("mapFromJson_Error() error should be returned")
+	}
+}
+
+func TestOpenChargeback(t *testing.T) {
+	svc := disputeSvc{}
+	d := Dispute{}
+
+	if err := svc.openChargeback(d); err != nil {
+		t.Error("openChargeback error should be returned")
 	}
 }
