@@ -1,4 +1,4 @@
-version: '2'
+version: '3.8'
 services:
   localstack:
     image: localstack/localstack:latest
@@ -14,3 +14,5 @@ services:
     volumes:
       - './.localstack:/tmp/localstack'
       - '/var/run/docker.sock:/var/run/docker.sock'
+    healthcheck:
+      test: curl -f "http://localhost:4566/health"
