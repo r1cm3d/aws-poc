@@ -33,6 +33,8 @@ unit-test: build
 run-dep: clean
 	@echo "\nStarting localstack container and creating AWS local resources\n"
 	@docker-compose up -d --force-recreate
+	@echo "\nWaiting until localstack be ready"
+	@until docker inspect --format='{{json .State.Health}}' aws | grep -o healthy; do sleep 1; done
 	@echo "\nCleaning AWS resources"
 	-@cd scripts && bash cleanup-aws-rs.sh
 	@echo "\nApplying terraform scripts"
