@@ -10,6 +10,7 @@ import (
 type (
 	errMapper     struct{}
 	errRepository struct{}
+	errCbSvc      struct{}
 )
 
 func (e errMapper) mapFromJson(string, string) (Dispute, error) {
@@ -21,6 +22,10 @@ func (e errRepository) lock(Dispute) (ok bool) {
 }
 
 func (e errRepository) unlock(Dispute) {
+}
+
+func (e errCbSvc) openChargeback(Dispute) error {
+	return nil
 }
 
 func TestMapFromJson(t *testing.T) {
@@ -94,6 +99,16 @@ func TestHandleMessage_LockError(t *testing.T) {
 
 	if err := svc.handleMessage("", ""); err == nil {
 		t.Error("HandleMessage_LockError() error should be returned")
+	}
+}
+
+func TestHandleMessage_OpenChargebackError(t *testing.T) {
+	svc := disputeSvc{
+		chargebackSvc: errCbSvc{},
+	}
+
+	if err := svc.handleMessage("", ""); err == nil {
+		t.Error("HandleMessage_OpenChargebackError() error should be returned")
 	}
 }
 
