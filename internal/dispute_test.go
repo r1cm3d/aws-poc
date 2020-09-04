@@ -1,15 +1,32 @@
 package internal
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 	"time"
 )
 
+type (
+	errMapper     struct{}
+	errRepository struct{}
+)
+
+func (e errMapper) mapFromJson(string, string) (Dispute, error) {
+	return Dispute{}, errors.New("mocked error")
+}
+
+func (e errRepository) lock(Dispute) (ok bool) {
+	return false
+}
+
+func (e errRepository) unlock(Dispute) {
+}
+
 func TestMapFromJson(t *testing.T) {
 	svc := disputeSvc{}
+	cid := "7658c09d-a8c3-47f4-b584-922641ab3416"
 	json := `{
-  "correlationId": "7658c09d-a8c3-47f4-b584-922641ab3416",
   "disputeId": 611,
   "accountId": 48448,
   "authorizationCode": "451",
@@ -25,7 +42,7 @@ func TestMapFromJson(t *testing.T) {
   "isPartialChargeback": false
 }`
 	want := Dispute{
-		CorrelationId:       "7658c09d-a8c3-47f4-b584-922641ab3416",
+		CorrelationId:       cid,
 		DisputeId:           611,
 		AccountId:           48448,
 		AuthorizationCode:   "451",
@@ -40,7 +57,7 @@ func TestMapFromJson(t *testing.T) {
 		IsPartialChargeback: false,
 	}
 
-	got, err := svc.mapFromJson(json)
+	got, err := svc.mapFromJson(cid, json)
 
 	if err != nil {
 		t.Error("mapFromJson() error should not be returned")
@@ -53,10 +70,30 @@ func TestMapFromJson(t *testing.T) {
 func TestMapFromJson_Error(t *testing.T) {
 	svc := disputeSvc{}
 
-	_, err := svc.mapFromJson("json")
+	_, err := svc.mapFromJson("", "json")
 
 	if err == nil {
 		t.Error("mapFromJson_Error() error should be returned")
+	}
+}
+
+func TestHandleMessage_MapError(t *testing.T) {
+	svc := disputeSvc{
+		disputeMapper: errMapper{},
+	}
+
+	if err := svc.handleMessage("", ""); err == nil {
+		t.Error("HandleMessage_MapError() error should be returned")
+	}
+}
+
+func TestHandleMessage_LockError(t *testing.T) {
+	svc := disputeSvc{
+		disputeRepository: errRepository{},
+	}
+
+	if err := svc.handleMessage("", ""); err == nil {
+		t.Error("HandleMessage_LockError() error should be returned")
 	}
 }
 

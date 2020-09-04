@@ -27,12 +27,12 @@ type (
 		IsPartialChargeback bool
 	}
 	disputeRepository interface {
-		lock(string, Dispute) (ok bool)
-		unlock(string, Dispute)
+		lock(Dispute) (ok bool)
+		unlock(Dispute)
 	}
 
 	disputeMapper interface {
-		mapFromJson(string) (Dispute, error)
+		mapFromJson(string, string) (Dispute, error)
 	}
 
 	disputeSvc struct {
@@ -46,17 +46,17 @@ func (s disputeSvc) openChargeback(_ Dispute) error {
 }
 
 func (s disputeSvc) handleMessage(cid, body string) error {
-	d, err := s.mapFromJson(body) // TODO: extract it to an interface to be able to test it
+	d, err := s.mapFromJson(cid, body)
 	if err != nil {
 		return errors.New(fmt.Sprintf("parser error: %s", err.Error()))
 	}
 
-	if ok := s.disputeRepository.lock(cid, d); !ok { //TODO: cover this flow
+	if ok := s.disputeRepository.lock(d); !ok { //TODO: cover this flow
 		return errors.New(fmt.Sprintf("idempotence error: cid(%v), disputeId(%v)", cid, d.DisputeId))
 	}
 
 	if err := s.openChargeback(d); err != nil { //TODO: cover this flow
-		defer s.disputeRepository.unlock(cid, d)
+		defer s.disputeRepository.unlock(d)
 		return errors.New(fmt.Sprintf("parser error: %s", err.Error()))
 	}
 
@@ -79,11 +79,12 @@ func (d *Date) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (s disputeSvc) mapFromJson(j string) (Dispute, error) {
+func (s disputeSvc) mapFromJson(cid, j string) (Dispute, error) {
 	var d Dispute
 	err := json.Unmarshal([]byte(j), &d)
 	if err != nil {
 		return Dispute{}, err
 	}
+	d.CorrelationId = cid
 	return d, nil
 }
