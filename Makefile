@@ -22,7 +22,7 @@ clean:
 	@(@docker rm -f aws || \
 	  rm -rf terraform/*tfstate* terraform/.terraform) 2>/dev/null | true
 
-build: clean fmt
+build: clean fmt lint
 	@echo "\nBuilding application\n"
 	@go build cmd/main.go
 
