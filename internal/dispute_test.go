@@ -47,12 +47,12 @@ func TestMapFromJson(t *testing.T) {
   "isPartialChargeback": false
 }`
 	want := Dispute{
-		CorrelationId:       cid,
-		DisputeId:           611,
-		AccountId:           48448,
+		CorrelationID:       cid,
+		DisputeID:           611,
+		AccountID:           48448,
 		AuthorizationCode:   "451",
 		ReasonCode:          "848",
-		CardId:              "3123",
+		CardID:              "3123",
 		Tenant:              "pismo.io",
 		DisputeAmount:       32.32,
 		TransactionDate:     Date(time.Date(2012, 04, 23, 0, 0, 0, 0, time.UTC)),

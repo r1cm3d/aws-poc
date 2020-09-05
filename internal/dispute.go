@@ -12,12 +12,12 @@ type (
 	Date time.Time
 
 	Dispute struct {
-		CorrelationId       string
-		DisputeId           int
-		AccountId           int
+		CorrelationID       string
+		DisputeID           int
+		AccountID           int
 		AuthorizationCode   string
 		ReasonCode          string
-		CardId              string
+		CardID              string
 		Tenant              string
 		DisputeAmount       float64
 		TransactionDate     Date
@@ -57,7 +57,7 @@ func (s disputeSvc) handleMessage(cid, body string) error {
 	}
 
 	if ok := s.disputeRepository.lock(d); !ok {
-		return errors.New(fmt.Sprintf("idempotence error: cid(%v), disputeId(%v)", cid, d.DisputeId))
+		return errors.New(fmt.Sprintf("idempotence error: cid(%v), disputeId(%v)", cid, d.DisputeID))
 	}
 
 	if err := s.open(d); err != nil {
@@ -90,6 +90,6 @@ func (s disputeSvc) mapFromJson(cid, j string) (Dispute, error) {
 	if err != nil {
 		return Dispute{}, err
 	}
-	d.CorrelationId = cid
+	d.CorrelationID = cid
 	return d, nil
 }
