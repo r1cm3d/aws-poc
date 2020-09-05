@@ -10,7 +10,7 @@ import (
 type (
 	errMapper     struct{}
 	errRepository struct{}
-	errCbSvc      struct{}
+	errDisputer   struct{}
 )
 
 func (e errMapper) mapFromJson(string, string) (Dispute, error) {
@@ -24,7 +24,7 @@ func (e errRepository) lock(Dispute) (ok bool) {
 func (e errRepository) unlock(Dispute) {
 }
 
-func (e errCbSvc) open(Dispute) error {
+func (e errDisputer) open(Dispute) error {
 	return nil
 }
 
@@ -82,37 +82,26 @@ func TestMapFromJson_Error(t *testing.T) {
 	}
 }
 
-func TestHandleMessage_MapError(t *testing.T) {
-	svc := disputeSvc{
-		disputeMapper: errMapper{},
+func TestHandleMessage(t *testing.T) {
+	cases := []struct {
+		name string
+		disputeSvc
+	}{
+		{"lockError", disputeSvc{disputeRepository: errRepository{}}},
+		{"mapError", disputeSvc{disputeMapper: errMapper{}}},
+		{"openError", disputeSvc{disputer: errDisputer{}}},
 	}
 
-	if err := svc.handleMessage("", ""); err == nil {
-		t.Error("HandleMessage_MapError() error should be returned")
-	}
-}
-
-func TestHandleMessage_LockError(t *testing.T) {
-	svc := disputeSvc{
-		disputeRepository: errRepository{},
-	}
-
-	if err := svc.handleMessage("", ""); err == nil {
-		t.Error("HandleMessage_LockError() error should be returned")
-	}
-}
-
-func TestHandleMessage_OpenChargebackError(t *testing.T) {
-	svc := disputeSvc{
-		disputer: errCbSvc{},
-	}
-
-	if err := svc.handleMessage("", ""); err == nil {
-		t.Error("HandleMessage_OpenChargebackError() error should be returned")
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			if err := c.disputeSvc.handleMessage("", ""); err == nil {
+				t.Errorf("%s . An error should be returned", c.name)
+			}
+		})
 	}
 }
 
-func TestOpenChargeback(t *testing.T) {
+func TestOpen(t *testing.T) {
 	svc := disputeSvc{}
 	d := Dispute{}
 
