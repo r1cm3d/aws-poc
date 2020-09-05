@@ -26,6 +26,7 @@ type SendMessageInput func(req *sqs.SendMessageInput)
 type receiveMessageInput func(req *sqs.ReceiveMessageInput)
 
 type sqsAdapter interface {
+	// This name is not linter compliance because is equal to GetQueueUrl method
 	GetQueueUrl(*sqs.GetQueueUrlInput) (*sqs.GetQueueUrlOutput, error)
 	ReceiveMessage(*sqs.ReceiveMessageInput) (*sqs.ReceiveMessageOutput, error)
 	ChangeMessageVisibility(*sqs.ChangeMessageVisibilityInput) (*sqs.ChangeMessageVisibilityOutput, error)

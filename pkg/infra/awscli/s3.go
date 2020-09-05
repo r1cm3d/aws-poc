@@ -10,10 +10,12 @@ import (
 	"os"
 )
 
+// S3cli handles S3 operations
 type S3cli struct {
 	session client.ConfigProvider
 }
 
+// Upload sent a io.Reader file to a S3 bucket with bucket and key name
 func (s S3cli) Upload(bucket, key string, file io.Reader) (err error) {
 	uploader := s3manager.NewUploader(s.session)
 	_, err = uploader.Upload(&s3manager.UploadInput{
@@ -25,6 +27,7 @@ func (s S3cli) Upload(bucket, key string, file io.Reader) (err error) {
 	return
 }
 
+// List is not complete implemented yet
 func (s S3cli) List(bucket, _ string) error {
 	svc := s3.New(s.session)
 	resp, err := svc.ListObjectsV2(&s3.ListObjectsV2Input{Bucket: aws.String(bucket)})
@@ -43,6 +46,7 @@ func (s S3cli) List(bucket, _ string) error {
 	return err
 }
 
+// Get is not complete implemented yet
 func (s S3cli) Get(bucket, key string) error {
 	file, err := os.Create(key)
 	if err != nil {
