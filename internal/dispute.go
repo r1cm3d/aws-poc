@@ -2,7 +2,6 @@ package internal
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -53,16 +52,16 @@ func (s disputeSvc) open(_ Dispute) error {
 func (s disputeSvc) handleMessage(cid, body string) error {
 	d, err := s.mapFromJson(cid, body)
 	if err != nil {
-		return errors.New(fmt.Sprintf("parser error: %s", err.Error()))
+		return fmt.Errorf("parser error: %s", err.Error())
 	}
 
 	if ok := s.disputeRepository.lock(d); !ok {
-		return errors.New(fmt.Sprintf("idempotence error: cid(%v), disputeId(%v)", cid, d.DisputeID))
+		return fmt.Errorf("idempotence error: cid(%v), disputeId(%v)", cid, d.DisputeID)
 	}
 
 	if err := s.open(d); err != nil {
 		defer s.disputeRepository.unlock(d)
-		return errors.New(fmt.Sprintf("parser error: %s", err.Error()))
+		return fmt.Errorf("parser error: %s", err.Error())
 	}
 
 	return nil
