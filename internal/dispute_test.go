@@ -16,10 +16,10 @@ type (
 	mockDisputer   struct{}
 )
 
-var mockError = errors.New("mocked error")
+var errFake = errors.New("mocked error")
 
 func (e errMapper) mapFromJSON(string, string) (dispute, error) {
-	return dispute{}, mockError
+	return dispute{}, errFake
 }
 
 func (m mockMapper) mapFromJSON(string, string) (dispute, error) {
@@ -34,7 +34,7 @@ func (e errRepository) unlock(dispute) {
 }
 
 func (e errDisputer) open(dispute) error {
-	return mockError
+	return errFake
 }
 
 func (m mockDisputer) open(dispute) error {
