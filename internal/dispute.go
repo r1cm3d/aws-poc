@@ -50,13 +50,13 @@ type (
 func (d *Date) UnmarshalJSON(data []byte) error {
 	if string(data) == "null" { //TODO: cover this flow
 		return nil
-	}
+	} //TODO: cover it with unit tests
 
 	s := strings.Trim(string(data), `"`)
 	t, err := time.Parse("2006-01-02", s)
 	if err != nil { //TODO: cover this flow
 		return err
-	}
+	} //TODO: cover it with unit tests
 
 	*d = Date(t)
 
@@ -68,8 +68,8 @@ func (s disputeSvc) open(_ dispute) error {
 }
 
 func (s disputeSvc) handleMessage(cid, body string) error {
-	d, err := s.mapFromJSON(cid, body)
-	if err != nil {
+	d, err := s.disputeMapper.mapFromJSON(cid, body)
+	if err != nil { // TODO: change errors to custom errors aiming to type assertions in tests improve handleMessage tests
 		return fmt.Errorf("parser error: %s", err.Error())
 	}
 
@@ -77,7 +77,7 @@ func (s disputeSvc) handleMessage(cid, body string) error {
 		return fmt.Errorf("idempotence error: cid(%v), disputeId(%v)", cid, d.DisputeID)
 	}
 
-	if err := s.open(d); err != nil {
+	if err := s.disputer.open(d); err != nil {
 		defer s.disputeRepository.unlock(d)
 		return fmt.Errorf("parser error: %s", err.Error())
 	}

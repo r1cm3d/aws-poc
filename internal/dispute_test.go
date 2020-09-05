@@ -8,13 +8,22 @@ import (
 )
 
 type (
-	errMapper     struct{}
-	errRepository struct{}
-	errDisputer   struct{}
+	errMapper      struct{}
+	errRepository  struct{}
+	errDisputer    struct{}
+	mockRepository struct{}
+	mockMapper     struct{}
+	mockDisputer   struct{}
 )
 
+var mockError = errors.New("mocked error")
+
 func (e errMapper) mapFromJSON(string, string) (dispute, error) {
-	return dispute{}, errors.New("mocked error")
+	return dispute{}, mockError
+}
+
+func (m mockMapper) mapFromJSON(string, string) (dispute, error) {
+	return dispute{}, nil
 }
 
 func (e errRepository) lock(dispute) (ok bool) {
@@ -25,7 +34,18 @@ func (e errRepository) unlock(dispute) {
 }
 
 func (e errDisputer) open(dispute) error {
+	return mockError
+}
+
+func (m mockDisputer) open(dispute) error {
 	return nil
+}
+
+func (m mockRepository) lock(dispute) (ok bool) {
+	return true
+}
+
+func (m mockRepository) unlock(dispute) {
 }
 
 func TestMapFromJson(t *testing.T) {
@@ -83,13 +103,25 @@ func TestMapFromJson_Error(t *testing.T) {
 }
 
 func TestHandleMessage(t *testing.T) {
+	svc := disputeSvc{
+		disputeRepository: mockRepository{},
+		disputeMapper:     mockMapper{},
+		disputer:          mockDisputer{},
+	}
+
+	if err := svc.handleMessage("", ""); err != nil {
+		t.Errorf("handleMessage should not return an error")
+	}
+}
+
+func TestHandleMessage_Error(t *testing.T) {
 	cases := []struct {
 		name string
 		disputeSvc
 	}{
-		{"lockError", disputeSvc{disputeRepository: errRepository{}}},
-		{"mapError", disputeSvc{disputeMapper: errMapper{}}},
-		{"openError", disputeSvc{disputer: errDisputer{}}},
+		{"lockError", disputeSvc{disputeMapper: mockMapper{}, disputeRepository: errRepository{}}},
+		{"mapError", disputeSvc{disputeRepository: mockRepository{}, disputeMapper: errMapper{}}},
+		{"openError", disputeSvc{disputeMapper: mockMapper{}, disputeRepository: mockRepository{}, disputer: errDisputer{}}},
 	}
 
 	for _, c := range cases {
