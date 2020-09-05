@@ -35,18 +35,18 @@ type (
 		mapFromJson(string, string) (Dispute, error)
 	}
 
-	chargebackSvc interface {
-		openChargeback(Dispute) error
+	disputer interface {
+		open(Dispute) error
 	}
 
 	disputeSvc struct {
 		disputeRepository
 		disputeMapper
-		chargebackSvc
+		disputer
 	}
 )
 
-func (s disputeSvc) openChargeback(_ Dispute) error {
+func (s disputeSvc) open(_ Dispute) error {
 	return nil
 }
 
@@ -60,7 +60,7 @@ func (s disputeSvc) handleMessage(cid, body string) error {
 		return errors.New(fmt.Sprintf("idempotence error: cid(%v), disputeId(%v)", cid, d.DisputeId))
 	}
 
-	if err := s.openChargeback(d); err != nil {
+	if err := s.open(d); err != nil {
 		defer s.disputeRepository.unlock(d)
 		return errors.New(fmt.Sprintf("parser error: %s", err.Error()))
 	}

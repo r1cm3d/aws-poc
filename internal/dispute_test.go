@@ -24,7 +24,7 @@ func (e errRepository) lock(Dispute) (ok bool) {
 func (e errRepository) unlock(Dispute) {
 }
 
-func (e errCbSvc) openChargeback(Dispute) error {
+func (e errCbSvc) open(Dispute) error {
 	return nil
 }
 
@@ -104,7 +104,7 @@ func TestHandleMessage_LockError(t *testing.T) {
 
 func TestHandleMessage_OpenChargebackError(t *testing.T) {
 	svc := disputeSvc{
-		chargebackSvc: errCbSvc{},
+		disputer: errCbSvc{},
 	}
 
 	if err := svc.handleMessage("", ""); err == nil {
@@ -116,7 +116,7 @@ func TestOpenChargeback(t *testing.T) {
 	svc := disputeSvc{}
 	d := Dispute{}
 
-	if err := svc.openChargeback(d); err != nil {
-		t.Error("openChargeback error should be returned")
+	if err := svc.open(d); err != nil {
+		t.Error("open error should be returned")
 	}
 }
