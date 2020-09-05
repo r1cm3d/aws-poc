@@ -10,7 +10,7 @@ import (
 
 var (
 	tableName     = aws.String("MasterChargebackError")
-	disputeId     = aws.String("DisputeId")
+	disputeID     = aws.String("DisputeID")
 	timestamp     = aws.String("Timestamp")
 	hashKeyType   = aws.String("HASH")
 	rangeKeyType  = aws.String("RANGE")

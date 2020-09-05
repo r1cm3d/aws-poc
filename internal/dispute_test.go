@@ -13,7 +13,7 @@ type (
 	errDisputer   struct{}
 )
 
-func (e errMapper) mapFromJson(string, string) (Dispute, error) {
+func (e errMapper) mapFromJSON(string, string) (Dispute, error) {
 	return Dispute{}, errors.New("mocked error")
 }
 
@@ -62,20 +62,20 @@ func TestMapFromJson(t *testing.T) {
 		IsPartialChargeback: false,
 	}
 
-	got, err := svc.mapFromJson(cid, json)
+	got, err := svc.mapFromJSON(cid, json)
 
 	if err != nil {
-		t.Error("mapFromJson() error should not be returned")
+		t.Error("mapFromJSON() error should not be returned")
 	}
 	if reflect.DeepEqual(got, want) {
-		t.Errorf("mapFromJson() got: %v, want: %v", got, want)
+		t.Errorf("mapFromJSON() got: %v, want: %v", got, want)
 	}
 }
 
 func TestMapFromJson_Error(t *testing.T) {
 	svc := disputeSvc{}
 
-	_, err := svc.mapFromJson("", "json")
+	_, err := svc.mapFromJSON("", "json")
 
 	if err == nil {
 		t.Error("mapFromJson_Error() error should be returned")

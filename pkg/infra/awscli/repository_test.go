@@ -8,7 +8,7 @@ import (
 )
 
 type Item struct {
-	DisputeId int
+	DisputeID int
 	Timestamp string
 }
 
@@ -17,8 +17,7 @@ func TestPutIntegration(t *testing.T) {
 	setupTable()
 	defer cleanupTable()
 	i := Item{
-		DisputeId: 666,
-		Timestamp: "2020-04-17T17:19:19.831Z",
+		DisputeID: 666, Timestamp: "2020-04-17T17:19:19.831Z",
 	}
 	table := newRepository(newLocalSession())
 
@@ -31,7 +30,7 @@ func setupTable() {
 	input := &dynamodb.CreateTableInput{
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
 			{
-				AttributeName: disputeId,
+				AttributeName: disputeID,
 				AttributeType: numberType,
 			},
 			{
@@ -41,7 +40,7 @@ func setupTable() {
 		},
 		KeySchema: []*dynamodb.KeySchemaElement{
 			{
-				AttributeName: disputeId,
+				AttributeName: disputeID,
 				KeyType:       hashKeyType,
 			},
 			{

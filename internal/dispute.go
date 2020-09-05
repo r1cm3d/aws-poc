@@ -31,7 +31,7 @@ type (
 	}
 
 	disputeMapper interface {
-		mapFromJson(string, string) (Dispute, error)
+		mapFromJSON(string, string) (Dispute, error)
 	}
 
 	disputer interface {
@@ -50,7 +50,7 @@ func (s disputeSvc) open(_ Dispute) error {
 }
 
 func (s disputeSvc) handleMessage(cid, body string) error {
-	d, err := s.mapFromJson(cid, body)
+	d, err := s.mapFromJSON(cid, body)
 	if err != nil {
 		return fmt.Errorf("parser error: %s", err.Error())
 	}
@@ -83,7 +83,7 @@ func (d *Date) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (s disputeSvc) mapFromJson(cid, j string) (Dispute, error) {
+func (s disputeSvc) mapFromJSON(cid, j string) (Dispute, error) {
 	var d Dispute
 	err := json.Unmarshal([]byte(j), &d)
 	if err != nil {
