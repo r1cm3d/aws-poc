@@ -8,9 +8,10 @@ import (
 )
 
 type (
+	// Date is an type to parse a string in the format YYYY-MM-DD and parse to time.Time
 	Date time.Time
 
-	Dispute struct {
+	dispute struct {
 		CorrelationID       string
 		DisputeID           int
 		AccountID           int
@@ -26,16 +27,16 @@ type (
 		IsPartialChargeback bool
 	}
 	disputeRepository interface {
-		lock(Dispute) (ok bool)
-		unlock(Dispute)
+		lock(dispute) (ok bool)
+		unlock(dispute)
 	}
 
 	disputeMapper interface {
-		mapFromJSON(string, string) (Dispute, error)
+		mapFromJSON(string, string) (dispute, error)
 	}
 
 	disputer interface {
-		open(Dispute) error
+		open(dispute) error
 	}
 
 	disputeSvc struct {
@@ -45,7 +46,24 @@ type (
 	}
 )
 
-func (s disputeSvc) open(_ Dispute) error {
+// UnmarshalJSON receive a date in []bytes and parse it in the pattern YYYY-MM-DD
+func (d *Date) UnmarshalJSON(data []byte) error {
+	if string(data) == "null" { //TODO: cover this flow
+		return nil
+	}
+
+	s := strings.Trim(string(data), `"`)
+	t, err := time.Parse("2006-01-02", s)
+	if err != nil { //TODO: cover this flow
+		return err
+	}
+
+	*d = Date(t)
+
+	return nil
+}
+
+func (s disputeSvc) open(_ dispute) error {
 	return nil
 }
 
@@ -67,27 +85,11 @@ func (s disputeSvc) handleMessage(cid, body string) error {
 	return nil
 }
 
-func (d *Date) UnmarshalJSON(data []byte) error {
-	if string(data) == "null" { //TODO: cover this flow
-		return nil
-	}
-
-	s := strings.Trim(string(data), `"`)
-	t, err := time.Parse("2006-01-02", s)
-	if err != nil { //TODO: cover this flow
-		return err
-	}
-
-	*d = Date(t)
-
-	return nil
-}
-
-func (s disputeSvc) mapFromJSON(cid, j string) (Dispute, error) {
-	var d Dispute
+func (s disputeSvc) mapFromJSON(cid, j string) (dispute, error) {
+	var d dispute
 	err := json.Unmarshal([]byte(j), &d)
 	if err != nil {
-		return Dispute{}, err
+		return dispute{}, err
 	}
 	d.CorrelationID = cid
 	return d, nil

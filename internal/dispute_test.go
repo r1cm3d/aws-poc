@@ -13,18 +13,18 @@ type (
 	errDisputer   struct{}
 )
 
-func (e errMapper) mapFromJSON(string, string) (Dispute, error) {
-	return Dispute{}, errors.New("mocked error")
+func (e errMapper) mapFromJSON(string, string) (dispute, error) {
+	return dispute{}, errors.New("mocked error")
 }
 
-func (e errRepository) lock(Dispute) (ok bool) {
+func (e errRepository) lock(dispute) (ok bool) {
 	return false
 }
 
-func (e errRepository) unlock(Dispute) {
+func (e errRepository) unlock(dispute) {
 }
 
-func (e errDisputer) open(Dispute) error {
+func (e errDisputer) open(dispute) error {
 	return nil
 }
 
@@ -46,7 +46,7 @@ func TestMapFromJson(t *testing.T) {
   "documentIndicator": true,
   "isPartialChargeback": false
 }`
-	want := Dispute{
+	want := dispute{
 		CorrelationID:       cid,
 		DisputeID:           611,
 		AccountID:           48448,
@@ -103,7 +103,7 @@ func TestHandleMessage(t *testing.T) {
 
 func TestOpen(t *testing.T) {
 	svc := disputeSvc{}
-	d := Dispute{}
+	d := dispute{}
 
 	if err := svc.open(d); err != nil {
 		t.Error("open error should be returned")
