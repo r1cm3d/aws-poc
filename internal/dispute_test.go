@@ -75,7 +75,7 @@ func TestMapFromJson(t *testing.T) {
 		CardID:              "3123",
 		Tenant:              "pismo.io",
 		DisputeAmount:       32.32,
-		TransactionDate:     Date(time.Date(2012, 04, 23, 0, 0, 0, 0, time.UTC)),
+		TransactionDate:     date(time.Date(2012, 04, 23, 0, 0, 0, 0, time.UTC)),
 		LocalCurrencyCode:   "USD",
 		TextMessage:         "this is a test message",
 		DocumentIndicator:   true,

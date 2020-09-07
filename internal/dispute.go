@@ -8,8 +8,7 @@ import (
 )
 
 type (
-	// Date is an type to parse a string in the format YYYY-MM-DD and parse to time.Time
-	Date time.Time
+	date time.Time
 
 	dispute struct {
 		CorrelationID       string
@@ -20,7 +19,7 @@ type (
 		CardID              string
 		Tenant              string
 		DisputeAmount       float64
-		TransactionDate     Date
+		TransactionDate     date
 		LocalCurrencyCode   string
 		TextMessage         string
 		DocumentIndicator   bool
@@ -48,7 +47,7 @@ type (
 )
 
 // UnmarshalJSON receive a date in []bytes and parse it in the pattern YYYY-MM-DD
-func (d *Date) UnmarshalJSON(data []byte) error {
+func (d *date) UnmarshalJSON(data []byte) error {
 	if string(data) == "null" { //TODO: cover this flow
 		return nil
 	} //TODO: cover it with unit tests
@@ -59,7 +58,7 @@ func (d *Date) UnmarshalJSON(data []byte) error {
 		return err
 	} //TODO: cover it with unit tests
 
-	*d = Date(t)
+	*d = date(t)
 
 	return nil
 }
