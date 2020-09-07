@@ -15,7 +15,7 @@ fmt:
 	@echo "\nFormatting terraform files"
 	@terraform fmt deployments/terraform/
 	@echo "\nFormatting go files\n"
-	@go fmt ./...
+	@goimports -w $(shell find . -type f -name '*.go')
 
 clean:
 	@echo "\nRemoving localstack container\n"
