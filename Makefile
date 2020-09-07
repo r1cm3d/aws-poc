@@ -13,14 +13,14 @@ fmt:
 	@echo "\nFormatting scripts\n"
 	@shfmt -w scripts/*sh
 	@echo "\nFormatting terraform files"
-	@terraform fmt terraform/
+	@terraform fmt deployments/terraform/
 	@echo "\nFormatting go files\n"
 	@go fmt ./...
 
 clean:
 	@echo "\nRemoving localstack container\n"
 	@(@docker rm -f aws || \
-	  rm -rf terraform/*tfstate* terraform/.terraform) 2>/dev/null | true
+	  rm -rf deployments/terraform/*tfstate* deployments/terraform/.terraform) 2>/dev/null | true
 
 build: clean fmt lint
 	@echo "\nBuilding application\n"
@@ -38,7 +38,7 @@ run-dep: clean
 	@echo "\nCleaning AWS resources"
 	-@cd scripts && bash cleanup-aws-rs.sh
 	@echo "\nApplying terraform scripts"
-	-cd terraform && \
+	-cd deployments/terraform/ && \
 	terraform init && \
 	terraform destroy  -auto-approve && \
 	terraform plan && \

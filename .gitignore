@@ -8,5 +8,5 @@ main
 *.out
 .localstack
 .idea/
-terraform/*tfstate*
-terraform/.terraform
+**/terraform/*tfstate*
+**/terraform/.terraform
