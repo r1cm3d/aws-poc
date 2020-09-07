@@ -26,22 +26,23 @@ type (
 		DocumentIndicator   bool
 		IsPartialChargeback bool
 	}
-	disputeRepository interface {
+
+	register interface {
 		lock(dispute) (ok bool)
 		unlock(dispute)
 	}
 
-	disputeMapper interface {
-		mapFromJSON(string, string) (dispute, error)
+	mapper interface {
+		fromJSON(string, string) (dispute, error)
 	}
 
 	disputer interface {
 		open(dispute) error
 	}
 
-	disputeSvc struct {
-		disputeRepository
-		disputeMapper
+	service struct {
+		register
+		mapper
 		disputer
 	}
 )
@@ -63,29 +64,29 @@ func (d *Date) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (s disputeSvc) open(_ dispute) error {
+func (s service) open(_ dispute) error {
 	return nil
 }
 
-func (s disputeSvc) handleMessage(cid, body string) error {
-	d, err := s.disputeMapper.mapFromJSON(cid, body)
+func (s service) handleMessage(cid, body string) error {
+	d, err := s.mapper.fromJSON(cid, body)
 	if err != nil { // TODO: change errors to custom errors aiming to type assertions in tests improve handleMessage tests
 		return fmt.Errorf("parser error: %s", err.Error())
 	}
 
-	if ok := s.disputeRepository.lock(d); !ok {
+	if ok := s.register.lock(d); !ok {
 		return fmt.Errorf("idempotence error: cid(%v), disputeId(%v)", cid, d.DisputeID)
 	}
 
 	if err := s.disputer.open(d); err != nil {
-		defer s.disputeRepository.unlock(d)
+		defer s.register.unlock(d)
 		return fmt.Errorf("parser error: %s", err.Error())
 	}
 
 	return nil
 }
 
-func (s disputeSvc) mapFromJSON(cid, j string) (dispute, error) {
+func (s service) fromJSON(cid, j string) (dispute, error) {
 	var d dispute
 	err := json.Unmarshal([]byte(j), &d)
 	if err != nil {

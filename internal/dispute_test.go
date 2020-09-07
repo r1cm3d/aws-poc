@@ -18,11 +18,11 @@ type (
 
 var errFake = errors.New("mocked error")
 
-func (e errMapper) mapFromJSON(string, string) (dispute, error) {
+func (e errMapper) fromJSON(string, string) (dispute, error) {
 	return dispute{}, errFake
 }
 
-func (m mockMapper) mapFromJSON(string, string) (dispute, error) {
+func (m mockMapper) fromJSON(string, string) (dispute, error) {
 	return dispute{}, nil
 }
 
@@ -49,7 +49,7 @@ func (m mockRepository) unlock(dispute) {
 }
 
 func TestMapFromJson(t *testing.T) {
-	svc := disputeSvc{}
+	svc := service{}
 	cid := "7658c09d-a8c3-47f4-b584-922641ab3416"
 	json := `{
   "disputeId": 611,
@@ -82,20 +82,20 @@ func TestMapFromJson(t *testing.T) {
 		IsPartialChargeback: false,
 	}
 
-	got, err := svc.mapFromJSON(cid, json)
+	got, err := svc.fromJSON(cid, json)
 
 	if err != nil {
-		t.Error("mapFromJSON() error should not be returned")
+		t.Error("fromJSON() error should not be returned")
 	}
 	if reflect.DeepEqual(got, want) {
-		t.Errorf("mapFromJSON() got: %v, want: %v", got, want)
+		t.Errorf("fromJSON() got: %v, want: %v", got, want)
 	}
 }
 
 func TestMapFromJson_Error(t *testing.T) {
-	svc := disputeSvc{}
+	svc := service{}
 
-	_, err := svc.mapFromJSON("", "json")
+	_, err := svc.fromJSON("", "json")
 
 	if err == nil {
 		t.Error("mapFromJson_Error() error should be returned")
@@ -103,10 +103,10 @@ func TestMapFromJson_Error(t *testing.T) {
 }
 
 func TestHandleMessage(t *testing.T) {
-	svc := disputeSvc{
-		disputeRepository: mockRepository{},
-		disputeMapper:     mockMapper{},
-		disputer:          mockDisputer{},
+	svc := service{
+		register: mockRepository{},
+		mapper:   mockMapper{},
+		disputer: mockDisputer{},
 	}
 
 	if err := svc.handleMessage("", ""); err != nil {
@@ -117,16 +117,16 @@ func TestHandleMessage(t *testing.T) {
 func TestHandleMessage_Error(t *testing.T) {
 	cases := []struct {
 		name string
-		disputeSvc
+		service
 	}{
-		{"lockError", disputeSvc{disputeMapper: mockMapper{}, disputeRepository: errRepository{}}},
-		{"mapError", disputeSvc{disputeRepository: mockRepository{}, disputeMapper: errMapper{}}},
-		{"openError", disputeSvc{disputeMapper: mockMapper{}, disputeRepository: mockRepository{}, disputer: errDisputer{}}},
+		{"lockError", service{mapper: mockMapper{}, register: errRepository{}}},
+		{"mapError", service{register: mockRepository{}, mapper: errMapper{}}},
+		{"openError", service{mapper: mockMapper{}, register: mockRepository{}, disputer: errDisputer{}}},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			if err := c.disputeSvc.handleMessage("", ""); err == nil {
+			if err := c.service.handleMessage("", ""); err == nil {
 				t.Errorf("%s . An error should be returned", c.name)
 			}
 		})
@@ -134,7 +134,7 @@ func TestHandleMessage_Error(t *testing.T) {
 }
 
 func TestOpen(t *testing.T) {
-	svc := disputeSvc{}
+	svc := service{}
 	d := dispute{}
 
 	if err := svc.open(d); err != nil {
