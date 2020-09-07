@@ -1,6 +1,7 @@
 package awscli
 
 import (
+	"fmt"
 	"log"
 	"reflect"
 	"strconv"
@@ -76,7 +77,7 @@ func TestMessageAttributeValue_Panic(t *testing.T) {
 }
 
 func TestMessageAttributeValue(t *testing.T) {
-	s, i64, i := "string", int64(666), 42
+	s, i64, integer := "string", int64(666), 42
 	m := map[interface{}]interface{}{
 		s: &sqs.MessageAttributeValue{
 			DataType:    aws.String(dataTypeString),
@@ -86,9 +87,9 @@ func TestMessageAttributeValue(t *testing.T) {
 			DataType:    aws.String(dataTypeNumber),
 			StringValue: aws.String(strconv.FormatInt(i64, 10)),
 		},
-		i: &sqs.MessageAttributeValue{
+		integer: &sqs.MessageAttributeValue{
 			DataType:    aws.String(dataTypeNumber),
-			StringValue: aws.String(strconv.FormatInt(int64(i), 10)),
+			StringValue: aws.String(strconv.FormatInt(int64(integer), 10)),
 		},
 	}
 	b := &sqs.MessageAttributeValue{
@@ -96,11 +97,13 @@ func TestMessageAttributeValue(t *testing.T) {
 		BinaryValue: []byte{0},
 	}
 
-	for in, want := range m {
-		got := MessageAttributeValue(in)
-		if !reflect.DeepEqual(got, want) {
-			t.Errorf("want: %d; got: %d", want, got)
-		}
+	for i, want := range m {
+		t.Run(fmt.Sprintf("%T", m[i]), func(t *testing.T) {
+			got := MessageAttributeValue(i)
+			if !reflect.DeepEqual(got, want) {
+				t.Errorf("want: %d; got: %d", want, got)
+			}
+		})
 	}
 
 	got := MessageAttributeValue([]byte{0})
