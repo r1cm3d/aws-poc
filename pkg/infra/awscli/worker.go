@@ -1,8 +1,9 @@
 package awscli
 
 import (
-	"github.com/aws/aws-sdk-go/service/sqs"
 	"log"
+
+	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
 type worker struct {

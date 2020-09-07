@@ -2,9 +2,10 @@ package awscli
 
 import (
 	"fmt"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"log"
 	"testing"
+
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
 type Item struct {

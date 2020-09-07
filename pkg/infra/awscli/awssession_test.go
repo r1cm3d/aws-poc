@@ -2,9 +2,10 @@ package awscli
 
 import (
 	"aws-poc/pkg/infra"
+	"testing"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"testing"
 )
 
 const (

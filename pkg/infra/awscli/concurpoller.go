@@ -1,9 +1,10 @@
 package awscli
 
 import (
-	"github.com/aws/aws-sdk-go/service/sqs"
 	"log"
 	"sync"
+
+	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
 type concurPoller struct{}

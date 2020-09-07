@@ -1,12 +1,13 @@
 package awscli
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/sqs"
 	"log"
 	"reflect"
 	"strconv"
 	"testing"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
 const (

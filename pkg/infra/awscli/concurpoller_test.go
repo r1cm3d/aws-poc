@@ -1,8 +1,9 @@
 package awscli
 
 import (
-	"github.com/aws/aws-sdk-go/service/sqs"
 	"testing"
+
+	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
 func TestHandleMessage_Error(t *testing.T) {

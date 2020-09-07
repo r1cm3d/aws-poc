@@ -1,9 +1,10 @@
 package awscli
 
 import (
+	"strconv"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/sqs"
-	"strconv"
 )
 
 const (
