@@ -13,27 +13,29 @@ const (
 	dataTypeBinary = "Binary"
 )
 
-// A Queue is an sqs queue which holds queue url in url.
-// Queue allows you to call actions without queue url for every call.
-type Queue struct {
-	url *string
-	sqs sqsAdapter
-}
+type (
+	// A Queue is an sqs queue which holds queue url in url.
+	// Queue allows you to call actions without queue url for every call.
+	Queue struct {
+		url *string
+		sqs sqsAdapter
+	}
 
-// SendMessageInput type is an adapter to change a parameter in
-// sqs.SendMessageInput.
-type SendMessageInput func(req *sqs.SendMessageInput)
+	// SendMessageInput type is an adapter to change a parameter in
+	// sqs.SendMessageInput.
+	SendMessageInput func(req *sqs.SendMessageInput)
 
-type receiveMessageInput func(req *sqs.ReceiveMessageInput)
+	receiveMessageInput func(req *sqs.ReceiveMessageInput)
 
-type sqsAdapter interface {
-	// This name is not linter compliance because is equal to GetQueueUrl method
-	GetQueueUrl(*sqs.GetQueueUrlInput) (*sqs.GetQueueUrlOutput, error)
-	ReceiveMessage(*sqs.ReceiveMessageInput) (*sqs.ReceiveMessageOutput, error)
-	ChangeMessageVisibility(*sqs.ChangeMessageVisibilityInput) (*sqs.ChangeMessageVisibilityOutput, error)
-	SendMessage(*sqs.SendMessageInput) (*sqs.SendMessageOutput, error)
-	DeleteMessage(*sqs.DeleteMessageInput) (*sqs.DeleteMessageOutput, error)
-}
+	sqsAdapter interface {
+		// This name is not linter compliance because is equal to GetQueueUrl method
+		GetQueueUrl(*sqs.GetQueueUrlInput) (*sqs.GetQueueUrlOutput, error)
+		ReceiveMessage(*sqs.ReceiveMessageInput) (*sqs.ReceiveMessageOutput, error)
+		ChangeMessageVisibility(*sqs.ChangeMessageVisibilityInput) (*sqs.ChangeMessageVisibilityOutput, error)
+		SendMessage(*sqs.SendMessageInput) (*sqs.SendMessageOutput, error)
+		DeleteMessage(*sqs.DeleteMessageInput) (*sqs.DeleteMessageOutput, error)
+	}
+)
 
 // New initializes Queue with queue name.
 func New(s sqsAdapter, name string) (*Queue, error) {

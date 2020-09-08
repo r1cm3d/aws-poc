@@ -6,21 +6,26 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
-type worker struct {
-	handler
-	consumer
-	poller
-}
-type handler interface {
-	handleMessage(cid, body string) error
-}
-type consumer interface {
-	receiveMessage(opts ...receiveMessageInput) ([]*sqs.Message, error)
-	deleteMessage(receiptHandle *string) error
-}
-type poller interface {
-	run(consumer, handler, []*sqs.Message)
-}
+type (
+	worker struct {
+		handler
+		consumer
+		poller
+	}
+
+	handler interface {
+		handleMessage(cid, body string) error
+	}
+
+	consumer interface {
+		receiveMessage(opts ...receiveMessageInput) ([]*sqs.Message, error)
+		deleteMessage(receiptHandle *string) error
+	}
+
+	poller interface {
+		run(consumer, handler, []*sqs.Message)
+	}
+)
 
 // Start starts worker passed as argument and errors and success through channels
 func Start(w worker, errors, success chan<- int) {

@@ -7,17 +7,19 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
-type errHandler func(string) error
-type okHandler func(string) error
-type fakeErrQueue struct{}
-type fakeOkQueue struct{}
-type fakePoller struct{}
-type sqsMock struct{}
-
 var (
 	errMock       = errors.New("mocked error")
 	attr          = map[string]*sqs.MessageAttributeValue{"cid": {StringValue: aws.String("2ce488cd-e6b0-4fea-a960-31256018cf08")}}
 	mockedMessage = &sqs.Message{MessageAttributes: attr, Body: aws.String(""), ReceiptHandle: aws.String("receipt")}
+)
+
+type (
+	sqsMock      struct{}
+	fakePoller   struct{}
+	fakeOkQueue  struct{}
+	fakeErrQueue struct{}
+	okHandler    func(string) error
+	errHandler   func(string) error
 )
 
 func (s sqsMock) GetQueueUrl(*sqs.GetQueueUrlInput) (*sqs.GetQueueUrlOutput, error) {
