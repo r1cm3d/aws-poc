@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+//TODO: extract it to a file called service and a package called dispute
 type (
 	date time.Time
 
