@@ -103,31 +103,23 @@ func TestMapFromJson_Error(t *testing.T) {
 }
 
 func TestHandleMessage(t *testing.T) {
-	svc := service{
-		register: mockRepository{},
-		mapper:   mockMapper{},
-		disputer: mockDisputer{},
-	}
-
-	if err := svc.handleMessage("", ""); err != nil {
-		t.Errorf("handleMessage should not return an error")
-	}
-}
-
-func TestHandleMessage_Error(t *testing.T) {
+	defaultInput := [2]string{"e1388e36-1683-4902-b30c-5c5b63f5976c", "body"}
 	cases := []struct {
 		name string
+		in   [2]string
+		want error
 		service
 	}{
-		{"lockError", service{mapper: mockMapper{}, register: errRepository{}}},
-		{"mapError", service{register: mockRepository{}, mapper: errMapper{}}},
-		{"openError", service{mapper: mockMapper{}, register: mockRepository{}, disputer: errDisputer{}}},
+		{"success", defaultInput, nil, service{mapper: mockMapper{}, register: mockRepository{}, disputer: mockDisputer{}}},
+		{"lockError", defaultInput, nil, service{mapper: mockMapper{}, register: errRepository{}}}, //TODO: fix below from here
+		{"mapError", defaultInput, nil, service{register: mockRepository{}, mapper: errMapper{}}},
+		{"openError", defaultInput, nil, service{mapper: mockMapper{}, register: mockRepository{}, disputer: errDisputer{}}},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			if err := c.service.handleMessage("", ""); err == nil {
-				t.Errorf("%s . An error should be returned", c.name)
+			if got := c.service.handleMessage(c.in[0], c.in[1]); !reflect.DeepEqual(c.want, got) {
+				t.Errorf("%s, want: %v, got: %v", c.name, c.want, got)
 			}
 		})
 	}
