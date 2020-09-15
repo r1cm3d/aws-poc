@@ -48,15 +48,15 @@ type (
 
 // UnmarshalJSON receive a date in []bytes and parse it in the pattern YYYY-MM-DD
 func (d *date) UnmarshalJSON(data []byte) error {
-	if string(data) == "null" { //TODO: cover this flow
+	if string(data) == "null" {
 		return nil
-	} //TODO: cover it with unit tests
+	}
 
 	s := strings.Trim(string(data), `"`)
 	t, err := time.Parse("2006-01-02", s)
-	if err != nil { //TODO: cover this flow
+	if err != nil {
 		return err
-	} //TODO: cover it with unit tests
+	}
 
 	*d = date(t)
 
