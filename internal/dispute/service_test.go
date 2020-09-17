@@ -1,7 +1,6 @@
 package dispute
 
 import (
-	"errors"
 	"reflect"
 	"testing"
 	"time"
@@ -14,16 +13,6 @@ type (
 	mockRepository struct{}
 	mockMapper     struct{}
 	mockDisputer   struct{}
-)
-
-const (
-	disputeID = 666
-	cid       = "e1388e36-1683-4902-b30c-5c5b63f5976c"
-)
-
-var (
-	errFake     = errors.New("mocked error")
-	disputeFake = dispute{DisputeID: disputeID}
 )
 
 func (e errMapper) fromJSON(string, string) (dispute, error) {
