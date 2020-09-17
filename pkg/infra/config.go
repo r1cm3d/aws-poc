@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const defaultConfigDir = "../../../scripts/env/"
+const defaultConfigDir = "../../scripts/env/"
 
 // LoadConf load env files according dir string passed as argument and set them into a map
 func LoadConf(dir string) (map[string]string, error) {
