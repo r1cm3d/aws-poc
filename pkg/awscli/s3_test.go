@@ -67,7 +67,7 @@ func TestGetIntegration(t *testing.T) {
 	setupBucket()
 	defer cleanupBucket()
 
-	file, err := os.Open("../../scripts/env/.env")
+	file, err := os.Open(filename)
 	if err != nil {
 		log.Fatal("enable to open file")
 	}
