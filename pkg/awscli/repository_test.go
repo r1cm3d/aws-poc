@@ -1,6 +1,7 @@
 package awscli
 
 import (
+	"aws-poc/pkg/awssession"
 	"fmt"
 	"log"
 	"testing"
@@ -20,7 +21,7 @@ func TestPutIntegration(t *testing.T) {
 	i := Item{
 		DisputeID: 666, Timestamp: "2020-04-17T17:19:19.831Z",
 	}
-	table := newRepository(newLocalSession())
+	table := newRepository(awssession.NewLocalSession())
 
 	if err := table.put(i); err != nil {
 		t.Errorf("put fails: %d", err)
@@ -53,7 +54,7 @@ func setupTable() {
 		TableName:   tableName,
 	}
 
-	r := newRepository(newLocalSession())
+	r := newRepository(awssession.NewLocalSession())
 	svc := r.svc()
 	if _, err := svc.CreateTable(input); err != nil {
 		log.Fatal(err.Error())
@@ -63,7 +64,7 @@ func setupTable() {
 }
 
 func cleanupTable() {
-	r := newRepository(newLocalSession())
+	r := newRepository(awssession.NewLocalSession())
 	svc := r.svc()
 
 	input := &dynamodb.DeleteTableInput{

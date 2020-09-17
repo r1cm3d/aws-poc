@@ -1,6 +1,7 @@
 package awscli
 
 import (
+	"aws-poc/pkg/awssession"
 	"log"
 	"os"
 	"testing"
@@ -20,7 +21,7 @@ func TestUploadIntegration(t *testing.T) {
 	setupBucket()
 	defer cleanupBucket()
 
-	sess := newLocalSessionWithS3ForcePathStyle()
+	sess := awssession.NewLocalSessionWithS3ForcePathStyle()
 
 	file, err := os.Open(filename)
 	if err != nil {
@@ -42,7 +43,7 @@ func TestListIntegration(t *testing.T) {
 	setupBucket()
 	defer cleanupBucket()
 
-	sess := newLocalSessionWithS3ForcePathStyle()
+	sess := awssession.NewLocalSessionWithS3ForcePathStyle()
 
 	file, err := os.Open(filename)
 	if err != nil {
@@ -74,7 +75,7 @@ func TestGetIntegration(t *testing.T) {
 	defer file.Close()
 
 	s3cli := S3cli{
-		newLocalSessionWithS3ForcePathStyle(),
+		awssession.NewLocalSessionWithS3ForcePathStyle(),
 	}
 
 	if err := s3cli.Upload(bucketName, key, file); err != nil {
@@ -86,7 +87,7 @@ func TestGetIntegration(t *testing.T) {
 }
 
 func setupBucket() {
-	sess := newLocalSessionWithS3ForcePathStyle()
+	sess := awssession.NewLocalSessionWithS3ForcePathStyle()
 
 	svc := s3.New(sess)
 	if _, err := svc.CreateBucket(&s3.CreateBucketInput{Bucket: aws.String(bucketName)}); err != nil {
@@ -102,7 +103,7 @@ func setupBucket() {
 }
 
 func cleanupBucket() {
-	sess := newLocalSessionWithS3ForcePathStyle()
+	sess := awssession.NewLocalSessionWithS3ForcePathStyle()
 	svc := s3.New(sess)
 	doi := &s3.DeleteObjectInput{Bucket: aws.String(bucketName), Key: aws.String(key)}
 	if _, err := svc.DeleteObject(doi); err != nil {

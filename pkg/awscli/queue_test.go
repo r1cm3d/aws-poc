@@ -1,6 +1,7 @@
 package awscli
 
 import (
+	"aws-poc/pkg/awssession"
 	"fmt"
 	"log"
 	"reflect"
@@ -17,7 +18,7 @@ const (
 )
 
 func newSQS() *sqs.SQS {
-	return sqs.New(newLocalSession())
+	return sqs.New(awssession.NewLocalSession())
 }
 
 func setup() *Queue {
