@@ -16,14 +16,22 @@ type (
 	mockDisputer   struct{}
 )
 
-var errFake = errors.New("mocked error")
+const (
+	disputeID = 666
+	cid       = "e1388e36-1683-4902-b30c-5c5b63f5976c"
+)
+
+var (
+	errFake     = errors.New("mocked error")
+	disputeFake = dispute{DisputeID: disputeID}
+)
 
 func (e errMapper) fromJSON(string, string) (dispute, error) {
-	return dispute{}, errFake
+	return disputeFake, errFake
 }
 
 func (m mockMapper) fromJSON(string, string) (dispute, error) {
-	return dispute{}, nil
+	return disputeFake, nil
 }
 
 func (e errRepository) lock(dispute) (ok bool) {
@@ -50,7 +58,7 @@ func (m mockRepository) unlock(dispute) {
 
 func TestMapFromJson(t *testing.T) {
 	svc := service{}
-	cid := "7658c09d-a8c3-47f4-b584-922641ab3416"
+	cid := cid
 	json := `{
   "disputeId": 611,
   "accountId": 48448,
@@ -103,7 +111,7 @@ func TestMapFromJson_Error(t *testing.T) {
 }
 
 func TestHandleMessage(t *testing.T) {
-	defaultInput := [2]string{"e1388e36-1683-4902-b30c-5c5b63f5976c", "body"}
+	defaultInput := [2]string{cid, "body"}
 	cases := []struct {
 		name string
 		in   [2]string
@@ -111,9 +119,9 @@ func TestHandleMessage(t *testing.T) {
 		service
 	}{
 		{"success", defaultInput, nil, service{mapper: mockMapper{}, register: mockRepository{}, disputer: mockDisputer{}}},
-		{"lockError", defaultInput, nil, service{mapper: mockMapper{}, register: errRepository{}}}, //TODO: fix below from here
-		{"mapError", defaultInput, nil, service{register: mockRepository{}, mapper: errMapper{}}},
-		{"openError", defaultInput, nil, service{mapper: mockMapper{}, register: mockRepository{}, disputer: errDisputer{}}},
+		{"parseError", defaultInput, newParseError(errFake), service{register: mockRepository{}, mapper: errMapper{}}},
+		{"idempotenceError", defaultInput, newIdempotenceError(cid, disputeID), service{mapper: mockMapper{}, register: errRepository{}}},
+		{"chargebackError", defaultInput, newChargebackError(errFake, cid, disputeID), service{mapper: mockMapper{}, register: mockRepository{}, disputer: errDisputer{}}},
 	}
 
 	for _, c := range cases {

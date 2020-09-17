@@ -2,7 +2,6 @@ package dispute
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 	"time"
 )
@@ -69,17 +68,17 @@ func (s service) open(_ dispute) error {
 
 func (s service) handleMessage(cid, body string) error {
 	d, err := s.mapper.fromJSON(cid, body)
-	if err != nil { // TODO: change errors to custom errors aiming to type assertions in tests improve handleMessage tests
-		return fmt.Errorf("parser error: %s", err.Error())
+	if err != nil {
+		return newParseError(err)
 	}
 
 	if ok := s.register.lock(d); !ok {
-		return fmt.Errorf("idempotence error: cid(%v), disputeId(%v)", cid, d.DisputeID)
+		return newIdempotenceError(cid, d.DisputeID)
 	}
 
 	if err := s.disputer.open(d); err != nil {
 		defer s.register.unlock(d)
-		return fmt.Errorf("parser error: %s", err.Error())
+		return newChargebackError(err, cid, d.DisputeID)
 	}
 
 	return nil
