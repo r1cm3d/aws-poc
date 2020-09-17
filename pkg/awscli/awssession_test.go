@@ -1,7 +1,7 @@
 package awscli
 
 import (
-	"aws-poc/pkg/infra"
+	"aws-poc/pkg/config"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -14,7 +14,7 @@ const (
 )
 
 func newLocalSession() (sess *session.Session) {
-	env, _ := infra.LoadDefaultConf()
+	env, _ := config.LoadDefaultConf()
 	sess = newSession(env["REGION"], env["ENDPOINT"])
 	return
 }

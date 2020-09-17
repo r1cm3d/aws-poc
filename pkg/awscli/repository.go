@@ -1,7 +1,7 @@
 package awscli
 
 import (
-	"aws-poc/pkg/infra"
+	"aws-poc/pkg/config"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -29,7 +29,7 @@ func newRepository(sess *session.Session) repository {
 }
 
 func (r repository) svc() (svc *dynamodb.DynamoDB) {
-	env, _ := infra.LoadDefaultConf()
+	env, _ := config.LoadDefaultConf()
 	sess := newSession(env["REGION"], env["ENDPOINT"])
 	svc = dynamodb.New(sess)
 	return
