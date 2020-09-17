@@ -12,7 +12,7 @@ import (
 const (
 	bucketName = "bucket"
 	key        = "kellyKey"
-	filename   = "../../../scripts/env/.env"
+	filename   = "../../scripts/env/.env"
 )
 
 func TestUploadIntegration(t *testing.T) {
@@ -67,7 +67,7 @@ func TestGetIntegration(t *testing.T) {
 	setupBucket()
 	defer cleanupBucket()
 
-	file, err := os.Open("../../../scripts/env/.env")
+	file, err := os.Open("../../scripts/env/.env")
 	if err != nil {
 		log.Fatal("enable to open file")
 	}
