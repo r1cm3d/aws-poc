@@ -1,4 +1,4 @@
-package awsdynamo
+package awsregister
 
 import (
 	"aws-poc/pkg/awssession"
