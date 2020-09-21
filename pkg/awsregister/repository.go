@@ -1,4 +1,4 @@
-package awscli
+package awsdynamo
 
 import (
 	"aws-poc/pkg/awssession"
