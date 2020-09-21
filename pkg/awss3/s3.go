@@ -1,4 +1,4 @@
-package awscli
+package awss3
 
 import (
 	"fmt"

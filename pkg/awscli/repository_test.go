@@ -2,6 +2,7 @@ package awscli
 
 import (
 	"aws-poc/pkg/awssession"
+	"aws-poc/pkg/test/integration"
 	"fmt"
 	"log"
 	"testing"
@@ -15,7 +16,7 @@ type Item struct {
 }
 
 func TestPutIntegration(t *testing.T) {
-	skipShort(t)
+	integration.SkipShort(t)
 	setupTable()
 	defer cleanupTable()
 	i := Item{

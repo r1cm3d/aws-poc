@@ -2,6 +2,7 @@ package awscli
 
 import (
 	"aws-poc/pkg/awssession"
+	"aws-poc/pkg/test/integration"
 	"fmt"
 	"log"
 	"reflect"
@@ -157,7 +158,7 @@ func TestMessageAttributes(t *testing.T) {
 }
 
 func TestReceiveMessageIntegration(t *testing.T) {
-	skipShort(t)
+	integration.SkipShort(t)
 	q, body := setup(), "Message Body"
 	defer teardown()
 	sendMsg(q, body)
@@ -173,7 +174,7 @@ func TestReceiveMessageIntegration(t *testing.T) {
 }
 
 func TestSendMessageIntegration(t *testing.T) {
-	skipShort(t)
+	integration.SkipShort(t)
 	q := setup()
 	defer teardown()
 
@@ -189,12 +190,6 @@ func sendMsg(queue *Queue, body string) {
 	}
 	if _, err := queue.SendMessage(body, MessageAttributes(attrs)); err != nil {
 		log.Fatal(err)
-	}
-}
-
-func skipShort(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping integration test")
 	}
 }
 

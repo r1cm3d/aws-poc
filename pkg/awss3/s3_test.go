@@ -1,7 +1,8 @@
-package awscli
+package awss3
 
 import (
 	"aws-poc/pkg/awssession"
+	"aws-poc/pkg/test/integration"
 	"log"
 	"os"
 	"testing"
@@ -17,7 +18,7 @@ const (
 )
 
 func TestUploadIntegration(t *testing.T) {
-	skipShort(t)
+	integration.SkipShort(t)
 	setupBucket()
 	defer cleanupBucket()
 
@@ -39,7 +40,7 @@ func TestUploadIntegration(t *testing.T) {
 }
 
 func TestListIntegration(t *testing.T) {
-	skipShort(t)
+	integration.SkipShort(t)
 	setupBucket()
 	defer cleanupBucket()
 
@@ -64,7 +65,7 @@ func TestListIntegration(t *testing.T) {
 }
 
 func TestGetIntegration(t *testing.T) {
-	skipShort(t)
+	integration.SkipShort(t)
 	setupBucket()
 	defer cleanupBucket()
 
