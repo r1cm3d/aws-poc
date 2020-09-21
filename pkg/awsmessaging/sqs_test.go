@@ -1,4 +1,4 @@
-package awscli
+package awsmessaging
 
 import (
 	"errors"
