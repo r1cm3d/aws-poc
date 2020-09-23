@@ -2,7 +2,6 @@ package awsregister
 
 import (
 	"aws-poc/pkg/awssession"
-	"aws-poc/pkg/config"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -11,9 +10,6 @@ import (
 )
 
 var (
-	tableName     = aws.String("MasterChargebackError")
-	disputeID     = aws.String("DisputeID")
-	timestamp     = aws.String("Timestamp")
 	hashKeyType   = aws.String("HASH")
 	rangeKeyType  = aws.String("RANGE")
 	numberType    = aws.String("N")
@@ -21,22 +17,22 @@ var (
 	payPerRequest = aws.String("PAY_PER_REQUEST")
 )
 
-type repository struct {
-	sess *session.Session
+type register struct {
+	sess      *session.Session
+	tableName *string
 }
 
-func newRepository(sess *session.Session) repository {
-	return repository{sess: sess}
+func newRegister(sess *session.Session, tableName *string) register {
+	return register{sess, tableName}
 }
 
-func (r repository) svc() (svc *dynamodb.DynamoDB) {
-	env, _ := config.LoadDefaultConf()
-	sess := awssession.NewSession(env["REGION"], env["ENDPOINT"])
+func (r register) svc() (svc *dynamodb.DynamoDB) {
+	sess := awssession.NewLocalSession()
 	svc = dynamodb.New(sess)
 	return
 }
 
-func (r repository) put(i interface{}) error {
+func (r register) put(i interface{}) error {
 	av, err := dynamodbattribute.MarshalMap(i)
 	if err != nil {
 		return err
@@ -44,7 +40,7 @@ func (r repository) put(i interface{}) error {
 
 	input := &dynamodb.PutItemInput{
 		Item:      av,
-		TableName: tableName,
+		TableName: r.tableName,
 	}
 
 	svc := r.svc()

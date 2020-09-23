@@ -7,7 +7,15 @@ import (
 	"log"
 	"testing"
 
+	"github.com/aws/aws-sdk-go/aws"
+
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+)
+
+var (
+	tableName = aws.String("ChargebackError_TEST")
+	disputeID = aws.String("DisputeID")
+	timestamp = aws.String("Timestamp")
 )
 
 type Item struct {
@@ -22,7 +30,7 @@ func TestPutIntegration(t *testing.T) {
 	i := Item{
 		DisputeID: 666, Timestamp: "2020-04-17T17:19:19.831Z",
 	}
-	table := newRepository(awssession.NewLocalSession())
+	table := newRegister(awssession.NewLocalSession(), tableName)
 
 	if err := table.put(i); err != nil {
 		t.Errorf("put fails: %d", err)
@@ -55,17 +63,17 @@ func setupTable() {
 		TableName:   tableName,
 	}
 
-	r := newRepository(awssession.NewLocalSession())
+	r := newRegister(awssession.NewLocalSession(), tableName)
 	svc := r.svc()
 	if _, err := svc.CreateTable(input); err != nil {
 		log.Fatal(err.Error())
 	}
 
-	fmt.Println("created the repository", tableName)
+	fmt.Println("created the register", tableName)
 }
 
 func cleanupTable() {
-	r := newRepository(awssession.NewLocalSession())
+	r := newRegister(awssession.NewLocalSession(), tableName)
 	svc := r.svc()
 
 	input := &dynamodb.DeleteTableInput{
@@ -75,5 +83,5 @@ func cleanupTable() {
 		log.Fatal(err.Error())
 	}
 
-	fmt.Println("deleted the repository", tableName)
+	fmt.Println("deleted the register", tableName)
 }
