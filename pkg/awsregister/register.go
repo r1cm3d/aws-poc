@@ -17,13 +17,17 @@ var (
 	payPerRequest = aws.String("PAY_PER_REQUEST")
 )
 
-type register struct {
-	sess      *session.Session
-	tableName *string
-}
+type (
+	mapMarshaller func(in interface{}) (map[string]*dynamodb.AttributeValue, error)
+	register      struct {
+		sess      *session.Session
+		tableName *string
+		mapMarshaller
+	}
+)
 
 func newRegister(sess *session.Session, tableName *string) register {
-	return register{sess, tableName}
+	return register{sess, tableName, dynamodbattribute.MarshalMap}
 }
 
 func (r register) svc() (svc *dynamodb.DynamoDB) {
@@ -33,7 +37,7 @@ func (r register) svc() (svc *dynamodb.DynamoDB) {
 }
 
 func (r register) put(i interface{}) error {
-	av, err := dynamodbattribute.MarshalMap(i)
+	av, err := r.mapMarshaller(i)
 	if err != nil {
 		return err
 	}

@@ -3,6 +3,7 @@ package awsregister
 import (
 	"aws-poc/pkg/awssession"
 	"aws-poc/pkg/test/integration"
+	"errors"
 	"fmt"
 	"log"
 	"reflect"
@@ -19,10 +20,12 @@ var (
 	timestamp = aws.String("Timestamp")
 )
 
-type Item struct {
-	DisputeID int
-	Timestamp string
-}
+type (
+	Item struct {
+		DisputeID int
+		Timestamp string
+	}
+)
 
 func TestPutIntegration(t *testing.T) {
 	integration.SkipShort(t)
@@ -32,18 +35,22 @@ func TestPutIntegration(t *testing.T) {
 		DisputeID: 666,
 		Timestamp: "2020-04-17T17:19:19.831Z",
 	}
+	err := errors.New("parseError")
 	cases := []struct {
 		name string
-		in   Item
+		in   interface{}
 		want error
+		register
 	}{
-		{"success", defaultInput, nil},
+		{"success", defaultInput, nil, newRegister(awssession.NewLocalSession(), tableName)},
+		{"parseError", defaultInput, err, register{awssession.NewLocalSession(), tableName, func(in interface{}) (map[string]*dynamodb.AttributeValue, error) {
+			return nil, err
+		}}},
 	}
-	table := newRegister(awssession.NewLocalSession(), tableName)
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			if got := table.put(c.in); !reflect.DeepEqual(c.want, got) {
+			if got := c.register.put(c.in); !reflect.DeepEqual(c.want, got) {
 				t.Errorf("%s, want: %v, got: %v", c.name, c.want, got)
 			}
 		})
@@ -51,6 +58,7 @@ func TestPutIntegration(t *testing.T) {
 }
 
 func setupTable() {
+	cleanupTable()
 	input := &dynamodb.CreateTableInput{
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
 			{
@@ -92,9 +100,8 @@ func cleanupTable() {
 	input := &dynamodb.DeleteTableInput{
 		TableName: tableName,
 	}
-	if _, err := svc.DeleteTable(input); err != nil {
-		log.Fatal(err.Error())
-	}
 
-	fmt.Println("deleted the register", tableName)
+	if out, _ := svc.DeleteTable(input); out != nil {
+		log.Printf("table %v deleted", tableName)
+	}
 }
