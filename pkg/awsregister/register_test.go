@@ -5,6 +5,7 @@ import (
 	"aws-poc/pkg/test/integration"
 	"fmt"
 	"log"
+	"reflect"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -27,13 +28,25 @@ func TestPutIntegration(t *testing.T) {
 	integration.SkipShort(t)
 	setupTable()
 	defer cleanupTable()
-	i := Item{
-		DisputeID: 666, Timestamp: "2020-04-17T17:19:19.831Z",
+	defaultInput := Item{
+		DisputeID: 666,
+		Timestamp: "2020-04-17T17:19:19.831Z",
+	}
+	cases := []struct {
+		name string
+		in   Item
+		want error
+	}{
+		{"success", defaultInput, nil},
 	}
 	table := newRegister(awssession.NewLocalSession(), tableName)
 
-	if err := table.put(i); err != nil {
-		t.Errorf("put fails: %d", err)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			if got := table.put(c.in); !reflect.DeepEqual(c.want, got) {
+				t.Errorf("%s, want: %v, got: %v", c.name, c.want, got)
+			}
+		})
 	}
 }
 
