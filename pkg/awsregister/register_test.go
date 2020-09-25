@@ -40,17 +40,17 @@ func TestPutIntegration(t *testing.T) {
 		name string
 		in   interface{}
 		want error
-		register
+		dynamoRegister
 	}{
 		{"success", defaultInput, nil, newRegister(awssession.NewLocalSession(), tableName)},
-		{"parseError", defaultInput, err, register{awssession.NewLocalSession(), tableName, func(in interface{}) (map[string]*dynamodb.AttributeValue, error) {
+		{"parseError", defaultInput, err, dynamoRegister{awssession.NewLocalSession(), tableName, func(in interface{}) (map[string]*dynamodb.AttributeValue, error) {
 			return nil, err
-		}}},
+		}, svc()}},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			if got := c.register.put(c.in); !reflect.DeepEqual(c.want, got) {
+			if got := c.dynamoRegister.put(c.in); !reflect.DeepEqual(c.want, got) {
 				t.Errorf("%s, want: %v, got: %v", c.name, c.want, got)
 			}
 		})
@@ -84,18 +84,16 @@ func setupTable() {
 		TableName:   tableName,
 	}
 
-	r := newRegister(awssession.NewLocalSession(), tableName)
-	svc := r.svc()
+	svc := svc()
 	if _, err := svc.CreateTable(input); err != nil {
 		log.Fatal(err.Error())
 	}
 
-	fmt.Println("created the register", tableName)
+	fmt.Println("created the dynamoRegister", tableName)
 }
 
 func cleanupTable() {
-	r := newRegister(awssession.NewLocalSession(), tableName)
-	svc := r.svc()
+	svc := svc()
 
 	input := &dynamodb.DeleteTableInput{
 		TableName: tableName,
