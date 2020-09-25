@@ -22,7 +22,7 @@ make run
 [![GNU Bash](https://img.shields.io/badge/GNU%20Bash-4.2.1-lightgrey)](https://www.gnu.org/software/bash/)
 [![terraform](https://img.shields.io/badge/terraform-0.13.3-blueviolet)](https://github.com/hashicorp/terraform)
 [![shfmt](https://img.shields.io/badge/shfmt-v3.1.0-lightgrey)](https://github.com/mvdan/sh)
-[![aws-cli](https://img.shields.io/badge/aws--cli-1.18.95-yellow)](https://github.com/aws/aws-cli)          
+[![aws-cli](https://img.shields.io/badge/aws--cli-2.0.49-yellow)](https://github.com/aws/aws-cli)
 
 ## Table of Contents
 * [TL;DR](#aws-poc)
