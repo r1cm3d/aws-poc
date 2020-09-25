@@ -18,8 +18,8 @@ var (
 )
 
 type (
-	mapMarshaller  func(in interface{}) (map[string]*dynamodb.AttributeValue, error)
-	register interface {
+	mapMarshaller func(in interface{}) (map[string]*dynamodb.AttributeValue, error)
+	register      interface {
 		PutItem(input *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error)
 	}
 	dynamoRegister struct {

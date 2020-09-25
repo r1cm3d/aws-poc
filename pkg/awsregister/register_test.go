@@ -9,23 +9,36 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+
 	"github.com/aws/aws-sdk-go/aws"
 
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
 var (
-	tableName = aws.String("ChargebackError_TEST")
-	disputeID = aws.String("DisputeID")
-	timestamp = aws.String("Timestamp")
+	tableName  = aws.String("ChargebackError_TEST")
+	disputeID  = aws.String("DisputeID")
+	timestamp  = aws.String("Timestamp")
+	errParser  = errors.New("parseError")
+	errPutItem = errors.New("putItemError")
 )
 
 type (
-	Item struct {
+	errPutItemMock struct{}
+	Item           struct {
 		DisputeID int
 		Timestamp string
 	}
 )
+
+func (e errPutItemMock) PutItem(_ *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
+	return nil, errPutItem
+}
+
+func errMarshaller(_ interface{}) (map[string]*dynamodb.AttributeValue, error) {
+	return nil, errParser
+}
 
 func TestPutIntegration(t *testing.T) {
 	integration.SkipShort(t)
@@ -35,7 +48,6 @@ func TestPutIntegration(t *testing.T) {
 		DisputeID: 666,
 		Timestamp: "2020-04-17T17:19:19.831Z",
 	}
-	err := errors.New("parseError")
 	cases := []struct {
 		name string
 		in   interface{}
@@ -43,9 +55,8 @@ func TestPutIntegration(t *testing.T) {
 		dynamoRegister
 	}{
 		{"success", defaultInput, nil, newRegister(awssession.NewLocalSession(), tableName)},
-		{"parseError", defaultInput, err, dynamoRegister{awssession.NewLocalSession(), tableName, func(in interface{}) (map[string]*dynamodb.AttributeValue, error) {
-			return nil, err
-		}, svc()}},
+		{"parseError", defaultInput, errParser, dynamoRegister{awssession.NewLocalSession(), tableName, errMarshaller, svc()}},
+		{"putItemError", defaultInput, errPutItem, dynamoRegister{awssession.NewLocalSession(), tableName, dynamodbattribute.MarshalMap, errPutItemMock{}}},
 	}
 
 	for _, c := range cases {
