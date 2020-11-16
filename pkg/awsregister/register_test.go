@@ -36,6 +36,10 @@ func (e errPutItemMock) PutItem(_ *dynamodb.PutItemInput) (*dynamodb.PutItemOutp
 	return nil, errPutItem
 }
 
+func (e errPutItemMock) DeleteItem(_ *dynamodb.DeleteItemInput) (*dynamodb.DeleteItemOutput, error) {
+	return nil, errPutItem
+}
+
 func errMarshaller(_ interface{}) (map[string]*dynamodb.AttributeValue, error) {
 	return nil, errParser
 }
@@ -62,6 +66,33 @@ func TestPutIntegration(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			if got := c.dynamoRegister.put(c.in); !reflect.DeepEqual(c.want, got) {
+				t.Errorf("%s, want: %v, got: %v", c.name, c.want, got)
+			}
+		})
+	}
+}
+
+func TestDeleteIntegration(t *testing.T) {
+	integration.SkipShort(t)
+	setupTable()
+	defer cleanupTable()
+	defaultInput := Item{
+		DisputeID: 666,
+		Timestamp: "2020-04-17T17:19:19.831Z",
+	}
+	cases := []struct {
+		name string
+		in   Item
+		want error
+		dynamoRegister
+	}{
+		{"success", defaultInput, nil, newRegister(awssession.NewLocalSession(), tableName)},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			c.dynamoRegister.put(c.in)
+			if got := c.dynamoRegister.delete(c.in.DisputeID, c.in.Timestamp); !reflect.DeepEqual(c.want, got) {
 				t.Errorf("%s, want: %v, got: %v", c.name, c.want, got)
 			}
 		})
