@@ -20,20 +20,19 @@ import (
 var (
 	tableName  = aws.String("ChargebackError_TEST")
 	id         = aws.String("ID")
-	timestamp  = aws.String("Timestamp")
 	errParser  = errors.New("parseError")
 	errPutItem = errors.New("putItemError")
 )
 
 type (
 	errPutItemMock struct{}
-	item           struct {
+	Item           struct {
 		DisputeID int
 		Timestamp string
 	}
 )
 
-func (i item) Id() string {
+func (i Item) Id() string {
 	return strconv.Itoa(i.DisputeID)
 }
 
@@ -53,19 +52,15 @@ func TestPutIntegration(t *testing.T) {
 	integration.SkipShort(t)
 	setupTable()
 	defer cleanupTable()
-	defaultInput := item{
-		DisputeID: 666,
-		Timestamp: "2020-04-17T17:19:19.831Z",
-	}
 	cases := []struct {
 		name string
 		in   record
 		want error
 		dynamoRegister
 	}{
-		{"success", defaultInput, nil, newRegister(awssession.NewLocalSession(), tableName)},
-		{"parseError", defaultInput, errParser, dynamoRegister{awssession.NewLocalSession(), tableName, errMarshaller, svc()}},
-		{"putItemError", defaultInput, errPutItem, dynamoRegister{awssession.NewLocalSession(), tableName, dynamodbattribute.MarshalMap, errPutItemMock{}}},
+		{"success", defaultInput(), nil, newRegister(awssession.NewLocalSession(), tableName)},
+		{"parseError", defaultInput(), errParser, dynamoRegister{awssession.NewLocalSession(), tableName, errMarshaller, svc()}},
+		{"putItemError", defaultInput(), errPutItem, dynamoRegister{awssession.NewLocalSession(), tableName, dynamodbattribute.MarshalMap, errPutItemMock{}}},
 	}
 
 	for _, c := range cases {
@@ -81,17 +76,13 @@ func TestDeleteIntegration(t *testing.T) {
 	integration.SkipShort(t)
 	setupTable()
 	defer cleanupTable()
-	defaultInput := item{
-		DisputeID: 666,
-		Timestamp: "2020-04-17T17:19:19.831Z",
-	}
 	cases := []struct {
 		name string
 		in   record
 		want error
 		dynamoRegister
 	}{
-		{"success", defaultInput, nil, newRegister(awssession.NewLocalSession(), tableName)},
+		{"success", defaultInput(), nil, newRegister(awssession.NewLocalSession(), tableName)},
 	}
 
 	for _, c := range cases {
@@ -110,10 +101,6 @@ func setupTable() {
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
 			{
 				AttributeName: id,
-				AttributeType: numberType,
-			},
-			{
-				AttributeName: timestamp,
 				AttributeType: stringType,
 			},
 		},
@@ -144,5 +131,12 @@ func cleanupTable() {
 
 	if out, _ := svc.DeleteTable(input); out != nil {
 		log.Printf("table %v deleted", tableName)
+	}
+}
+
+func defaultInput() record {
+	return Item{
+		DisputeID: 666,
+		Timestamp: "2020-04-17T17:19:19.831Z",
 	}
 }

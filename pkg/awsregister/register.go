@@ -2,6 +2,7 @@ package awsregister
 
 import (
 	"aws-poc/pkg/awssession"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -52,6 +53,10 @@ func (r dynamoRegister) put(rec record) error {
 	input := &dynamodb.PutItemInput{
 		Item:      item,
 		TableName: r.tableName,
+	}
+
+	item["ID"] = &dynamodb.AttributeValue{
+		S: aws.String(rec.Id()),
 	}
 
 	if _, err = r.PutItem(input); err != nil {
