@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"strconv"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
@@ -18,7 +19,7 @@ import (
 
 var (
 	tableName  = aws.String("ChargebackError_TEST")
-	disputeID  = aws.String("DisputeID")
+	id         = aws.String("ID")
 	timestamp  = aws.String("Timestamp")
 	errParser  = errors.New("parseError")
 	errPutItem = errors.New("putItemError")
@@ -26,11 +27,15 @@ var (
 
 type (
 	errPutItemMock struct{}
-	Item           struct {
+	item           struct {
 		DisputeID int
 		Timestamp string
 	}
 )
+
+func (i item) Id() string {
+	return strconv.Itoa(i.DisputeID)
+}
 
 func (e errPutItemMock) PutItem(_ *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
 	return nil, errPutItem
@@ -48,13 +53,13 @@ func TestPutIntegration(t *testing.T) {
 	integration.SkipShort(t)
 	setupTable()
 	defer cleanupTable()
-	defaultInput := Item{
+	defaultInput := item{
 		DisputeID: 666,
 		Timestamp: "2020-04-17T17:19:19.831Z",
 	}
 	cases := []struct {
 		name string
-		in   interface{}
+		in   record
 		want error
 		dynamoRegister
 	}{
@@ -76,13 +81,13 @@ func TestDeleteIntegration(t *testing.T) {
 	integration.SkipShort(t)
 	setupTable()
 	defer cleanupTable()
-	defaultInput := Item{
+	defaultInput := item{
 		DisputeID: 666,
 		Timestamp: "2020-04-17T17:19:19.831Z",
 	}
 	cases := []struct {
 		name string
-		in   Item
+		in   record
 		want error
 		dynamoRegister
 	}{
@@ -92,7 +97,7 @@ func TestDeleteIntegration(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			c.dynamoRegister.put(c.in)
-			if got := c.dynamoRegister.delete(c.in.DisputeID, c.in.Timestamp); !reflect.DeepEqual(c.want, got) {
+			if got := c.dynamoRegister.delete(c.in); !reflect.DeepEqual(c.want, got) {
 				t.Errorf("%s, want: %v, got: %v", c.name, c.want, got)
 			}
 		})
@@ -104,7 +109,7 @@ func setupTable() {
 	input := &dynamodb.CreateTableInput{
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
 			{
-				AttributeName: disputeID,
+				AttributeName: id,
 				AttributeType: numberType,
 			},
 			{
@@ -114,12 +119,8 @@ func setupTable() {
 		},
 		KeySchema: []*dynamodb.KeySchemaElement{
 			{
-				AttributeName: disputeID,
+				AttributeName: id,
 				KeyType:       hashKeyType,
-			},
-			{
-				AttributeName: timestamp,
-				KeyType:       rangeKeyType,
 			},
 		},
 		BillingMode: payPerRequest,

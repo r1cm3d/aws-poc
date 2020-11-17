@@ -2,8 +2,6 @@ package awsregister
 
 import (
 	"aws-poc/pkg/awssession"
-	"strconv"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -19,6 +17,9 @@ var (
 )
 
 type (
+	record interface {
+		Id() string
+	}
 	mapMarshaller func(in interface{}) (map[string]*dynamodb.AttributeValue, error)
 	register      interface {
 		PutItem(input *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error)
@@ -42,8 +43,8 @@ func svc() (svc *dynamodb.DynamoDB) {
 	return
 }
 
-func (r dynamoRegister) put(i interface{}) error {
-	item, err := r.mapMarshaller(i)
+func (r dynamoRegister) put(rec record) error {
+	item, err := r.mapMarshaller(rec)
 	if err != nil {
 		return err
 	}
@@ -60,15 +61,12 @@ func (r dynamoRegister) put(i interface{}) error {
 	return nil
 }
 
-func (r dynamoRegister) delete(key int, timestamp string) error {
+func (r dynamoRegister) delete(rec record) error {
 	input := &dynamodb.DeleteItemInput{
 		TableName: r.tableName,
 		Key: map[string]*dynamodb.AttributeValue{
-			"DisputeID": {
-				N: aws.String(strconv.Itoa(key)),
-			},
-			"Timestamp": {
-				S: aws.String(timestamp),
+			"ID": {
+				S: aws.String(rec.Id()),
 			},
 		},
 	}
