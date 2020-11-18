@@ -7,7 +7,7 @@ resource "aws_dynamodb_table" "chargeback-table" {
     name = "ID"
     type = "S"
   }
-  
+
   tags = {
     Environment = var.account
   }
