@@ -9,5 +9,5 @@ const (
 
 var (
 	errFake     = errors.New("mocked error")
-	disputeFake = dispute{DisputeID: disputeID}
+	disputeFake = Entity{DisputeID: disputeID}
 )

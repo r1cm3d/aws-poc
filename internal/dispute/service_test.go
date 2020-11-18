@@ -15,34 +15,34 @@ type (
 	mockDisputer   struct{}
 )
 
-func (e errMapper) fromJSON(string, string) (dispute, error) {
+func (e errMapper) fromJSON(string, string) (Entity, error) {
 	return disputeFake, errFake
 }
 
-func (m mockMapper) fromJSON(string, string) (dispute, error) {
+func (m mockMapper) fromJSON(string, string) (Entity, error) {
 	return disputeFake, nil
 }
 
-func (e errRepository) lock(dispute) (ok bool) {
+func (e errRepository) lock(Entity) (ok bool) {
 	return false
 }
 
-func (e errRepository) unlock(dispute) {
+func (e errRepository) unlock(Entity) {
 }
 
-func (e errDisputer) open(dispute) error {
+func (e errDisputer) open(Entity) error {
 	return errFake
 }
 
-func (m mockDisputer) open(dispute) error {
+func (m mockDisputer) open(Entity) error {
 	return nil
 }
 
-func (m mockRepository) lock(dispute) (ok bool) {
+func (m mockRepository) lock(Entity) (ok bool) {
 	return true
 }
 
-func (m mockRepository) unlock(dispute) {
+func (m mockRepository) unlock(Entity) {
 }
 
 func TestMapFromJson(t *testing.T) {
@@ -63,7 +63,7 @@ func TestMapFromJson(t *testing.T) {
   "documentIndicator": true,
   "isPartialChargeback": false
 }`
-	want := dispute{
+	want := Entity{
 		CorrelationID:       cid,
 		DisputeID:           611,
 		AccountID:           48448,
@@ -107,10 +107,10 @@ func TestHandleMessage(t *testing.T) {
 		want error
 		service
 	}{
-		{"success", defaultInput, nil, service{mapper: mockMapper{}, register: mockRepository{}, disputer: mockDisputer{}}},
-		{"parseError", defaultInput, newParseError(errFake), service{register: mockRepository{}, mapper: errMapper{}}},
-		{"idempotenceError", defaultInput, newIdempotenceError(cid, disputeID), service{mapper: mockMapper{}, register: errRepository{}}},
-		{"chargebackError", defaultInput, newChargebackError(errFake, cid, disputeID), service{mapper: mockMapper{}, register: mockRepository{}, disputer: errDisputer{}}},
+		{"success", defaultInput, nil, service{mapper: mockMapper{}, locker: mockRepository{}, disputer: mockDisputer{}}},
+		{"parseError", defaultInput, newParseError(errFake), service{locker: mockRepository{}, mapper: errMapper{}}},
+		{"idempotenceError", defaultInput, newIdempotenceError(cid, disputeID), service{mapper: mockMapper{}, locker: errRepository{}}},
+		{"chargebackError", defaultInput, newChargebackError(errFake, cid, disputeID), service{mapper: mockMapper{}, locker: mockRepository{}, disputer: errDisputer{}}},
 	}
 
 	for _, c := range cases {
@@ -124,7 +124,7 @@ func TestHandleMessage(t *testing.T) {
 
 func TestOpen(t *testing.T) {
 	svc := service{}
-	d := dispute{}
+	d := Entity{}
 
 	if err := svc.open(d); err != nil {
 		t.Error("open error should be returned")

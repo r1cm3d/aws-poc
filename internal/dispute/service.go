@@ -2,6 +2,7 @@ package dispute
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 )
@@ -9,7 +10,7 @@ import (
 type (
 	date time.Time
 
-	dispute struct {
+	Entity struct {
 		CorrelationID       string
 		DisputeID           int
 		AccountID           int
@@ -25,25 +26,30 @@ type (
 		IsPartialChargeback bool
 	}
 
-	register interface {
-		lock(dispute) (ok bool)
-		unlock(dispute)
+	locker interface {
+		lock(Entity) (ok bool)
+		unlock(Entity)
 	}
 
 	mapper interface {
-		fromJSON(string, string) (dispute, error)
+		fromJSON(string, string) (Entity, error)
 	}
 
 	disputer interface {
-		open(dispute) error
+		open(Entity) error
 	}
 
 	service struct {
-		register
+		locker
 		mapper
 		disputer
 	}
 )
+
+// ID return DisputeID::CorrelationID
+func (e Entity) ID() string {
+	return fmt.Sprintf("%v::%s", e.DisputeID, e.CorrelationID)
+}
 
 // UnmarshalJSON receive a date in []bytes and parse it in the pattern YYYY-MM-DD
 func (d *date) UnmarshalJSON(data []byte) error {
@@ -62,7 +68,7 @@ func (d *date) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (s service) open(_ dispute) error {
+func (s service) open(_ Entity) error {
 	return nil
 }
 
@@ -72,23 +78,23 @@ func (s service) handleMessage(cid, body string) error {
 		return newParseError(err)
 	}
 
-	if ok := s.register.lock(d); !ok {
+	if ok := s.locker.lock(d); !ok {
 		return newIdempotenceError(cid, d.DisputeID)
 	}
 
 	if err := s.disputer.open(d); err != nil {
-		defer s.register.unlock(d)
+		defer s.locker.unlock(d)
 		return newChargebackError(err, cid, d.DisputeID)
 	}
 
 	return nil
 }
 
-func (s service) fromJSON(cid, j string) (dispute, error) {
-	var d dispute
+func (s service) fromJSON(cid, j string) (Entity, error) {
+	var d Entity
 	err := json.Unmarshal([]byte(j), &d)
 	if err != nil {
-		return dispute{}, err
+		return Entity{}, err
 	}
 	d.CorrelationID = cid
 	return d, nil

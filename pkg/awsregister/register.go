@@ -17,18 +17,22 @@ var (
 
 type (
 	record interface {
-		Id() string
+		ID() string
 	}
-	mapMarshaller func(in interface{}) (map[string]*dynamodb.AttributeValue, error)
-	register      interface {
+	mapMarshaller   func(in interface{}) (map[string]*dynamodb.AttributeValue, error)
+	registerAdapter interface {
 		PutItem(input *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error)
 		DeleteItem(input *dynamodb.DeleteItemInput) (*dynamodb.DeleteItemOutput, error)
+	}
+	register interface {
+		put(rec record) error
+		delete(rec record) error
 	}
 	dynamoRegister struct {
 		sess      *session.Session
 		tableName *string
 		mapMarshaller
-		register
+		registerAdapter
 	}
 )
 
@@ -54,7 +58,7 @@ func (r dynamoRegister) put(rec record) error {
 	}
 
 	item["ID"] = &dynamodb.AttributeValue{
-		S: aws.String(rec.Id()),
+		S: aws.String(rec.ID()),
 	}
 
 	if _, err = r.PutItem(input); err != nil {
@@ -69,7 +73,7 @@ func (r dynamoRegister) delete(rec record) error {
 		TableName: r.tableName,
 		Key: map[string]*dynamodb.AttributeValue{
 			"ID": {
-				S: aws.String(rec.Id()),
+				S: aws.String(rec.ID()),
 			},
 		},
 	}

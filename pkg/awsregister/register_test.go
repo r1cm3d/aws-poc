@@ -18,10 +18,11 @@ import (
 )
 
 var (
-	tableName  = aws.String("ChargebackError_TEST")
+	tableName  = aws.String("Dispute")
 	id         = aws.String("ID")
 	errParser  = errors.New("parseError")
 	errPutItem = errors.New("putItemError")
+	errDelete  = errors.New("deleteError")
 )
 
 type (
@@ -32,7 +33,7 @@ type (
 	}
 )
 
-func (i Item) Id() string {
+func (i Item) ID() string {
 	return strconv.Itoa(i.DisputeID)
 }
 
@@ -83,6 +84,7 @@ func TestDeleteIntegration(t *testing.T) {
 		dynamoRegister
 	}{
 		{"success", defaultInput(), nil, newRegister(awssession.NewLocalSession(), tableName)},
+		//TODO: add error case
 	}
 
 	for _, c := range cases {
