@@ -87,8 +87,7 @@ resource "aws_iam_policy" "aws_poc_dynamo_policy" {
                 "dynamodb:PutItem"
             ],
             "Resource": [
-                "${aws_dynamodb_table.chargeback-table.arn}",
-                "${aws_dynamodb_table.claim-table.arn}"
+                "${aws_dynamodb_table.dispute.arn}",
             ]
         }
     ]
