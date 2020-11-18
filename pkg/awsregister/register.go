@@ -11,8 +11,6 @@ import (
 
 var (
 	hashKeyType   = aws.String("HASH")
-	rangeKeyType  = aws.String("RANGE")
-	numberType    = aws.String("N")
 	stringType    = aws.String("S")
 	payPerRequest = aws.String("PAY_PER_REQUEST")
 )
