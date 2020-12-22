@@ -1,22 +1,22 @@
 {
-  "TableName": "ChargebackError",
+  "TableName": "Chargeback",
   "KeySchema": [
     {
-      "AttributeName": "Dispute_ID",
+      "AttributeName": "ID",
       "KeyType": "HASH"
     },
     {
-      "AttributeName": "TimeStamp",
+      "AttributeName": "rangeID",
       "KeyType": "RANGE"
     }
   ],
   "AttributeDefinitions": [
     {
-      "AttributeName": "Dispute_ID",
-      "AttributeType": "N"
+      "AttributeName": "ID",
+      "AttributeType": "S"
     },
     {
-      "AttributeName": "TimeStamp",
+      "AttributeName": "rangeID",
       "AttributeType": "S"
     }
   ],
