@@ -28,7 +28,7 @@ type (
 
 	locker interface {
 		lock(Entity) (ok bool)
-		unlock(Entity)
+		release(Entity) (ok bool)
 	}
 
 	mapper interface {
@@ -83,7 +83,7 @@ func (s service) handleMessage(cid, body string) error {
 	}
 
 	if err := s.disputer.open(d); err != nil {
-		defer s.locker.unlock(d)
+		defer s.locker.release(d)
 		return newChargebackError(err, cid, d.DisputeID)
 	}
 
