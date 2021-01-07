@@ -10,6 +10,11 @@ import (
 
 type errRegister struct{}
 
+var stubDispute = dispute.Entity{
+	CorrelationID: "ee67f4f2-0b08-4f58-908f-bbb9bc37a1d2",
+	DisputeID:     666,
+}
+
 func (e errRegister) put(_ record) error {
 	return errPutItem
 }
@@ -22,18 +27,14 @@ func TestLockIntegration(t *testing.T) {
 	integration.SkipShort(t)
 	setupTable()
 	defer cleanupTable()
-	d := dispute.Entity{
-		CorrelationID: "ee67f4f2-0b08-4f58-908f-bbb9bc37a1d2",
-		DisputeID:     666,
-	}
 	cases := []struct {
 		name string
 		in   dispute.Entity
 		want bool
 		locker
 	}{
-		{"success", d, true, locker{newRegister(awssession.NewLocalSession(), tableName)}},
-		{"error", d, false, locker{errRegister{}}},
+		{"success", stubDispute, true, locker{newRegister(awssession.NewLocalSession(), tableName)}},
+		{"error", stubDispute, false, locker{errRegister{}}},
 	}
 
 	for _, c := range cases {
@@ -49,18 +50,14 @@ func TestReleaseIntegration(t *testing.T) {
 	integration.SkipShort(t)
 	setupTable()
 	defer cleanupTable()
-	d := dispute.Entity{
-		CorrelationID: "ee67f4f2-0b08-4f58-908f-bbb9bc37a1d2",
-		DisputeID:     666,
-	}
 	cases := []struct {
 		name string
 		in   dispute.Entity
 		want bool
 		locker
 	}{
-		{"success", d, true, locker{newRegister(awssession.NewLocalSession(), tableName)}},
-		{"error", d, false, locker{errRegister{}}},
+		{"success", stubDispute, true, locker{newRegister(awssession.NewLocalSession(), tableName)}},
+		{"error", stubDispute, false, locker{errRegister{}}},
 	}
 
 	for _, c := range cases {

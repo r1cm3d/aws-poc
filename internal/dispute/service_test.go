@@ -27,7 +27,8 @@ func (e errRepository) lock(Entity) (ok bool) {
 	return false
 }
 
-func (e errRepository) release(Entity) {
+func (e errRepository) release(Entity) (ok bool) {
+	return false
 }
 
 func (e errDisputer) open(Entity) error {
@@ -42,7 +43,8 @@ func (m mockRepository) lock(Entity) (ok bool) {
 	return true
 }
 
-func (m mockRepository) release(Entity) {
+func (m mockRepository) release(Entity) (ok bool) {
+	return true
 }
 
 func TestMapFromJson(t *testing.T) {
