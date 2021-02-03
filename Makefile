@@ -30,7 +30,7 @@ unit-test: build
 	@echo "\nRunning unit tests\n"
 	@go test -cover -short ./...
 
-run-dep: clean
+up: clean
 	@echo "\nStarting localstack container and creating AWS local resources\n"
 	@docker-compose up -d --force-recreate
 	@echo "\nWaiting until localstack be ready"
@@ -44,20 +44,24 @@ run-dep: clean
 	terraform plan && \
 	terraform apply -auto-approve
 
-integration-test: run-dep build
+integration-test: up build
 	@echo "\nRunning integration tests\n"
 	@go test -cover -run Integration ./...
 
-test: fmt unit-test run-dep integration-test
+test: fmt unit-test up integration-test
 	@echo "\nRunning tests\n"
 
-codecov: run-dep
+codecov: up
 	@echo "\nRunning Codecov\n"
 
-run: run-dep build run-local
+run: up build run-local
 	@echo "\nRunning locally"
 	@go test -race -coverprofile=coverage.txt -covermode=atomic -cover ./...
 
 run-local:
 	@echo "\nRunning without building it"
 	@go run cmd/main.go
+
+stop:
+	@echo "\nStopping containers"
+	@docker-compose stop

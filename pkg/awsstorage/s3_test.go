@@ -26,7 +26,7 @@ func TestUploadIntegration(t *testing.T) {
 
 	file, err := os.Open(filename)
 	if err != nil {
-		log.Fatal("enable to open file")
+		log.Fatal("enable to open attachment")
 	}
 	defer file.Close()
 
@@ -48,7 +48,7 @@ func TestListIntegration(t *testing.T) {
 
 	file, err := os.Open(filename)
 	if err != nil {
-		log.Fatal("enable to open file")
+		log.Fatal("enable to open attachment")
 	}
 	defer file.Close()
 
@@ -71,7 +71,7 @@ func TestGetIntegration(t *testing.T) {
 
 	file, err := os.Open(filename)
 	if err != nil {
-		log.Fatal("enable to open file")
+		log.Fatal("enable to open attachment")
 	}
 	defer file.Close()
 
