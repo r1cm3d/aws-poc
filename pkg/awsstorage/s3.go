@@ -16,7 +16,7 @@ type S3cli struct {
 	session client.ConfigProvider
 }
 
-// Upload sent a io.Reader file to a S3 bucket with bucket and key name
+// Upload sent a io.Reader attachment to a S3 bucket with bucket and key name
 func (s S3cli) Upload(bucket, key string, file io.Reader) (err error) {
 	uploader := s3manager.NewUploader(s.session)
 	_, err = uploader.Upload(&s3manager.UploadInput{

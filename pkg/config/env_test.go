@@ -38,7 +38,7 @@ func TestMerge(t *testing.T) {
 
 func TestLoadFileNotFound(t *testing.T) {
 	if _, err := loadFile("unreachablePath"); err == nil {
-		t.Error("expected an error when file is not found")
+		t.Error("expected an error when attachment is not found")
 	}
 }
 

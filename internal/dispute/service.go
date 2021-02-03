@@ -1,6 +1,9 @@
 package dispute
 
 import (
+	"aws-poc/internal/attachment"
+	"aws-poc/internal/card"
+	"aws-poc/internal/chargeback"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -43,6 +46,9 @@ type (
 		locker
 		mapper
 		disputer
+		cardRegister       card.Register
+		attachmentRegister attachment.Register
+		chargebackCreator  chargeback.Facade
 	}
 )
 
