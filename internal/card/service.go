@@ -5,13 +5,13 @@ type (
 		Number string
 	}
 
-	request struct {
-		cid       string
-		orgId     string
-		accountId int
+	Request struct {
+		Cid       string
+		OrgId     string
+		AccountId int
 	}
 
 	Register interface {
-		get(request) (Entity, error)
+		Get(Request) (Entity, error)
 	}
 )

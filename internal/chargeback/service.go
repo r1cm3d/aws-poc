@@ -6,6 +6,7 @@ const (
 	ARB_CHARGEBACK     = Type("ARB_CHARGEBACK")
 )
 
+// TODO: restructure this
 type (
 	Entity struct {
 	}

@@ -6,16 +6,15 @@ type (
 		Base64 string
 	}
 
-	request struct {
-		cid       string
-		disputeId int
-		accountId int
-		orgId     string
-		files     []string
+	Request struct {
+		Cid       string
+		DisputeId int
+		AccountId int
+		OrgId     string
 	}
 
 	Register interface {
-		get(request) (Entity, error)
-		save(request) error
+		Get(Request) (Entity, error)
+		Save(Request) error
 	}
 )

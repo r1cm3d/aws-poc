@@ -1,18 +1,27 @@
 package dispute
 
 import (
+	"aws-poc/internal/attachment"
+	"aws-poc/internal/card"
 	"reflect"
 	"testing"
 	"time"
 )
 
 type (
-	errMapper      struct{}
-	errRepository  struct{}
-	errDisputer    struct{}
-	mockRepository struct{}
-	mockMapper     struct{}
-	mockDisputer   struct{}
+	errMapper              struct{}
+	errRepository          struct{}
+	errDisputer            struct{}
+	mockRepository         struct{}
+	mockMapper             struct{}
+	mockDisputer           struct{}
+	mockCardRegister       struct{}
+	mockAttachmentRegister struct{}
+)
+
+var (
+	cardRegisterCalled       bool
+	attachmentRegisterCalled bool
 )
 
 func (e errMapper) fromJSON(string, string) (Entity, error) {
@@ -45,6 +54,22 @@ func (m mockRepository) lock(Entity) (ok bool) {
 
 func (m mockRepository) release(Entity) (ok bool) {
 	return true
+}
+
+func (m mockCardRegister) Get(request card.Request) (card.Entity, error) {
+	cardRegisterCalled = request.Cid == cid && request.OrgId == orgId && request.AccountId == accountId
+
+	return card.Entity{Number: "5172163143182969"}, nil
+}
+
+func (m mockAttachmentRegister) Get(request attachment.Request) (attachment.Entity, error) {
+	attachmentRegisterCalled = request.Cid == cid && request.OrgId == orgId && request.AccountId == accountId && request.DisputeId == disputeID
+
+	return attachment.Entity{Name: "filename", Base64: "ZmlsZW5hbWUgaW4gYmFzZTY0"}, nil
+}
+
+func (m mockAttachmentRegister) Save(request attachment.Request) error {
+	return nil
 }
 
 func TestMapFromJson(t *testing.T) {
@@ -124,14 +149,37 @@ func TestHandleMessage(t *testing.T) {
 	}
 }
 
-func TestOpen(t *testing.T) {
-	svc := service{}
-	d := Entity{}
-
-	if err := svc.open(d); err != nil {
-		t.Error("open error should be returned")
+func TestOpenSuccess(t *testing.T) {
+	svc := service{
+		cardRegister:       mockCardRegister{},
+		attachmentRegister: mockAttachmentRegister{},
+		chargebackCreator:  nil,
 	}
+	d := Entity{
+		CorrelationID: cid,
+		Tenant:        orgId,
+		AccountID:     accountId,
+		DisputeID:     disputeID,
+	}
+	cardRegisterCalled = false
+	attachmentRegisterCalled = false
+
+	_ = svc.open(d)
+
+	if !cardRegisterCalled {
+		t.Error("card register not called")
+	}
+
+	if !attachmentRegisterCalled {
+		t.Error("attachment register not called")
+	}
+
+	//TODO: finalize with chargeback service
 }
+
+//TODO: implement this
+//func TestOpenFail(t *testing.T) {
+//}
 
 func TestUnmarshalJSON_Errors(t *testing.T) {
 	errDate := "unparseableData"

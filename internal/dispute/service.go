@@ -74,7 +74,32 @@ func (d *date) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (s service) open(_ Entity) error {
+func (s service) open(dispute Entity) error {
+	var (
+		c   card.Entity
+		att attachment.Entity
+		err error
+	)
+	if c, err = s.cardRegister.Get(card.Request{
+		Cid:       dispute.CorrelationID,
+		OrgId:     dispute.Tenant,
+		AccountId: dispute.AccountID,
+	}); err != nil {
+		return err
+	}
+
+	if att, err = s.attachmentRegister.Get(attachment.Request{
+		Cid:       dispute.CorrelationID,
+		OrgId:     dispute.Tenant,
+		AccountId: dispute.AccountID,
+		DisputeId: dispute.DisputeID,
+	}); err != nil {
+		return err
+	}
+
+	fmt.Printf("card: %v", c)
+	fmt.Printf("attachment: %v", att)
+
 	return nil
 }
 
