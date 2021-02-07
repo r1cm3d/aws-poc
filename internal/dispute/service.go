@@ -11,19 +11,22 @@ import (
 )
 
 type (
-	date time.Time
+	date              time.Time
+	AuthorizationCode string
+	ReasonCode        string
+	LocalCurrencyCode string
 
 	Entity struct {
-		CorrelationID       string
-		DisputeID           int
-		AccountID           int
-		AuthorizationCode   string
-		ReasonCode          string
-		CardID              string
-		Tenant              string
-		DisputeAmount       float64
-		TransactionDate     date
-		LocalCurrencyCode   string
+		CorrelationID string
+		DisputeID     int
+		AccountID     int
+		AuthorizationCode
+		ReasonCode
+		CardID          int
+		Tenant          string
+		DisputeAmount   float64
+		TransactionDate date
+		LocalCurrencyCode
 		TextMessage         string
 		DocumentIndicator   bool
 		IsPartialChargeback bool
@@ -48,7 +51,7 @@ type (
 		disputer
 		cardRegister       card.Register
 		attachmentRegister attachment.Register
-		chargebackCreator  chargeback.Facade
+		chargebackCreator  chargeback.Creator
 	}
 )
 
@@ -75,30 +78,32 @@ func (d *date) UnmarshalJSON(data []byte) error {
 }
 
 func (s service) open(dispute Entity) error {
-	var (
-		c   card.Entity
-		att attachment.Entity
-		err error
-	)
-	if c, err = s.cardRegister.Get(card.Request{
-		Cid:       dispute.CorrelationID,
-		OrgId:     dispute.Tenant,
-		AccountId: dispute.AccountID,
-	}); err != nil {
+	var err error
+	var c card.Entity
+	if c, err = s.cardRegister.Get(dispute.CorrelationID, dispute.Tenant, dispute.AccountID); err != nil {
 		return err
 	}
-
-	if att, err = s.attachmentRegister.Get(attachment.Request{
-		Cid:       dispute.CorrelationID,
-		OrgId:     dispute.Tenant,
-		AccountId: dispute.AccountID,
-		DisputeId: dispute.DisputeID,
+	var att attachment.Entity
+	if att, err = s.attachmentRegister.Get(dispute.CorrelationID, dispute.Tenant, dispute.AccountID, dispute.DisputeID); err != nil {
+		return err
+	}
+	var cbk chargeback.Entity
+	if cbk, err = s.chargebackCreator.Create(chargeback.Input{
+		Cid:               dispute.CorrelationID,
+		OrgId:             dispute.Tenant,
+		DisputeId:         dispute.DisputeID,
+		AccountId:         dispute.AccountID,
+		DocumentIndicator: dispute.DocumentIndicator,
+		ReasonCode:        chargeback.ReasonCode(dispute.ReasonCode),
+		Card:              c,
+		Attachment:        att,
 	}); err != nil {
 		return err
 	}
 
 	fmt.Printf("card: %v", c)
 	fmt.Printf("attachment: %v", att)
+	fmt.Printf("chargeback: %v", cbk)
 
 	return nil
 }

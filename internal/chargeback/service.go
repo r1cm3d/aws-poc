@@ -1,49 +1,46 @@
 package chargeback
 
-const (
-	CHARGEBACK         = Type("CHARGEBACK")
-	SECOND_PRESENTMENT = Type("SECOND_PRESENTMENT")
-	ARB_CHARGEBACK     = Type("ARB_CHARGEBACK")
+import (
+	"aws-poc/internal/attachment"
+	"aws-poc/internal/card"
 )
 
-// TODO: restructure this
 type (
+	Type       string
+	Queue      string
+	ReasonCode string
+	Status     string
+
 	Entity struct {
+		OrgId         string
+		DisputeId     int
+		AccountId     int
+		TransactionId int
+		ClaimId       int
+		ChargebackId  int
+		Status
+		cid string
+		Type
+		Queue
+		Attachment        attachment.Entity
+		IsClaimOpen       bool
+		DocumentIndicator bool
+		RejectReason      string
+		ReasonCode
 	}
 
-	Type string
-
-	request struct {
-		cid               string
-		currencyCode      string
-		documentIndicator bool
-		message           string
-		disputedAmount    float64
-		reasonCode        string
-		isPartial         bool
-		chargebackType    Type
+	Input struct {
+		Cid               string
+		OrgId             string
+		DisputeId         int
+		AccountId         int
+		DocumentIndicator bool
+		ReasonCode
+		Card       card.Entity
+		Attachment attachment.Entity
 	}
 
 	Creator interface {
-		create(request) (Entity, error)
-	}
-
-	Producer interface {
-		produce(chargeback Entity) error
-	}
-
-	Register interface {
-		save(chargeback Entity) error
-	}
-
-	Scheduler interface {
-		scheduleForTomorrow(chargeback Entity) error
-	}
-
-	Facade interface {
-		Creator
-		Producer
-		Register
-		Scheduler
+		Create(input Input) (Entity, error)
 	}
 )

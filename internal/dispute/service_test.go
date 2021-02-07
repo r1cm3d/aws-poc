@@ -3,6 +3,7 @@ package dispute
 import (
 	"aws-poc/internal/attachment"
 	"aws-poc/internal/card"
+	"aws-poc/internal/chargeback"
 	"reflect"
 	"testing"
 	"time"
@@ -17,11 +18,13 @@ type (
 	mockDisputer           struct{}
 	mockCardRegister       struct{}
 	mockAttachmentRegister struct{}
+	mockChargebackCreator  struct{}
 )
 
 var (
 	cardRegisterCalled       bool
 	attachmentRegisterCalled bool
+	chargebackCreatorCalled  bool
 )
 
 func (e errMapper) fromJSON(string, string) (Entity, error) {
@@ -56,20 +59,29 @@ func (m mockRepository) release(Entity) (ok bool) {
 	return true
 }
 
-func (m mockCardRegister) Get(request card.Request) (card.Entity, error) {
-	cardRegisterCalled = request.Cid == cid && request.OrgId == orgId && request.AccountId == accountId
+func (m mockCardRegister) Get(correlationId string, tenant string, accId int) (card.Entity, error) {
+	cardRegisterCalled = correlationId == cid && tenant == orgId && accId == accountId
 
-	return card.Entity{Number: "5172163143182969"}, nil
+	return cardFake, nil
 }
 
-func (m mockAttachmentRegister) Get(request attachment.Request) (attachment.Entity, error) {
-	attachmentRegisterCalled = request.Cid == cid && request.OrgId == orgId && request.AccountId == accountId && request.DisputeId == disputeID
+func (m mockAttachmentRegister) Get(correlationId string, tenant string, accId int, disId int) (attachment.Entity, error) {
+	attachmentRegisterCalled = correlationId == cid && tenant == orgId && accId == accountId && disId == disputeID
 
-	return attachment.Entity{Name: "filename", Base64: "ZmlsZW5hbWUgaW4gYmFzZTY0"}, nil
+	return attachmentFake, nil
 }
 
-func (m mockAttachmentRegister) Save(request attachment.Request) error {
-	return nil
+func (m mockChargebackCreator) Create(input chargeback.Input) (chargeback.Entity, error) {
+	chargebackCreatorCalled = input.Cid == cid &&
+		input.DocumentIndicator == documentIndicator &&
+		input.OrgId == orgId &&
+		input.AccountId == accountId &&
+		input.DisputeId == disputeID &&
+		ReasonCode(input.ReasonCode) == reasonCode &&
+		input.Card == cardFake &&
+		input.Attachment == attachmentFake
+
+	return chargebackFake, nil
 }
 
 func TestMapFromJson(t *testing.T) {
@@ -78,14 +90,14 @@ func TestMapFromJson(t *testing.T) {
 	json := `{
   "disputeId": 611,
   "accountId": 48448,
-  "authorizationCode": "451",
+  "authorizationCode": "7HSGXW",
   "reasonCode": "848",
-  "cardId": "3123",
+  "cardId": 3123,
   "tenant": "pismo.io",
   "disputeAmount": 32.32,
   "transactionAmount": 42.65,
   "transactionDate": "2012-04-23",
-  "localCurrencyCode": "USD",
+  "localCurrencyCode": "986",
   "textMessage": "this a test message",
   "documentIndicator": true,
   "isPartialChargeback": false
@@ -94,13 +106,13 @@ func TestMapFromJson(t *testing.T) {
 		CorrelationID:       cid,
 		DisputeID:           611,
 		AccountID:           48448,
-		AuthorizationCode:   "451",
-		ReasonCode:          "848",
-		CardID:              "3123",
+		AuthorizationCode:   AuthorizationCode("7HSGXW"),
+		ReasonCode:          ReasonCode("848"),
+		CardID:              3123,
 		Tenant:              "pismo.io",
 		DisputeAmount:       32.32,
 		TransactionDate:     date(time.Date(2012, 04, 23, 0, 0, 0, 0, time.UTC)),
-		LocalCurrencyCode:   "USD",
+		LocalCurrencyCode:   LocalCurrencyCode("986"),
 		TextMessage:         "this is a test message",
 		DocumentIndicator:   true,
 		IsPartialChargeback: false,
@@ -153,18 +165,13 @@ func TestOpenSuccess(t *testing.T) {
 	svc := service{
 		cardRegister:       mockCardRegister{},
 		attachmentRegister: mockAttachmentRegister{},
-		chargebackCreator:  nil,
-	}
-	d := Entity{
-		CorrelationID: cid,
-		Tenant:        orgId,
-		AccountID:     accountId,
-		DisputeID:     disputeID,
+		chargebackCreator:  mockChargebackCreator{},
 	}
 	cardRegisterCalled = false
 	attachmentRegisterCalled = false
+	chargebackCreatorCalled = false
 
-	_ = svc.open(d)
+	_ = svc.open(disputeFake)
 
 	if !cardRegisterCalled {
 		t.Error("card register not called")
@@ -174,7 +181,9 @@ func TestOpenSuccess(t *testing.T) {
 		t.Error("attachment register not called")
 	}
 
-	//TODO: finalize with chargeback service
+	if !chargebackCreatorCalled {
+		t.Error("chargeback creator not called")
+	}
 }
 
 //TODO: implement this
