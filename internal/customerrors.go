@@ -1,4 +1,4 @@
-package dispute
+package internal
 
 import "fmt"
 
@@ -14,6 +14,9 @@ type (
 		src       error
 		cid       string
 		disputeID int
+	}
+
+	ResponseError struct {
 	}
 )
 

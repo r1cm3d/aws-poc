@@ -1,19 +1,16 @@
 package awsregister
 
 import (
-	"aws-poc/internal/dispute"
+	"aws-poc/internal"
 	"aws-poc/pkg/awssession"
 	"aws-poc/pkg/test/integration"
 	"reflect"
 	"testing"
 )
 
-type errRegister struct{}
+var disputeStub = internal.Dispute{DisputeId: 123, Cid: "cid"}
 
-var stubDispute = dispute.Entity{
-	CorrelationID: "ee67f4f2-0b08-4f58-908f-bbb9bc37a1d2",
-	DisputeID:     666,
-}
+type errRegister struct{}
 
 func (e errRegister) put(_ record) error {
 	return errPutItem
@@ -29,12 +26,12 @@ func TestLockIntegration(t *testing.T) {
 	defer cleanupTable()
 	cases := []struct {
 		name string
-		in   dispute.Entity
+		in   internal.Dispute
 		want bool
 		locker
 	}{
-		{"success", stubDispute, true, locker{newRegister(awssession.NewLocalSession(), tableName)}},
-		{"error", stubDispute, false, locker{errRegister{}}},
+		{"success", disputeStub, true, locker{newRegister(awssession.NewLocalSession(), tableName)}},
+		{"error", disputeStub, false, locker{errRegister{}}},
 	}
 
 	for _, c := range cases {
@@ -52,12 +49,12 @@ func TestReleaseIntegration(t *testing.T) {
 	defer cleanupTable()
 	cases := []struct {
 		name string
-		in   dispute.Entity
+		in   internal.Dispute
 		want bool
 		locker
 	}{
-		{"success", stubDispute, true, locker{newRegister(awssession.NewLocalSession(), tableName)}},
-		{"error", stubDispute, false, locker{errRegister{}}},
+		{"success", disputeStub, true, locker{newRegister(awssession.NewLocalSession(), tableName)}},
+		{"error", disputeStub, false, locker{errRegister{}}},
 	}
 
 	for _, c := range cases {
