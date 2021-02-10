@@ -16,6 +16,9 @@ type (
 	mockCardGetter       struct{}
 	mockAttachmentGetter struct{}
 	mockOpener           struct{}
+	errCardGetter       struct{}
+	errAttachmentGetter struct{}
+	errOpener           struct{}
 )
 
 var (
@@ -24,51 +27,71 @@ var (
 	chargebackCreatorCalled  bool
 )
 
-func (e errMapper) fromJSON(string, string) (Dispute, error) {
+func (e errMapper) fromJSON(string, string) (*Dispute, error) {
 	return disputeStub, errStub
 }
 
-func (m mockMapper) fromJSON(string, string) (Dispute, error) {
+func (m mockMapper) fromJSON(string, string) (*Dispute, error) {
 	return disputeStub, nil
 }
 
-func (e errRepository) lock(Dispute) (ok bool) {
+func (e errRepository) lock(*Dispute) (ok bool) {
 	return false
 }
 
-func (e errRepository) release(Dispute) (ok bool) {
+func (e errRepository) release(*Dispute) (ok bool) {
 	return false
 }
 
-func (e errDisputer) create(Dispute) error {
+func (e errDisputer) create(*Dispute) error {
 	return errStub
 }
 
-func (m mockCreator) create(Dispute) error {
+func (m mockCreator) create(*Dispute) error {
 	return nil
 }
 
-func (m mockRepository) lock(Dispute) (ok bool) {
+func (m mockRepository) lock(*Dispute) (ok bool) {
 	return true
 }
 
-func (m mockRepository) release(Dispute) (ok bool) {
+func (m mockRepository) release(*Dispute) (ok bool) {
 	return true
 }
 
-func (m mockCardGetter) Get(dispute Dispute) (Card, error) {
+func (m mockCardGetter) Get(dispute *Dispute) (*Card, error) {
 	cardRegisterCalled = dispute == disputeStub
 
 	return cardStub, nil
 }
 
-func (m mockAttachmentGetter) Get(dispute Dispute) (Attachment, error) {
+func (m mockAttachmentGetter) Get(dispute *Dispute) (*Attachment, error) {
 	attachmentRegisterCalled = dispute == disputeStub
 
 	return attachmentStub, nil
 }
 
-func (m mockOpener) Open(dispute Dispute, card Card, attachment Attachment) (Chargeback, error) {
+func (m mockOpener) Open(dispute *Dispute, card *Card, attachment *Attachment) (*Chargeback, error) {
+	chargebackCreatorCalled = dispute == disputeStub &&
+		card == cardStub &&
+		attachment == attachmentStub
+
+	return chargebackStub, nil
+}
+
+func (m errCardGetter) Get(dispute *Dispute) (*Card, error) {
+	cardRegisterCalled = dispute == disputeStub
+
+	return nil, errStub
+}
+
+func (m errAttachmentGetter) Get(dispute *Dispute) (*Attachment, error) {
+	attachmentRegisterCalled = dispute == disputeStub
+
+	return attachmentStub, nil
+}
+
+func (m errOpener) Open(dispute *Dispute, card *Card, attachment *Attachment) (*Chargeback, error) {
 	chargebackCreatorCalled = dispute == disputeStub &&
 		card == cardStub &&
 		attachment == attachmentStub
@@ -177,10 +200,6 @@ func TestCreateSuccess(t *testing.T) {
 		t.Error("chargeback creator not called")
 	}
 }
-
-//TODO: implement this
-//func TestOpenFail(t *testing.T) {
-//}
 
 func TestUnmarshalJSON_Errors(t *testing.T) {
 	errDate := "unparseableData"

@@ -7,6 +7,6 @@ type (
 	}
 
 	AttachmentGetter interface {
-		Get(dispute Dispute) (Attachment, error)
+		Get(dispute *Dispute) (*Attachment, error)
 	}
 )

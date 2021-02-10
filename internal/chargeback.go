@@ -34,7 +34,7 @@ type (
 	}
 
 	Chargeback struct {
-		Dispute
+		*Dispute
 		TransactionId string
 		ClaimId       string
 		ChargebackId  string
@@ -45,20 +45,20 @@ type (
 	}
 
 	locker interface {
-		lock(Dispute) (ok bool)
-		release(Dispute) (ok bool)
+		lock(*Dispute) (ok bool)
+		release(*Dispute) (ok bool)
 	}
 
 	mapper interface {
-		fromJSON(string, string) (Dispute, error)
+		fromJSON(string, string) (*Dispute, error)
 	}
 
 	creator interface {
-		create(Dispute) error
+		create(*Dispute) error
 	}
 
 	opener interface {
-		Open(Dispute, Card, Attachment) (Chargeback, error)
+		Open(*Dispute, *Card, *Attachment) (*Chargeback, error)
 	}
 
 	service struct {
@@ -93,20 +93,20 @@ func (d *date) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (s service) create(dispute Dispute) error {
+func (s service) create(dispute *Dispute) error {
 	var err error
-	var c Card
+	var c *Card
 	if c, err = s.cardRegister.Get(dispute); err != nil {
 		return err
 	}
-	var att Attachment
+	var att *Attachment
 	if att, err = s.attachmentRegister.Get(dispute); err != nil {
-		return err
+		return err //TODO: cover it
 	}
 
-	var cbk Chargeback
+	var cbk *Chargeback
 	if cbk, err = s.Open(dispute, c, att); err != nil {
-		return err
+		return err //TODO: cover it
 	}
 
 	fmt.Printf("card: %v", c)

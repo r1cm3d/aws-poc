@@ -25,7 +25,7 @@ const (
 
 var (
 	errStub     = errors.New("mocked error")
-	disputeStub = Dispute{
+	disputeStub = &Dispute{
 		Cid:               cid,
 		OrgId:             orgId,
 		AccountId:         accountId,
@@ -41,7 +41,7 @@ var (
 		IsPartial:         isPartial,
 	}
 
-	chargebackStub = Chargeback{
+	chargebackStub = &Chargeback{
 		Dispute:       disputeStub,
 		TransactionId: transactionId,
 		ClaimId:       claimId,
@@ -52,6 +52,6 @@ var (
 		ResponseError: ResponseError{},
 	}
 
-	cardStub       = Card{Number: "5172163143182969"}
-	attachmentStub = Attachment{Name: "filename", Base64: "ZmlsZW5hbWUgaW4gYmFzZTY0"}
+	cardStub       = &Card{Number: "5172163143182969"}
+	attachmentStub = &Attachment{Name: "filename", Base64: "ZmlsZW5hbWUgaW4gYmFzZTY0"}
 )

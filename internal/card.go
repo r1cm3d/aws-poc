@@ -6,6 +6,6 @@ type (
 	}
 
 	CardGetter interface {
-		Get(dispute Dispute) (Card, error)
+		Get(dispute *Dispute) (*Card, error)
 	}
 )
