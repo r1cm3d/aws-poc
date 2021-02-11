@@ -24,7 +24,10 @@ const (
 )
 
 var (
-	errStub     = errors.New("mocked error")
+	stubError   = errors.New("mocked error")
+	cardError   = errors.New("mocked card error")
+	attError    = errors.New("mocked att error")
+	openerError = errors.New("mocked opener error")
 	disputeStub = &Dispute{
 		Cid:               cid,
 		OrgId:             orgId,

@@ -101,12 +101,12 @@ func (s service) create(dispute *Dispute) error {
 	}
 	var att *Attachment
 	if att, err = s.attachmentRegister.Get(dispute); err != nil {
-		return err //TODO: cover it
+		return err
 	}
 
 	var cbk *Chargeback
 	if cbk, err = s.Open(dispute, c, att); err != nil {
-		return err //TODO: cover it
+		return err
 	}
 
 	fmt.Printf("card: %v", c)

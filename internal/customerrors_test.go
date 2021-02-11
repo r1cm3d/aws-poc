@@ -11,9 +11,9 @@ func TestErrorsMessages(t *testing.T) {
 		err  error
 		want string
 	}{
-		{"parseErrorMessage", newParseError(errStub), fmt.Sprintf("parser error: %v", errStub.Error())},
+		{"parseErrorMessage", newParseError(stubError), fmt.Sprintf("parser error: %v", stubError.Error())},
 		{"idempotenceErrorMessage", newIdempotenceError(cid, disputeID), fmt.Sprintf("idempotence error: cid(%v), disputeId(%v)", cid, disputeID)},
-		{"chargebackErrorMessage", newChargebackError(errStub, cid, disputeID), fmt.Sprintf("chargeback error: src(%v), cid(%v), disputeId(%v), ", errStub, cid, disputeID)},
+		{"chargebackErrorMessage", newChargebackError(stubError, cid, disputeID), fmt.Sprintf("chargeback error: src(%v), cid(%v), disputeId(%v), ", stubError, cid, disputeID)},
 	}
 
 	for _, c := range cases {

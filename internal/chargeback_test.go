@@ -13,22 +13,22 @@ type (
 	mockRepository       struct{}
 	mockMapper           struct{}
 	mockCreator          struct{}
-	mockCardGetter       struct{}
-	mockAttachmentGetter struct{}
-	mockOpener           struct{}
+	mockCardGetter       struct{
+		called bool
+	}
+	mockAttachmentGetter struct{
+		called bool
+	}
+	mockOpener           struct{
+		called bool
+	}
 	errCardGetter       struct{}
 	errAttachmentGetter struct{}
 	errOpener           struct{}
 )
 
-var (
-	cardRegisterCalled       bool
-	attachmentRegisterCalled bool
-	chargebackCreatorCalled  bool
-)
-
 func (e errMapper) fromJSON(string, string) (*Dispute, error) {
-	return disputeStub, errStub
+	return disputeStub, stubError
 }
 
 func (m mockMapper) fromJSON(string, string) (*Dispute, error) {
@@ -44,7 +44,7 @@ func (e errRepository) release(*Dispute) (ok bool) {
 }
 
 func (e errDisputer) create(*Dispute) error {
-	return errStub
+	return stubError
 }
 
 func (m mockCreator) create(*Dispute) error {
@@ -60,43 +60,33 @@ func (m mockRepository) release(*Dispute) (ok bool) {
 }
 
 func (m mockCardGetter) Get(dispute *Dispute) (*Card, error) {
-	cardRegisterCalled = dispute == disputeStub
+	m.called = dispute == disputeStub
 
 	return cardStub, nil
 }
 
 func (m mockAttachmentGetter) Get(dispute *Dispute) (*Attachment, error) {
-	attachmentRegisterCalled = dispute == disputeStub
+	m.called = dispute == disputeStub
 
 	return attachmentStub, nil
 }
 
 func (m mockOpener) Open(dispute *Dispute, card *Card, attachment *Attachment) (*Chargeback, error) {
-	chargebackCreatorCalled = dispute == disputeStub &&
-		card == cardStub &&
-		attachment == attachmentStub
+	m.called = dispute == disputeStub && card == cardStub && attachment == attachmentStub
 
 	return chargebackStub, nil
 }
 
 func (m errCardGetter) Get(dispute *Dispute) (*Card, error) {
-	cardRegisterCalled = dispute == disputeStub
-
-	return nil, errStub
+	return nil, cardError
 }
 
 func (m errAttachmentGetter) Get(dispute *Dispute) (*Attachment, error) {
-	attachmentRegisterCalled = dispute == disputeStub
-
-	return attachmentStub, nil
+	return nil, attError
 }
 
 func (m errOpener) Open(dispute *Dispute, card *Card, attachment *Attachment) (*Chargeback, error) {
-	chargebackCreatorCalled = dispute == disputeStub &&
-		card == cardStub &&
-		attachment == attachmentStub
-
-	return chargebackStub, nil
+	return nil, openerError
 }
 
 func TestMapFromJson(t *testing.T) {
@@ -162,9 +152,9 @@ func TestHandleMessage(t *testing.T) {
 		service
 	}{
 		{"success", defaultInput, nil, service{mapper: mockMapper{}, locker: mockRepository{}, creator: mockCreator{}}},
-		{"parseError", defaultInput, newParseError(errStub), service{locker: mockRepository{}, mapper: errMapper{}}},
+		{"parseError", defaultInput, newParseError(stubError), service{locker: mockRepository{}, mapper: errMapper{}}},
 		{"idempotenceError", defaultInput, newIdempotenceError(cid, disputeID), service{mapper: mockMapper{}, locker: errRepository{}}},
-		{"chargebackError", defaultInput, newChargebackError(errStub, cid, disputeID), service{mapper: mockMapper{}, locker: mockRepository{}, creator: errDisputer{}}},
+		{"chargebackError", defaultInput, newChargebackError(stubError, cid, disputeID), service{mapper: mockMapper{}, locker: mockRepository{}, creator: errDisputer{}}},
 	}
 
 	for _, c := range cases {
@@ -177,27 +167,54 @@ func TestHandleMessage(t *testing.T) {
 }
 
 func TestCreateSuccess(t *testing.T) {
+	cr, ar, ope := mockCardGetter{}, mockAttachmentGetter{}, mockOpener{}
 	svc := service{
-		cardRegister:       mockCardGetter{},
-		attachmentRegister: mockAttachmentGetter{},
-		opener:             mockOpener{},
+		cardRegister: 		cr,
+		attachmentRegister: ar,
+		opener:             ope,
 	}
-	cardRegisterCalled = false
-	attachmentRegisterCalled = false
-	chargebackCreatorCalled = false
-
 	_ = svc.create(disputeStub)
 
-	if !cardRegisterCalled {
+	if !cr.called {
 		t.Error("card register not called")
 	}
-
-	if !attachmentRegisterCalled {
+	if !ar.called {
 		t.Error("attachment register not called")
 	}
-
-	if !chargebackCreatorCalled {
+	if !ope.called {
 		t.Error("chargeback creator not called")
+	}
+
+	//TODO: implement the rest of create method
+}
+
+func TestOpenFail(t *testing.T) {
+	cases := []struct {
+		name string
+		in   *Dispute
+		svc	 service
+		want error
+	}{
+		{"cardError", disputeStub, service{
+			cardRegister:       errCardGetter{},
+		}, cardError},
+		{"attachmentError", disputeStub, service{
+			cardRegister:       mockCardGetter{},
+			attachmentRegister: errAttachmentGetter{},
+		}, attError},
+		{"openerError", disputeStub, service{
+			cardRegister:       mockCardGetter{},
+			attachmentRegister: mockAttachmentGetter{},
+			opener: errOpener{},
+		}, openerError},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			if got := c.svc.create(c.in); got != c.want {
+				t.Errorf("%s, want: %v, got: %v", c.name, c.want, got)
+			}
+		})
 	}
 }
 
