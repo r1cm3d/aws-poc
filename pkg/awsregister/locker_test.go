@@ -1,14 +1,14 @@
 package awsregister
 
 import (
-	"aws-poc/internal"
+	"aws-poc/internal/protocol"
 	"aws-poc/pkg/awssession"
 	"aws-poc/pkg/test/integration"
 	"reflect"
 	"testing"
 )
 
-var disputeStub = internal.Dispute{DisputeId: 123, Cid: "cid"}
+var disputeStub = protocol.Dispute{DisputeId: 123, Cid: "cid"}
 
 type errRegister struct{}
 
@@ -26,7 +26,7 @@ func TestLockIntegration(t *testing.T) {
 	defer cleanupTable()
 	cases := []struct {
 		name string
-		in   internal.Dispute
+		in   protocol.Dispute
 		want bool
 		locker
 	}{
@@ -49,7 +49,7 @@ func TestReleaseIntegration(t *testing.T) {
 	defer cleanupTable()
 	cases := []struct {
 		name string
-		in   internal.Dispute
+		in   protocol.Dispute
 		want bool
 		locker
 	}{

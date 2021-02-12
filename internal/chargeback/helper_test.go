@@ -1,6 +1,7 @@
-package internal
+package chargeback
 
 import (
+	"aws-poc/internal/protocol"
 	"errors"
 )
 
@@ -16,9 +17,9 @@ const (
 	disputeAmount     = 120.00
 	transactionAmount = 150.00
 	documentIndicator = false
-	reasonCode        = ReasonCode("4853")
-	authorizationCode = AuthorizationCode("ABDZAR")
-	usDollar          = LocalCurrencyCode("840")
+	reasonCode        = protocol.ReasonCode("4853")
+	authorizationCode = protocol.AuthorizationCode("ABDZAR")
+	usDollar          = protocol.LocalCurrencyCode("840")
 	isPartial         = false
 	textMessage       = "Example message"
 )
@@ -28,7 +29,7 @@ var (
 	cardError   = errors.New("mocked card error")
 	attError    = errors.New("mocked att error")
 	openerError = errors.New("mocked opener error")
-	disputeStub = &Dispute{
+	disputeStub = &protocol.Dispute{
 		Cid:               cid,
 		OrgId:             orgId,
 		AccountId:         accountId,
@@ -44,17 +45,17 @@ var (
 		IsPartial:         isPartial,
 	}
 
-	chargebackStub = &Chargeback{
+	chargebackStub = &protocol.Chargeback{
 		Dispute:       disputeStub,
 		TransactionId: transactionId,
 		ClaimId:       claimId,
 		ChargebackId:  chargebackId,
-		Status:        Status("CREATED"),
-		Queue:         Queue("REJECTS"),
-		Type:          Type("CHARGEBACK"),
-		ResponseError: ResponseError{},
+		Status:        protocol.Status("CREATED"),
+		Queue:         protocol.Queue("REJECTS"),
+		Type:          protocol.Type("CHARGEBACK"),
+		ResponseError: protocol.ResponseError{},
 	}
 
-	cardStub       = &Card{Number: "5172163143182969"}
-	attachmentStub = &Attachment{Name: "filename", Base64: "ZmlsZW5hbWUgaW4gYmFzZTY0"}
+	cardStub       = &protocol.Card{Number: "5172163143182969"}
+	attachmentStub = &protocol.Attachment{Name: "filename", Base64: "ZmlsZW5hbWUgaW4gYmFzZTY0"}
 )

@@ -1,91 +1,102 @@
-package internal
+package chargeback
 
 import (
+	"aws-poc/internal/protocol"
 	"reflect"
 	"testing"
 	"time"
 )
 
 type (
-	errMapper            struct{}
-	errRepository        struct{}
-	errDisputer          struct{}
-	mockRepository       struct{}
-	mockMapper           struct{}
-	mockCreator          struct{}
-	mockCardGetter       struct{
+	errMapper          struct{}
+	errRepository      struct{}
+	errDisputer        struct{}
+	mockRepository     struct{}
+	mockMapper         struct{}
+	mockCreator        struct{}
+	mockCardRepository struct {
 		called bool
 	}
-	mockAttachmentGetter struct{
+	mockAttachmentRepository struct {
 		called bool
 	}
-	mockOpener           struct{
+	mockOpener struct {
 		called bool
 	}
-	errCardGetter       struct{}
-	errAttachmentGetter struct{}
-	errOpener           struct{}
+	errCardGetter           struct{}
+	errAttachmentRepository struct{}
+	errOpener               struct{}
 )
 
-func (e errMapper) fromJSON(string, string) (*Dispute, error) {
+func (e errMapper) fromJSON(string, string) (*protocol.Dispute, error) {
 	return disputeStub, stubError
 }
 
-func (m mockMapper) fromJSON(string, string) (*Dispute, error) {
+func (m mockMapper) fromJSON(string, string) (*protocol.Dispute, error) {
 	return disputeStub, nil
 }
 
-func (e errRepository) lock(*Dispute) (ok bool) {
+func (e errRepository) lock(*protocol.Dispute) (ok bool) {
 	return false
 }
 
-func (e errRepository) release(*Dispute) (ok bool) {
+func (e errRepository) release(*protocol.Dispute) (ok bool) {
 	return false
 }
 
-func (e errDisputer) create(*Dispute) error {
+func (e errDisputer) create(*protocol.Dispute) error {
 	return stubError
 }
 
-func (m mockCreator) create(*Dispute) error {
+func (m mockCreator) create(*protocol.Dispute) error {
 	return nil
 }
 
-func (m mockRepository) lock(*Dispute) (ok bool) {
+func (m mockRepository) lock(*protocol.Dispute) (ok bool) {
 	return true
 }
 
-func (m mockRepository) release(*Dispute) (ok bool) {
+func (m mockRepository) release(*protocol.Dispute) (ok bool) {
 	return true
 }
 
-func (m mockCardGetter) Get(dispute *Dispute) (*Card, error) {
+func (m *mockCardRepository) Get(dispute *protocol.Dispute) (*protocol.Card, error) {
 	m.called = dispute == disputeStub
 
 	return cardStub, nil
 }
 
-func (m mockAttachmentGetter) Get(dispute *Dispute) (*Attachment, error) {
+func (m *mockAttachmentRepository) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 	m.called = dispute == disputeStub
 
 	return attachmentStub, nil
 }
 
-func (m mockOpener) Open(dispute *Dispute, card *Card, attachment *Attachment) (*Chargeback, error) {
+func (m *mockAttachmentRepository) Save(chargeback *protocol.Chargeback) error {
+	m.called = chargeback == chargebackStub
+
+	return nil
+}
+
+func (m *mockOpener) Open(dispute *protocol.Dispute, card *protocol.Card, attachment *protocol.Attachment) (*protocol.Chargeback, error) {
 	m.called = dispute == disputeStub && card == cardStub && attachment == attachmentStub
 
 	return chargebackStub, nil
 }
 
-func (m errCardGetter) Get(dispute *Dispute) (*Card, error) {
+func (m errCardGetter) Get(dispute *protocol.Dispute) (*protocol.Card, error) {
 	return nil, cardError
 }
 
-func (m errAttachmentGetter) Get(dispute *Dispute) (*Attachment, error) {
+func (m errAttachmentRepository) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 	return nil, attError
 }
 
-func (m errOpener) Open(dispute *Dispute, card *Card, attachment *Attachment) (*Chargeback, error) {
+func (m errAttachmentRepository) Save(chargeback *protocol.Chargeback) error {
+	return attError
+}
+
+func (m errOpener) Open(dispute *protocol.Dispute, card *protocol.Card, attachment *protocol.Attachment) (*protocol.Chargeback, error) {
 	return nil, openerError
 }
 
@@ -107,17 +118,17 @@ func TestMapFromJson(t *testing.T) {
   "documentIndicator": true,
   "isPartial": false
 }`
-	want := Dispute{
+	want := protocol.Dispute{
 		Cid:               cid,
 		DisputeId:         611,
 		AccountId:         48448,
-		AuthorizationCode: AuthorizationCode("7HSGXW"),
-		ReasonCode:        ReasonCode("848"),
+		AuthorizationCode: protocol.AuthorizationCode("7HSGXW"),
+		ReasonCode:        protocol.ReasonCode("848"),
 		CardId:            3123,
 		OrgId:             "pismo.io",
 		DisputeAmount:     32.32,
-		TransactionDate:   date(time.Date(2012, 04, 23, 0, 0, 0, 0, time.UTC)),
-		LocalCurrencyCode: LocalCurrencyCode("986"),
+		TransactionDate:   protocol.Date(time.Date(2012, 04, 23, 0, 0, 0, 0, time.UTC)),
+		LocalCurrencyCode: protocol.LocalCurrencyCode("986"),
 		TextMessage:       "this is a test message",
 		DocumentIndicator: true,
 		IsPartial:         false,
@@ -167,11 +178,11 @@ func TestHandleMessage(t *testing.T) {
 }
 
 func TestCreateSuccess(t *testing.T) {
-	cr, ar, ope := mockCardGetter{}, mockAttachmentGetter{}, mockOpener{}
+	cr, ar, ope := mockCardRepository{}, mockAttachmentRepository{}, mockOpener{}
 	svc := service{
-		cardRegister: 		cr,
-		attachmentRegister: ar,
-		opener:             ope,
+		cardRepository:       &cr,
+		attachmentRepository: &ar,
+		opener:               &ope,
 	}
 	_ = svc.create(disputeStub)
 
@@ -191,53 +202,27 @@ func TestCreateSuccess(t *testing.T) {
 func TestOpenFail(t *testing.T) {
 	cases := []struct {
 		name string
-		in   *Dispute
-		svc	 service
+		in   *protocol.Dispute
+		svc  service
 		want error
 	}{
 		{"cardError", disputeStub, service{
-			cardRegister:       errCardGetter{},
+			cardRepository: errCardGetter{},
 		}, cardError},
 		{"attachmentError", disputeStub, service{
-			cardRegister:       mockCardGetter{},
-			attachmentRegister: errAttachmentGetter{},
+			cardRepository:       &mockCardRepository{},
+			attachmentRepository: errAttachmentRepository{},
 		}, attError},
 		{"openerError", disputeStub, service{
-			cardRegister:       mockCardGetter{},
-			attachmentRegister: mockAttachmentGetter{},
-			opener: errOpener{},
+			cardRepository:       &mockCardRepository{},
+			attachmentRepository: &mockAttachmentRepository{},
+			opener:               errOpener{},
 		}, openerError},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			if got := c.svc.create(c.in); got != c.want {
-				t.Errorf("%s, want: %v, got: %v", c.name, c.want, got)
-			}
-		})
-	}
-}
-
-func TestUnmarshalJSON_Errors(t *testing.T) {
-	errDate := "unparseableData"
-	cases := []struct {
-		name string
-		in   []byte
-		want error
-	}{
-		{"null", []byte("null"), nil},
-		{"parseError", []byte(errDate), &time.ParseError{
-			Layout:     "2006-01-02",
-			Value:      errDate,
-			LayoutElem: "2006",
-			ValueElem:  errDate,
-			Message:    "",
-		}}}
-	var d date
-
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			if got := d.UnmarshalJSON(c.in); !reflect.DeepEqual(got, c.want) {
 				t.Errorf("%s, want: %v, got: %v", c.name, c.want, got)
 			}
 		})
