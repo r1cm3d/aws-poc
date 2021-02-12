@@ -3,16 +3,16 @@ package chargeback
 import "aws-poc/internal/protocol"
 
 type (
-	errMapper          struct{}
-	errRepository      struct{}
-	errDisputer        struct{}
-	mockRepository     struct{}
-	mockMapper         struct{}
-	mockCreator        struct{}
-	mockCardRepository struct {
+	errMapper       struct{}
+	errRepository   struct{}
+	errDisputer     struct{}
+	mockRepository  struct{}
+	mockMapper      struct{}
+	mockCreator     struct{}
+	mockCardService struct {
 		called bool
 	}
-	mockAttachmentRepository struct {
+	mockAttService struct {
 		getCalled  bool
 		saveCalled bool
 	}
@@ -26,13 +26,13 @@ type (
 	mockScheduler struct {
 		called bool
 	}
-	errCardGetter               struct{}
-	errAttachmentGetRepository  struct{}
-	errAttachmentSaveRepository struct{}
-	errNetworkCreator           struct{}
-	errProducer                 struct{}
-	errScheduler                struct{}
-	mockOpenerWithNetworkError  struct {
+	errCardService             struct{}
+	errAttGetService           struct{}
+	errAttSaveService          struct{}
+	errNetworkCreator          struct{}
+	errProducer                struct{}
+	errScheduler               struct{}
+	mockOpenerWithNetworkError struct {
 		called bool
 	}
 )
@@ -69,19 +69,19 @@ func (m mockRepository) release(*protocol.Dispute) (ok bool) {
 	return true
 }
 
-func (m *mockCardRepository) Get(dispute *protocol.Dispute) (*protocol.Card, error) {
+func (m *mockCardService) Get(dispute *protocol.Dispute) (*protocol.Card, error) {
 	m.called = dispute == disputeStub
 
 	return cardStub, nil
 }
 
-func (m *mockAttachmentRepository) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
+func (m *mockAttService) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 	m.getCalled = dispute == disputeStub
 
 	return attachmentStub, nil
 }
 
-func (m *mockAttachmentRepository) Save(chargeback *protocol.Chargeback) error {
+func (m *mockAttService) Save(chargeback *protocol.Chargeback) error {
 	m.saveCalled = chargeback == chargebackStub
 
 	return nil
@@ -93,23 +93,23 @@ func (m *mockNetworkCreator) Create(dispute *protocol.Dispute, card *protocol.Ca
 	return chargebackStub, nil
 }
 
-func (m errCardGetter) Get(dispute *protocol.Dispute) (*protocol.Card, error) {
+func (m errCardService) Get(dispute *protocol.Dispute) (*protocol.Card, error) {
 	return nil, cardError
 }
 
-func (m errAttachmentGetRepository) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
+func (m errAttGetService) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 	return nil, attGetError
 }
 
-func (m errAttachmentGetRepository) Save(chargeback *protocol.Chargeback) error {
+func (m errAttGetService) Save(chargeback *protocol.Chargeback) error {
 	return nil
 }
 
-func (m errAttachmentSaveRepository) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
+func (m errAttSaveService) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 	return nil, nil
 }
 
-func (m errAttachmentSaveRepository) Save(chargeback *protocol.Chargeback) error {
+func (m errAttSaveService) Save(chargeback *protocol.Chargeback) error {
 	return attSaveError
 }
 

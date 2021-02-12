@@ -5,7 +5,7 @@ import (
 )
 
 type (
-	Repository interface {
+	Service interface {
 		Get(dispute *protocol.Dispute) (*protocol.Card, error)
 	}
 )

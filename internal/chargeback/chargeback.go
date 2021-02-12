@@ -34,8 +34,8 @@ type (
 		locker
 		mapper
 		creator
-		cardRepository card.Repository
-		attRepository  attachment.Repository
+		cardService    card.Service
+		attService     attachment.Service
 		networkCreator network.Creator
 		Scheduler
 		Producer
@@ -45,11 +45,11 @@ type (
 func (s service) create(dispute *protocol.Dispute) error {
 	var err error
 	var c *protocol.Card
-	if c, err = s.cardRepository.Get(dispute); err != nil {
+	if c, err = s.cardService.Get(dispute); err != nil {
 		return err
 	}
 	var att *protocol.Attachment
-	if att, err = s.attRepository.Get(dispute); err != nil {
+	if att, err = s.attService.Get(dispute); err != nil {
 		return err
 	}
 	var cbk *protocol.Chargeback
@@ -62,7 +62,7 @@ func (s service) create(dispute *protocol.Dispute) error {
 	if cbk.HasError() {
 		return cbk.NetworkError
 	}
-	if err = s.attRepository.Save(cbk); err != nil {
+	if err = s.attService.Save(cbk); err != nil {
 		return err
 	}
 	if err = s.Schedule(cbk); err != nil {

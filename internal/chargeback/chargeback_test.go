@@ -85,10 +85,10 @@ func TestHandleMessage(t *testing.T) {
 }
 
 func TestCreateSuccess(t *testing.T) {
-	cr, ar, ope, prod, scd := mockCardRepository{}, mockAttachmentRepository{}, mockNetworkCreator{}, mockProducer{expected: chargebackStub}, mockScheduler{}
+	cr, ar, ope, prod, scd := mockCardService{}, mockAttService{}, mockNetworkCreator{}, mockProducer{expected: chargebackStub}, mockScheduler{}
 	svc := service{
-		cardRepository: &cr,
-		attRepository:  &ar,
+		cardService:    &cr,
+		attService:     &ar,
 		networkCreator: &ope,
 		Producer:       &prod,
 		Scheduler:      &scd,
@@ -116,10 +116,10 @@ func TestCreateSuccess(t *testing.T) {
 }
 
 func TestCreateNetworkError(t *testing.T) {
-	cr, ar, ope, prod, scd := mockCardRepository{}, mockAttachmentRepository{}, mockOpenerWithNetworkError{}, mockProducer{expected: chargebackWithErrorStub}, mockScheduler{}
+	cr, ar, ope, prod, scd := mockCardService{}, mockAttService{}, mockOpenerWithNetworkError{}, mockProducer{expected: chargebackWithErrorStub}, mockScheduler{}
 	svc := service{
-		cardRepository: &cr,
-		attRepository:  &ar,
+		cardService:    &cr,
+		attService:     &ar,
 		networkCreator: &ope,
 		Producer:       &prod,
 		Scheduler:      &scd,
@@ -154,32 +154,32 @@ func TestOpenFail(t *testing.T) {
 		want error
 	}{
 		{"cardError", disputeStub, service{
-			cardRepository: errCardGetter{},
+			cardService: errCardService{},
 		}, cardError},
 		{"attachmentGetError", disputeStub, service{
-			cardRepository: &mockCardRepository{},
-			attRepository:  &errAttachmentGetRepository{},
+			cardService: &mockCardService{},
+			attService:  &errAttGetService{},
 		}, attGetError},
 		{"openerError", disputeStub, service{
-			cardRepository: &mockCardRepository{},
-			attRepository:  &mockAttachmentRepository{},
+			cardService:    &mockCardService{},
+			attService:     &mockAttService{},
 			networkCreator: errNetworkCreator{},
 		}, openerError},
 		{"producerError", disputeStub, service{
-			cardRepository: &mockCardRepository{},
-			attRepository:  &mockAttachmentRepository{},
+			cardService:    &mockCardService{},
+			attService:     &mockAttService{},
 			networkCreator: &mockNetworkCreator{},
 			Producer:       &errProducer{},
 		}, producerError},
 		{"attachmentSaveError", disputeStub, service{
-			cardRepository: &mockCardRepository{},
-			attRepository:  &errAttachmentSaveRepository{},
+			cardService:    &mockCardService{},
+			attService:     &errAttSaveService{},
 			networkCreator: &mockNetworkCreator{},
 			Producer:       &mockProducer{},
 		}, attSaveError},
 		{"scheduleError", disputeStub, service{
-			cardRepository: &mockCardRepository{},
-			attRepository:  &mockAttachmentRepository{},
+			cardService:    &mockCardService{},
+			attService:     &mockAttService{},
 			networkCreator: &mockNetworkCreator{},
 			Producer:       &mockProducer{},
 			Scheduler:      &errScheduler{},
