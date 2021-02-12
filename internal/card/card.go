@@ -4,8 +4,7 @@ import (
 	"aws-poc/internal/protocol"
 )
 
-type (
-	Service interface {
-		Get(dispute *protocol.Dispute) (*protocol.Card, error)
-	}
-)
+type Service interface {
+		Get(*protocol.Dispute) (*protocol.Card, error)
+}
+
