@@ -16,7 +16,7 @@ type (
 		getCalled  bool
 		saveCalled bool
 	}
-	mockOpener struct {
+	mockNetworkCreator struct {
 		called bool
 	}
 	mockProducer struct {
@@ -29,7 +29,7 @@ type (
 	errCardGetter               struct{}
 	errAttachmentGetRepository  struct{}
 	errAttachmentSaveRepository struct{}
-	errOpener                   struct{}
+	errNetworkCreator           struct{}
 	errProducer                 struct{}
 	errScheduler                struct{}
 	mockOpenerWithNetworkError  struct {
@@ -87,7 +87,7 @@ func (m *mockAttachmentRepository) Save(chargeback *protocol.Chargeback) error {
 	return nil
 }
 
-func (m *mockOpener) Open(dispute *protocol.Dispute, card *protocol.Card, attachment *protocol.Attachment) (*protocol.Chargeback, error) {
+func (m *mockNetworkCreator) Create(dispute *protocol.Dispute, card *protocol.Card, attachment *protocol.Attachment) (*protocol.Chargeback, error) {
 	m.called = dispute == disputeStub && card == cardStub && attachment == attachmentStub
 
 	return chargebackStub, nil
@@ -113,7 +113,7 @@ func (m errAttachmentSaveRepository) Save(chargeback *protocol.Chargeback) error
 	return attSaveError
 }
 
-func (m errOpener) Open(dispute *protocol.Dispute, card *protocol.Card, attachment *protocol.Attachment) (*protocol.Chargeback, error) {
+func (m errNetworkCreator) Create(dispute *protocol.Dispute, card *protocol.Card, attachment *protocol.Attachment) (*protocol.Chargeback, error) {
 	return nil, openerError
 }
 
@@ -137,7 +137,7 @@ func (e errScheduler) Schedule(chargeback *protocol.Chargeback) error {
 	return scdError
 }
 
-func (m *mockOpenerWithNetworkError) Open(dispute *protocol.Dispute, card *protocol.Card, attachment *protocol.Attachment) (*protocol.Chargeback, error) {
+func (m *mockOpenerWithNetworkError) Create(dispute *protocol.Dispute, card *protocol.Card, attachment *protocol.Attachment) (*protocol.Chargeback, error) {
 	m.called = dispute == disputeStub && card == cardStub && attachment == attachmentStub
 
 	return chargebackWithErrorStub, nil

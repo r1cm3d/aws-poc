@@ -3,6 +3,7 @@ package chargeback
 import (
 	"aws-poc/internal/attachment"
 	"aws-poc/internal/card"
+	"aws-poc/internal/network"
 	"aws-poc/internal/protocol"
 	"encoding/json"
 )
@@ -21,10 +22,6 @@ type (
 		create(*protocol.Dispute) error
 	}
 
-	opener interface {
-		Open(*protocol.Dispute, *protocol.Card, *protocol.Attachment) (*protocol.Chargeback, error)
-	}
-
 	Producer interface {
 		Produce(*protocol.Chargeback) error
 	}
@@ -37,9 +34,9 @@ type (
 		locker
 		mapper
 		creator
-		cardRepository       card.Repository
-		attachmentRepository attachment.Repository
-		opener
+		cardRepository card.Repository
+		attRepository  attachment.Repository
+		networkCreator network.Creator
 		Scheduler
 		Producer
 	}
@@ -52,11 +49,11 @@ func (s service) create(dispute *protocol.Dispute) error {
 		return err
 	}
 	var att *protocol.Attachment
-	if att, err = s.attachmentRepository.Get(dispute); err != nil {
+	if att, err = s.attRepository.Get(dispute); err != nil {
 		return err
 	}
 	var cbk *protocol.Chargeback
-	if cbk, err = s.Open(dispute, c, att); err != nil {
+	if cbk, err = s.networkCreator.Create(dispute, c, att); err != nil {
 		return err
 	}
 	if err = s.Produce(cbk); err != nil {
@@ -65,7 +62,7 @@ func (s service) create(dispute *protocol.Dispute) error {
 	if cbk.HasError() {
 		return cbk.NetworkError
 	}
-	if err = s.attachmentRepository.Save(cbk); err != nil {
+	if err = s.attRepository.Save(cbk); err != nil {
 		return err
 	}
 	if err = s.Schedule(cbk); err != nil {

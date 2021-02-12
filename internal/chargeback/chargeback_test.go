@@ -85,13 +85,13 @@ func TestHandleMessage(t *testing.T) {
 }
 
 func TestCreateSuccess(t *testing.T) {
-	cr, ar, ope, prod, scd := mockCardRepository{}, mockAttachmentRepository{}, mockOpener{}, mockProducer{expected: chargebackStub}, mockScheduler{}
+	cr, ar, ope, prod, scd := mockCardRepository{}, mockAttachmentRepository{}, mockNetworkCreator{}, mockProducer{expected: chargebackStub}, mockScheduler{}
 	svc := service{
-		cardRepository:       &cr,
-		attachmentRepository: &ar,
-		opener:               &ope,
-		Producer:             &prod,
-		Scheduler:            &scd,
+		cardRepository: &cr,
+		attRepository:  &ar,
+		networkCreator: &ope,
+		Producer:       &prod,
+		Scheduler:      &scd,
 	}
 	_ = svc.create(disputeStub)
 
@@ -118,11 +118,11 @@ func TestCreateSuccess(t *testing.T) {
 func TestCreateNetworkError(t *testing.T) {
 	cr, ar, ope, prod, scd := mockCardRepository{}, mockAttachmentRepository{}, mockOpenerWithNetworkError{}, mockProducer{expected: chargebackWithErrorStub}, mockScheduler{}
 	svc := service{
-		cardRepository:       &cr,
-		attachmentRepository: &ar,
-		opener:               &ope,
-		Producer:             &prod,
-		Scheduler:            &scd,
+		cardRepository: &cr,
+		attRepository:  &ar,
+		networkCreator: &ope,
+		Producer:       &prod,
+		Scheduler:      &scd,
 	}
 	_ = svc.create(disputeStub)
 
@@ -157,32 +157,32 @@ func TestOpenFail(t *testing.T) {
 			cardRepository: errCardGetter{},
 		}, cardError},
 		{"attachmentGetError", disputeStub, service{
-			cardRepository:       &mockCardRepository{},
-			attachmentRepository: &errAttachmentGetRepository{},
+			cardRepository: &mockCardRepository{},
+			attRepository:  &errAttachmentGetRepository{},
 		}, attGetError},
 		{"openerError", disputeStub, service{
-			cardRepository:       &mockCardRepository{},
-			attachmentRepository: &mockAttachmentRepository{},
-			opener:               errOpener{},
+			cardRepository: &mockCardRepository{},
+			attRepository:  &mockAttachmentRepository{},
+			networkCreator: errNetworkCreator{},
 		}, openerError},
 		{"producerError", disputeStub, service{
-			cardRepository:       &mockCardRepository{},
-			attachmentRepository: &mockAttachmentRepository{},
-			opener:               &mockOpener{},
-			Producer:             &errProducer{},
+			cardRepository: &mockCardRepository{},
+			attRepository:  &mockAttachmentRepository{},
+			networkCreator: &mockNetworkCreator{},
+			Producer:       &errProducer{},
 		}, producerError},
 		{"attachmentSaveError", disputeStub, service{
-			cardRepository:       &mockCardRepository{},
-			attachmentRepository: &errAttachmentSaveRepository{},
-			opener:               &mockOpener{},
-			Producer:             &mockProducer{},
+			cardRepository: &mockCardRepository{},
+			attRepository:  &errAttachmentSaveRepository{},
+			networkCreator: &mockNetworkCreator{},
+			Producer:       &mockProducer{},
 		}, attSaveError},
 		{"scheduleError", disputeStub, service{
-			cardRepository:       &mockCardRepository{},
-			attachmentRepository: &mockAttachmentRepository{},
-			opener:               &mockOpener{},
-			Producer:             &mockProducer{},
-			Scheduler:            &errScheduler{},
+			cardRepository: &mockCardRepository{},
+			attRepository:  &mockAttachmentRepository{},
+			networkCreator: &mockNetworkCreator{},
+			Producer:       &mockProducer{},
+			Scheduler:      &errScheduler{},
 		}, scdError},
 	}
 
