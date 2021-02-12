@@ -18,14 +18,28 @@ type (
 		called bool
 	}
 	mockAttachmentRepository struct {
-		called bool
+		getCalled  bool
+		saveCalled bool
 	}
 	mockOpener struct {
 		called bool
 	}
-	errCardGetter           struct{}
-	errAttachmentRepository struct{}
-	errOpener               struct{}
+	mockProducer struct {
+		called   bool
+		expected *protocol.Chargeback
+	}
+	mockScheduler struct {
+		called bool
+	}
+	errCardGetter               struct{}
+	errAttachmentGetRepository  struct{}
+	errAttachmentSaveRepository struct{}
+	errOpener                   struct{}
+	errProducer                 struct{}
+	errScheduler                struct{}
+	mockOpenerWithNetworkError  struct {
+		called bool
+	}
 )
 
 func (e errMapper) fromJSON(string, string) (*protocol.Dispute, error) {
@@ -67,13 +81,13 @@ func (m *mockCardRepository) Get(dispute *protocol.Dispute) (*protocol.Card, err
 }
 
 func (m *mockAttachmentRepository) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
-	m.called = dispute == disputeStub
+	m.getCalled = dispute == disputeStub
 
 	return attachmentStub, nil
 }
 
 func (m *mockAttachmentRepository) Save(chargeback *protocol.Chargeback) error {
-	m.called = chargeback == chargebackStub
+	m.saveCalled = chargeback == chargebackStub
 
 	return nil
 }
@@ -88,16 +102,50 @@ func (m errCardGetter) Get(dispute *protocol.Dispute) (*protocol.Card, error) {
 	return nil, cardError
 }
 
-func (m errAttachmentRepository) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
-	return nil, attError
+func (m errAttachmentGetRepository) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
+	return nil, attGetError
 }
 
-func (m errAttachmentRepository) Save(chargeback *protocol.Chargeback) error {
-	return attError
+func (m errAttachmentGetRepository) Save(chargeback *protocol.Chargeback) error {
+	return nil
+}
+
+func (m errAttachmentSaveRepository) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
+	return nil, nil
+}
+
+func (m errAttachmentSaveRepository) Save(chargeback *protocol.Chargeback) error {
+	return attSaveError
 }
 
 func (m errOpener) Open(dispute *protocol.Dispute, card *protocol.Card, attachment *protocol.Attachment) (*protocol.Chargeback, error) {
 	return nil, openerError
+}
+
+func (m *mockProducer) Produce(chargeback *protocol.Chargeback) error {
+	m.called = m.expected == chargeback
+
+	return nil
+}
+
+func (m *mockScheduler) Schedule(chargeback *protocol.Chargeback) error {
+	m.called = chargeback == chargebackStub
+
+	return nil
+}
+
+func (e errProducer) Produce(chargeback *protocol.Chargeback) error {
+	return producerError
+}
+
+func (e errScheduler) Schedule(chargeback *protocol.Chargeback) error {
+	return scdError
+}
+
+func (m *mockOpenerWithNetworkError) Open(dispute *protocol.Dispute, card *protocol.Card, attachment *protocol.Attachment) (*protocol.Chargeback, error) {
+	m.called = dispute == disputeStub && card == cardStub && attachment == attachmentStub
+
+	return chargebackWithErrorStub, nil
 }
 
 func TestMapFromJson(t *testing.T) {
@@ -178,25 +226,65 @@ func TestHandleMessage(t *testing.T) {
 }
 
 func TestCreateSuccess(t *testing.T) {
-	cr, ar, ope := mockCardRepository{}, mockAttachmentRepository{}, mockOpener{}
+	cr, ar, ope, prod, scd := mockCardRepository{}, mockAttachmentRepository{}, mockOpener{}, mockProducer{expected: chargebackStub}, mockScheduler{}
 	svc := service{
 		cardRepository:       &cr,
 		attachmentRepository: &ar,
 		opener:               &ope,
+		Producer:             &prod,
+		Scheduler:            &scd,
 	}
 	_ = svc.create(disputeStub)
 
 	if !cr.called {
 		t.Error("card register not called")
 	}
-	if !ar.called {
-		t.Error("attachment register not called")
+	if !ar.getCalled {
+		t.Error("attachment register get not called")
 	}
 	if !ope.called {
 		t.Error("chargeback creator not called")
 	}
+	if !prod.called {
+		t.Error("chargeback producer not called")
+	}
+	if !ar.saveCalled {
+		t.Error("attachment register save not called")
+	}
+	if !scd.called {
+		t.Errorf("scheduler not called")
+	}
+}
 
-	//TODO: implement the rest of create method
+func TestCreateNetworkError(t *testing.T) {
+	cr, ar, ope, prod, scd := mockCardRepository{}, mockAttachmentRepository{}, mockOpenerWithNetworkError{}, mockProducer{expected: chargebackWithErrorStub}, mockScheduler{}
+	svc := service{
+		cardRepository:       &cr,
+		attachmentRepository: &ar,
+		opener:               &ope,
+		Producer:             &prod,
+		Scheduler:            &scd,
+	}
+	_ = svc.create(disputeStub)
+
+	if !cr.called {
+		t.Error("card register not called")
+	}
+	if !ar.getCalled {
+		t.Error("attachment register get not called")
+	}
+	if !ope.called {
+		t.Error("chargeback creator not called")
+	}
+	if !prod.called {
+		t.Error("chargeback producer not called")
+	}
+	if ar.saveCalled {
+		t.Error("attachment register save called")
+	}
+	if scd.called {
+		t.Errorf("scheduler called")
+	}
 }
 
 func TestOpenFail(t *testing.T) {
@@ -209,15 +297,34 @@ func TestOpenFail(t *testing.T) {
 		{"cardError", disputeStub, service{
 			cardRepository: errCardGetter{},
 		}, cardError},
-		{"attachmentError", disputeStub, service{
+		{"attachmentGetError", disputeStub, service{
 			cardRepository:       &mockCardRepository{},
-			attachmentRepository: errAttachmentRepository{},
-		}, attError},
+			attachmentRepository: &errAttachmentGetRepository{},
+		}, attGetError},
 		{"openerError", disputeStub, service{
 			cardRepository:       &mockCardRepository{},
 			attachmentRepository: &mockAttachmentRepository{},
 			opener:               errOpener{},
 		}, openerError},
+		{"producerError", disputeStub, service{
+			cardRepository:       &mockCardRepository{},
+			attachmentRepository: &mockAttachmentRepository{},
+			opener:               &mockOpener{},
+			Producer:             &errProducer{},
+		}, producerError},
+		{"attachmentSaveError", disputeStub, service{
+			cardRepository:       &mockCardRepository{},
+			attachmentRepository: &errAttachmentSaveRepository{},
+			opener:               &mockOpener{},
+			Producer:             &mockProducer{},
+		}, attSaveError},
+		{"scheduleError", disputeStub, service{
+			cardRepository:       &mockCardRepository{},
+			attachmentRepository: &mockAttachmentRepository{},
+			opener:               &mockOpener{},
+			Producer:             &mockProducer{},
+			Scheduler:            &errScheduler{},
+		}, scdError},
 	}
 
 	for _, c := range cases {

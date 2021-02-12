@@ -15,7 +15,7 @@ type (
 	Status            string
 	Type              string
 
-	ResponseError struct {
+	NetworkError struct {
 	}
 
 	Dispute struct {
@@ -52,13 +52,18 @@ type (
 		Status
 		Queue
 		Type
-		ResponseError
+		*NetworkError
 	}
 )
 
 // ID return DisputeID::CorrelationID
 func (e Chargeback) ID() string {
 	return fmt.Sprintf("%v::%s", e.DisputeId, e.Cid)
+}
+
+// HasError return true if NetworkError != nil
+func (e Chargeback) HasError() bool {
+	return e.NetworkError != nil
 }
 
 // UnmarshalJSON receive a date in []bytes and parse it in the pattern YYYY-MM-DD
@@ -76,4 +81,8 @@ func (d *Date) UnmarshalJSON(data []byte) error {
 	*d = Date(t)
 
 	return nil
+}
+
+func (n NetworkError) Error() string {
+	return fmt.Sprintf("network error: ")
 }

@@ -25,11 +25,14 @@ const (
 )
 
 var (
-	stubError   = errors.New("mocked error")
-	cardError   = errors.New("mocked card error")
-	attError    = errors.New("mocked att error")
-	openerError = errors.New("mocked opener error")
-	disputeStub = &protocol.Dispute{
+	stubError     = errors.New("mocked error")
+	cardError     = errors.New("mocked card error")
+	attGetError   = errors.New("mocked att get error")
+	openerError   = errors.New("mocked opener error")
+	producerError = errors.New("mocked producer error")
+	scdError      = errors.New("mocked scheduler error")
+	attSaveError  = errors.New("mocked att save error")
+	disputeStub   = &protocol.Dispute{
 		Cid:               cid,
 		OrgId:             orgId,
 		AccountId:         accountId,
@@ -53,7 +56,18 @@ var (
 		Status:        protocol.Status("CREATED"),
 		Queue:         protocol.Queue("REJECTS"),
 		Type:          protocol.Type("CHARGEBACK"),
-		ResponseError: protocol.ResponseError{},
+		NetworkError:  nil,
+	}
+
+	chargebackWithErrorStub = &protocol.Chargeback{
+		Dispute:       disputeStub,
+		TransactionId: transactionId,
+		ClaimId:       claimId,
+		ChargebackId:  chargebackId,
+		Status:        protocol.Status("CREATED"),
+		Queue:         protocol.Queue("REJECTS"),
+		Type:          protocol.Type("CHARGEBACK"),
+		NetworkError:  &protocol.NetworkError{},
 	}
 
 	cardStub       = &protocol.Card{Number: "5172163143182969"}

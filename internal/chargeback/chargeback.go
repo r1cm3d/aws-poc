@@ -5,7 +5,6 @@ import (
 	"aws-poc/internal/card"
 	"aws-poc/internal/protocol"
 	"encoding/json"
-	"fmt"
 )
 
 type (
@@ -41,6 +40,8 @@ type (
 		cardRepository       card.Repository
 		attachmentRepository attachment.Repository
 		opener
+		Scheduler
+		Producer
 	}
 )
 
@@ -54,15 +55,22 @@ func (s service) create(dispute *protocol.Dispute) error {
 	if att, err = s.attachmentRepository.Get(dispute); err != nil {
 		return err
 	}
-
 	var cbk *protocol.Chargeback
 	if cbk, err = s.Open(dispute, c, att); err != nil {
 		return err
 	}
-
-	fmt.Printf("card: %v", c)
-	fmt.Printf("attachment: %v", att)
-	fmt.Printf("chargeback: %v", cbk)
+	if err = s.Produce(cbk); err != nil {
+		return err
+	}
+	if cbk.HasError() {
+		return cbk.NetworkError
+	}
+	if err = s.attachmentRepository.Save(cbk); err != nil {
+		return err
+	}
+	if err = s.Schedule(cbk); err != nil {
+		return err
+	}
 
 	return nil
 }
