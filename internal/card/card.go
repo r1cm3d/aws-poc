@@ -5,6 +5,5 @@ import (
 )
 
 type Service interface {
-		Get(*protocol.Dispute) (*protocol.Card, error)
+	Get(*protocol.Dispute) (*protocol.Card, error)
 }
-

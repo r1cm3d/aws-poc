@@ -18,7 +18,7 @@ type (
 
 	storage interface {
 		list(cid string, bucket string, path string) ([]file, error)
-		get(cid string, bucket string, path string) (file, error)
+		get(cid string, bucket string, key string) (*file, error)
 	}
 
 	repository interface {
@@ -38,9 +38,9 @@ type (
 
 func (s svc) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 	var (
-		files []file
-		err error
-		unsentFiles []file
+		files          []file
+		err            error
+		unsentFiles    []file
 		filesToCompact []file
 	)
 	path := fmt.Sprintf("%s/%d/%d", filenameRoot, dispute.AccountId, dispute.DisputeId)
@@ -52,11 +52,11 @@ func (s svc) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 	}
 
 	for _, uf := range unsentFiles {
-		var rf file
-		if rf, err = s.get(dispute.Cid, uf.key, path); err != nil {
+		var rf *file
+		if rf, err = s.get(dispute.Cid, dispute.OrgId, uf.key); err != nil {
 			return nil, err
 		}
-		filesToCompact = append(filesToCompact, rf)
+		filesToCompact = append(filesToCompact, *rf)
 	}
 
 	return s.compact(dispute.Cid, filesToCompact, path)
