@@ -20,6 +20,9 @@ const (
 	usDollar          = protocol.LocalCurrencyCode("840")
 	isPartial         = false
 	textMessage       = "Example message"
+	transactionId     = "26811"
+	claimId           = "5717"
+	chargebackId      = "27202"
 )
 
 var (
@@ -27,6 +30,7 @@ var (
 	getError         = errors.New("storage get error")
 	unsentFilesError = errors.New("unsent files error")
 	archiverError    = errors.New("archiver error")
+	saveError        = errors.New("save error")
 	path             = fmt.Sprintf("%s/%d/%d", filenameRoot, disputeStub.AccountId, disputeStub.DisputeId)
 	f1               = file{key: "cbk_file1.pdf"}
 	f2               = file{key: "cbk_doc.pdf"}
@@ -59,5 +63,15 @@ var (
 	storageStub = &mockStorage{
 		expPath:  path,
 		expFiles: [3][2]file{{uf1, fg1}, {uf2, fg2}, {uf3, fg3}},
+	}
+	chargebackStub = &protocol.Chargeback{
+		Dispute:       disputeStub,
+		TransactionId: transactionId,
+		ClaimId:       claimId,
+		ChargebackId:  chargebackId,
+		Status:        protocol.Status("CREATED"),
+		Queue:         protocol.Queue("CLOSED"),
+		Type:          protocol.Type("SECOND_PRESENTMENT"),
+		NetworkError:  nil,
 	}
 )

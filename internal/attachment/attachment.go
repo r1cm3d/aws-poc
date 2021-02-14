@@ -23,6 +23,7 @@ type (
 
 	repository interface {
 		getUnsentFiles(*protocol.Dispute, []file) ([]file, error)
+		save(chargeback *protocol.Chargeback) error
 	}
 
 	archiver interface {
@@ -63,6 +64,5 @@ func (s svc) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 }
 
 func (s svc) Save(chargeback *protocol.Chargeback) error {
-	// TODO: implement it
-	return nil
+	return s.save(chargeback)
 }

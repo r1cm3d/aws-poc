@@ -48,7 +48,7 @@ func TestGetFail(t *testing.T) {
 		}, listError},
 		{"unsentFilesError", disputeStub, svc{
 			storage:    &mockStorage{},
-			repository: &errRepository{},
+			repository: &errUnsentFiles{},
 		}, unsentFilesError},
 		{"getError", disputeStub, svc{
 			storage:    &errStorageGet{},
@@ -64,6 +64,30 @@ func TestGetFail(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			if _, got := c.svc.Get(c.in); got != c.want {
+				t.Errorf("%s, want: %v, got: %v", c.name, c.want, got)
+			}
+		})
+	}
+}
+
+func TestSave(t *testing.T) {
+	cases := []struct {
+		name string
+		in   *protocol.Chargeback
+		svc
+		want error
+	}{
+		{"success", chargebackStub, svc{
+			repository: &mockRepository{},
+		}, nil},
+		{"error", chargebackStub, svc{
+			repository: &errUnsentFiles{},
+		}, saveError},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			if got := c.svc.Save(c.in); got != c.want {
 				t.Errorf("%s, want: %v, got: %v", c.name, c.want, got)
 			}
 		})

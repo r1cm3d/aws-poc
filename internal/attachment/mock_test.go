@@ -16,10 +16,12 @@ type (
 	}
 	mockRepository struct {
 		getUnsentFilesCalled bool
+		saveCalled           bool
 	}
 	errStorageList struct{}
 	errStorageGet  struct{}
-	errRepository  struct{}
+	errUnsentFiles struct{}
+	errSave        struct{}
 	errArchiver    struct{}
 )
 
@@ -39,8 +41,12 @@ func (e errStorageGet) get(cid string, bucket string, key string) (*file, error)
 	return nil, getError
 }
 
-func (e errRepository) getUnsentFiles(*protocol.Dispute, []file) ([]file, error) {
+func (e errUnsentFiles) getUnsentFiles(*protocol.Dispute, []file) ([]file, error) {
 	return nil, unsentFilesError
+}
+
+func (e errUnsentFiles) save(*protocol.Chargeback) error {
+	return saveError
 }
 
 func (e errArchiver) compact(cid string, files []file, strToRemove string) (*protocol.Attachment, error) {
@@ -84,6 +90,20 @@ func (m *mockRepository) getUnsentFiles(d *protocol.Dispute, fs []file) ([]file,
 	m.getUnsentFilesCalled = d == disputeStub && filesEquals(fs, files)
 
 	return unsentFiles, nil
+}
+
+func (m *mockRepository) save(c *protocol.Chargeback) error {
+	m.saveCalled = c == chargebackStub
+
+	return nil
+}
+
+func (e *errSave) getUnsentFiles(d *protocol.Dispute, fs []file) ([]file, error) {
+	return unsentFiles, nil
+}
+
+func (e *errSave) save(c *protocol.Chargeback) error {
+	return saveError
 }
 
 func filesEquals(files1 []file, files2 []file) (ok bool) {
