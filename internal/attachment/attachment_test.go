@@ -1,14 +1,12 @@
 package attachment
 
 import (
+	"aws-poc/internal/protocol"
 	"testing"
 )
 
 func TestGetSuccess(t *testing.T) {
-	storage, archiver, repository, exp := &mockStorage{
-		expPath:  path,
-		expFiles: [3][2]file{{uf1, fg1}, {uf2, fg2}, {uf3, fg3}},
-	}, &mockArchiver{
+	storage, archiver, repository, exp := storageStub, &mockArchiver{
 		strToRemove: path,
 	},
 		&mockRepository{},
@@ -35,5 +33,39 @@ func TestGetSuccess(t *testing.T) {
 
 	if act != exp {
 		t.Errorf("GetSuccess, want: %v, got: %v", act, exp)
+	}
+}
+
+func TestGetFail(t *testing.T) {
+	cases := []struct {
+		name string
+		in   *protocol.Dispute
+		svc
+		want error
+	}{
+		{"listError", disputeStub, svc{
+			storage: errStorageList{},
+		}, listError},
+		{"unsentFilesError", disputeStub, svc{
+			storage:    &mockStorage{},
+			repository: &errRepository{},
+		}, unsentFilesError},
+		{"getError", disputeStub, svc{
+			storage:    &errStorageGet{},
+			repository: &mockRepository{},
+		}, getError},
+		{"compactError", disputeStub, svc{
+			storage:    storageStub,
+			repository: &mockRepository{},
+			archiver:   &errArchiver{},
+		}, archiverError},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			if _, got := c.svc.Get(c.in); got != c.want {
+				t.Errorf("%s, want: %v, got: %v", c.name, c.want, got)
+			}
+		})
 	}
 }

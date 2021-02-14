@@ -30,7 +30,7 @@ type (
 		Schedule(*protocol.Chargeback) error
 	}
 
-	service struct {
+	svc struct {
 		locker
 		mapper
 		creator
@@ -42,7 +42,7 @@ type (
 	}
 )
 
-func (s service) create(dispute *protocol.Dispute) error {
+func (s svc) create(dispute *protocol.Dispute) error {
 	var err error
 	var c *protocol.Card
 	if c, err = s.cardService.Get(dispute); err != nil {
@@ -72,7 +72,7 @@ func (s service) create(dispute *protocol.Dispute) error {
 	return nil
 }
 
-func (s service) handleMessage(cid, body string) error {
+func (s svc) handleMessage(cid, body string) error {
 	d, err := s.mapper.fromJSON(cid, body)
 	if err != nil {
 		return newParseError(err)
@@ -90,7 +90,7 @@ func (s service) handleMessage(cid, body string) error {
 	return nil
 }
 
-func (s service) fromJSON(cid, j string) (protocol.Dispute, error) {
+func (s svc) fromJSON(cid, j string) (protocol.Dispute, error) {
 	var d protocol.Dispute
 	err := json.Unmarshal([]byte(j), &d)
 	if err != nil {

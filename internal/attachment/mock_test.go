@@ -17,7 +17,35 @@ type (
 	mockRepository struct {
 		getUnsentFilesCalled bool
 	}
+	errStorageList struct{}
+	errStorageGet  struct{}
+	errRepository  struct{}
+	errArchiver    struct{}
 )
+
+func (e errStorageList) list(cid string, bucket string, path string) ([]file, error) {
+	return nil, listError
+}
+
+func (e errStorageList) get(cid string, bucket string, key string) (*file, error) {
+	return nil, nil
+}
+
+func (e errStorageGet) list(cid string, bucket string, path string) ([]file, error) {
+	return files, nil
+}
+
+func (e errStorageGet) get(cid string, bucket string, key string) (*file, error) {
+	return nil, getError
+}
+
+func (e errRepository) getUnsentFiles(*protocol.Dispute, []file) ([]file, error) {
+	return nil, unsentFilesError
+}
+
+func (e errArchiver) compact(cid string, files []file, strToRemove string) (*protocol.Attachment, error) {
+	return nil, archiverError
+}
 
 func (m *mockStorage) getCalled(expGetCalled int) bool {
 	return expGetCalled == m.actGetCalled

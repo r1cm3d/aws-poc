@@ -8,7 +8,7 @@ import (
 )
 
 func TestMapFromJson(t *testing.T) {
-	svc := service{}
+	svc := svc{}
 	cid := cid
 	json := `{
   "disputeId": 611,
@@ -52,7 +52,7 @@ func TestMapFromJson(t *testing.T) {
 }
 
 func TestMapFromJson_Error(t *testing.T) {
-	svc := service{}
+	svc := svc{}
 
 	_, err := svc.fromJSON("", "json")
 
@@ -67,17 +67,17 @@ func TestHandleMessage(t *testing.T) {
 		name string
 		in   [2]string
 		want error
-		service
+		svc
 	}{
-		{"success", defaultInput, nil, service{mapper: mockMapper{}, locker: mockRepository{}, creator: mockCreator{}}},
-		{"parseError", defaultInput, newParseError(stubError), service{locker: mockRepository{}, mapper: errMapper{}}},
-		{"idempotenceError", defaultInput, newIdempotenceError(cid, disputeID), service{mapper: mockMapper{}, locker: errRepository{}}},
-		{"chargebackError", defaultInput, newChargebackError(stubError, cid, disputeID), service{mapper: mockMapper{}, locker: mockRepository{}, creator: errDisputer{}}},
+		{"success", defaultInput, nil, svc{mapper: mockMapper{}, locker: mockRepository{}, creator: mockCreator{}}},
+		{"parseError", defaultInput, newParseError(stubError), svc{locker: mockRepository{}, mapper: errMapper{}}},
+		{"idempotenceError", defaultInput, newIdempotenceError(cid, disputeID), svc{mapper: mockMapper{}, locker: errRepository{}}},
+		{"chargebackError", defaultInput, newChargebackError(stubError, cid, disputeID), svc{mapper: mockMapper{}, locker: mockRepository{}, creator: errDisputer{}}},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			if got := c.service.handleMessage(c.in[0], c.in[1]); !reflect.DeepEqual(c.want, got) {
+			if got := c.svc.handleMessage(c.in[0], c.in[1]); !reflect.DeepEqual(c.want, got) {
 				t.Errorf("%s, want: %v, got: %v", c.name, c.want, got)
 			}
 		})
@@ -86,7 +86,7 @@ func TestHandleMessage(t *testing.T) {
 
 func TestCreateSuccess(t *testing.T) {
 	cr, ar, ope, prod, scd := mockCardService{}, mockAttService{}, mockNetworkCreator{}, mockProducer{expected: chargebackStub}, mockScheduler{}
-	svc := service{
+	svc := svc{
 		cardService:    &cr,
 		attService:     &ar,
 		networkCreator: &ope,
@@ -117,7 +117,7 @@ func TestCreateSuccess(t *testing.T) {
 
 func TestCreateNetworkError(t *testing.T) {
 	cr, ar, ope, prod, scd := mockCardService{}, mockAttService{}, mockOpenerWithNetworkError{}, mockProducer{expected: chargebackWithErrorStub}, mockScheduler{}
-	svc := service{
+	svc := svc{
 		cardService:    &cr,
 		attService:     &ar,
 		networkCreator: &ope,
@@ -150,34 +150,34 @@ func TestOpenFail(t *testing.T) {
 	cases := []struct {
 		name string
 		in   *protocol.Dispute
-		svc  service
+		svc  svc
 		want error
 	}{
-		{"cardError", disputeStub, service{
+		{"cardError", disputeStub, svc{
 			cardService: errCardService{},
 		}, cardError},
-		{"attachmentGetError", disputeStub, service{
+		{"attachmentGetError", disputeStub, svc{
 			cardService: &mockCardService{},
 			attService:  &errAttGetService{},
 		}, attGetError},
-		{"openerError", disputeStub, service{
+		{"openerError", disputeStub, svc{
 			cardService:    &mockCardService{},
 			attService:     &mockAttService{},
 			networkCreator: errNetworkCreator{},
 		}, openerError},
-		{"producerError", disputeStub, service{
+		{"producerError", disputeStub, svc{
 			cardService:    &mockCardService{},
 			attService:     &mockAttService{},
 			networkCreator: &mockNetworkCreator{},
 			Producer:       &errProducer{},
 		}, producerError},
-		{"attachmentSaveError", disputeStub, service{
+		{"attachmentSaveError", disputeStub, svc{
 			cardService:    &mockCardService{},
 			attService:     &errAttSaveService{},
 			networkCreator: &mockNetworkCreator{},
 			Producer:       &mockProducer{},
 		}, attSaveError},
-		{"scheduleError", disputeStub, service{
+		{"scheduleError", disputeStub, svc{
 			cardService:    &mockCardService{},
 			attService:     &mockAttService{},
 			networkCreator: &mockNetworkCreator{},
