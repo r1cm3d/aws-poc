@@ -25,8 +25,8 @@ func TestPutIntegration(t *testing.T) {
 		dynamoRepository
 	}{
 		{"success", defaultInput(), nil, newRegister(awssession.NewLocalSession(), tableName)},
-		{"parseError", defaultInput(), errParser, dynamoRepository{awssession.NewLocalSession(), tableName, errMarshaller, mockUnmarshaller, svc()}},
-		{"putItemError", defaultInput(), errPutItem, dynamoRepository{awssession.NewLocalSession(), tableName, dynamodbattribute.MarshalMap, mockUnmarshaller, errPutItemMock{}}},
+		{"parseError", defaultInput(), errParser, dynamoRepository{awssession.NewLocalSession(), tableName, errMarshaller, mockUnmarshaller, mockUnmarshallerListOfMaps, svc()}},
+		{"putItemError", defaultInput(), errPutItem, dynamoRepository{awssession.NewLocalSession(), tableName, dynamodbattribute.MarshalMap, mockUnmarshaller, mockUnmarshallerListOfMaps, errPutItemMock{}}},
 	}
 
 	for _, c := range cases {
@@ -82,6 +82,34 @@ func TestGetIntegration(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			c.dynamoRepository.put(c.inRec)
 			if gotItem, gotErr := c.dynamoRepository.get(c.inRec, c.inItem); !reflect.DeepEqual(gotItem, c.outItem) && !reflect.DeepEqual(gotErr, c.outErr) {
+				t.Errorf("%s, want: %v %v, got: %v %v", c.name, c.outItem, c.outErr, gotItem, gotErr)
+			}
+		})
+	}
+}
+
+func TestQueryIntegration(t *testing.T) {
+	integration.SkipShort(t)
+	setupTable()
+	defer cleanupTable()
+	cases := []struct {
+		name      string
+		inItem    record
+		inField   string
+		inValue   string
+		emptyItem interface{}
+		outErr    error
+		outItem   interface{}
+		dynamoRepository
+	}{
+		{"success", disputeStub, "ID", disputeStub.ID(), protocol.Dispute{}, nil, disputeStub, newRegister(awssession.NewLocalSession(), tableName)},
+		//TODO: add error case
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			c.dynamoRepository.put(c.inItem)
+			if gotItem, gotErr := c.dynamoRepository.query(c.inField, c.inValue, c.emptyItem); !reflect.DeepEqual(gotItem, c.outItem) && !reflect.DeepEqual(gotErr, c.outErr) {
 				t.Errorf("%s, want: %v %v, got: %v %v", c.name, c.outItem, c.outErr, gotItem, gotErr)
 			}
 		})

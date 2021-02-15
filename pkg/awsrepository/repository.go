@@ -2,6 +2,7 @@ package awsrepository
 
 import (
 	"aws-poc/pkg/awssession"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -19,12 +20,14 @@ type (
 	record interface {
 		ID() string
 	}
-	mapMarshaller   func(in interface{}) (map[string]*dynamodb.AttributeValue, error)
-	mapUnmarshaller func(m map[string]*dynamodb.AttributeValue, out interface{}) error
-	adapter         interface {
+	marshall             func(in interface{}) (map[string]*dynamodb.AttributeValue, error)
+	unmarshall           func(m map[string]*dynamodb.AttributeValue, out interface{}) error
+	unmarshallListOfMaps func(l []map[string]*dynamodb.AttributeValue, out interface{}) error
+	adapter              interface {
 		PutItem(input *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error)
 		DeleteItem(input *dynamodb.DeleteItemInput) (*dynamodb.DeleteItemOutput, error)
 		GetItem(input *dynamodb.GetItemInput) (*dynamodb.GetItemOutput, error)
+		Query(input *dynamodb.QueryInput) (*dynamodb.QueryOutput, error)
 	}
 	repository interface {
 		put(rec record) error
@@ -33,14 +36,15 @@ type (
 	dynamoRepository struct {
 		sess      *session.Session
 		tableName *string
-		mapMarshaller
-		mapUnmarshaller
+		marshall
+		unmarshall
+		unmarshallListOfMaps
 		adapter
 	}
 )
 
 func newRegister(sess *session.Session, tableName *string) dynamoRepository {
-	return dynamoRepository{sess, tableName, dynamodbattribute.MarshalMap, dynamodbattribute.UnmarshalMap, svc()}
+	return dynamoRepository{sess, tableName, dynamodbattribute.MarshalMap, dynamodbattribute.UnmarshalMap, dynamodbattribute.UnmarshalListOfMaps, svc()}
 }
 
 func svc() (svc *dynamodb.DynamoDB) {
@@ -50,7 +54,7 @@ func svc() (svc *dynamodb.DynamoDB) {
 }
 
 func (r dynamoRepository) put(rec record) error {
-	item, err := r.mapMarshaller(rec)
+	item, err := r.marshall(rec)
 	if err != nil {
 		return err
 	}
@@ -103,9 +107,32 @@ func (r dynamoRepository) get(rec record, item interface{}) (interface{}, error)
 		return nil, err
 	}
 
-	if err := r.mapUnmarshaller(ri.Item, &item); err != nil {
+	if err := r.unmarshall(ri.Item, &item); err != nil {
 		return nil, err
 	} else {
 		return item, err
+	}
+}
+
+func (r dynamoRepository) query(field string, value string, items interface{}) (interface{}, error) {
+	input := &dynamodb.QueryInput{
+		TableName: r.tableName,
+		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+			":v1": {
+				S: aws.String(value),
+			},
+		},
+		KeyConditionExpression: aws.String(fmt.Sprintf("%s = :v1", field)),
+	}
+
+	ri, err := r.Query(input)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.unmarshallListOfMaps(ri.Items, &items); err != nil {
+		return nil, err
+	} else {
+		return items, err
 	}
 }
