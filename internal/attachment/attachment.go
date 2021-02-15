@@ -8,8 +8,8 @@ import (
 const filenameRoot = "disputes"
 
 type (
-	file struct {
-		key string
+	File struct {
+		Key string
 	}
 	Service interface {
 		Get(dispute *protocol.Dispute) (*protocol.Attachment, error)
@@ -17,17 +17,17 @@ type (
 	}
 
 	storage interface {
-		list(cid string, bucket string, path string) ([]file, error)
-		get(cid string, bucket string, key string) (*file, error)
+		list(cid string, bucket string, path string) ([]File, error)
+		get(cid string, bucket string, key string) (*File, error)
 	}
 
 	repository interface {
-		getUnsentFiles(*protocol.Dispute, []file) ([]file, error)
+		getUnsentFiles(*protocol.Dispute, []File) ([]File, error)
 		save(chargeback *protocol.Chargeback) error
 	}
 
 	archiver interface {
-		compact(cid string, files []file, strToRemove string) (*protocol.Attachment, error)
+		compact(cid string, files []File, strToRemove string) (*protocol.Attachment, error)
 	}
 
 	svc struct {
@@ -39,10 +39,10 @@ type (
 
 func (s svc) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 	var (
-		files          []file
+		files          []File
 		err            error
-		unsentFiles    []file
-		filesToCompact []file
+		unsentFiles    []File
+		filesToCompact []File
 	)
 	path := fmt.Sprintf("%s/%d/%d", filenameRoot, dispute.AccountId, dispute.DisputeId)
 	if files, err = s.list(dispute.Cid, dispute.OrgId, path); err != nil {
@@ -53,8 +53,8 @@ func (s svc) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 	}
 
 	for _, uf := range unsentFiles {
-		var rf *file
-		if rf, err = s.get(dispute.Cid, dispute.OrgId, uf.key); err != nil {
+		var rf *File
+		if rf, err = s.get(dispute.Cid, dispute.OrgId, uf.Key); err != nil {
 			return nil, err
 		}
 		filesToCompact = append(filesToCompact, *rf)

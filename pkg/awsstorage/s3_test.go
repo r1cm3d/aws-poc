@@ -11,12 +11,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
-const (
-	bucketName = "bucket"
-	key        = "kellyKey"
-	filename   = "../../scripts/env/.env"
-)
-
 func TestUploadIntegration(t *testing.T) {
 	integration.SkipShort(t)
 	setupBucket()
