@@ -1,4 +1,4 @@
-package awsregister
+package awsrepository
 
 import (
 	"aws-poc/pkg/awssession"
@@ -57,16 +57,16 @@ func TestPutIntegration(t *testing.T) {
 		name string
 		in   record
 		want error
-		dynamoRegister
+		dynamoRepository
 	}{
 		{"success", defaultInput(), nil, newRegister(awssession.NewLocalSession(), tableName)},
-		{"parseError", defaultInput(), errParser, dynamoRegister{awssession.NewLocalSession(), tableName, errMarshaller, svc()}},
-		{"putItemError", defaultInput(), errPutItem, dynamoRegister{awssession.NewLocalSession(), tableName, dynamodbattribute.MarshalMap, errPutItemMock{}}},
+		{"parseError", defaultInput(), errParser, dynamoRepository{awssession.NewLocalSession(), tableName, errMarshaller, svc()}},
+		{"putItemError", defaultInput(), errPutItem, dynamoRepository{awssession.NewLocalSession(), tableName, dynamodbattribute.MarshalMap, errPutItemMock{}}},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			if got := c.dynamoRegister.put(c.in); !reflect.DeepEqual(c.want, got) {
+			if got := c.dynamoRepository.put(c.in); !reflect.DeepEqual(c.want, got) {
 				t.Errorf("%s, want: %v, got: %v", c.name, c.want, got)
 			}
 		})
@@ -81,7 +81,7 @@ func TestDeleteIntegration(t *testing.T) {
 		name string
 		in   record
 		want error
-		dynamoRegister
+		dynamoRepository
 	}{
 		{"success", defaultInput(), nil, newRegister(awssession.NewLocalSession(), tableName)},
 		//TODO: add error case
@@ -89,8 +89,8 @@ func TestDeleteIntegration(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			c.dynamoRegister.put(c.in)
-			if got := c.dynamoRegister.delete(c.in); !reflect.DeepEqual(c.want, got) {
+			c.dynamoRepository.put(c.in)
+			if got := c.dynamoRepository.delete(c.in); !reflect.DeepEqual(c.want, got) {
 				t.Errorf("%s, want: %v, got: %v", c.name, c.want, got)
 			}
 		})
@@ -121,7 +121,7 @@ func setupTable() {
 		log.Fatal(err.Error())
 	}
 
-	fmt.Println("created the dynamoRegister", tableName)
+	fmt.Println("created the dynamoRepository", tableName)
 }
 
 func cleanupTable() {

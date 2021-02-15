@@ -1,4 +1,4 @@
-package awsregister
+package awsrepository
 
 import (
 	"aws-poc/internal/protocol"

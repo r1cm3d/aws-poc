@@ -1,4 +1,4 @@
-package awsregister
+package awsrepository
 
 import (
 	"aws-poc/pkg/awssession"
@@ -24,11 +24,11 @@ type (
 		PutItem(input *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error)
 		DeleteItem(input *dynamodb.DeleteItemInput) (*dynamodb.DeleteItemOutput, error)
 	}
-	register interface {
+	repository interface {
 		put(rec record) error
 		delete(rec record) error
 	}
-	dynamoRegister struct {
+	dynamoRepository struct {
 		sess      *session.Session
 		tableName *string
 		mapMarshaller
@@ -36,8 +36,8 @@ type (
 	}
 )
 
-func newRegister(sess *session.Session, tableName *string) dynamoRegister {
-	return dynamoRegister{sess, tableName, dynamodbattribute.MarshalMap, svc()}
+func newRegister(sess *session.Session, tableName *string) dynamoRepository {
+	return dynamoRepository{sess, tableName, dynamodbattribute.MarshalMap, svc()}
 }
 
 func svc() (svc *dynamodb.DynamoDB) {
@@ -46,7 +46,7 @@ func svc() (svc *dynamodb.DynamoDB) {
 	return
 }
 
-func (r dynamoRegister) put(rec record) error {
+func (r dynamoRepository) put(rec record) error {
 	item, err := r.mapMarshaller(rec)
 	if err != nil {
 		return err
@@ -68,7 +68,7 @@ func (r dynamoRegister) put(rec record) error {
 	return nil
 }
 
-func (r dynamoRegister) delete(rec record) error {
+func (r dynamoRepository) delete(rec record) error {
 	input := &dynamodb.DeleteItemInput{
 		TableName: r.tableName,
 		Key: map[string]*dynamodb.AttributeValue{

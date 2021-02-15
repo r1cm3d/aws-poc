@@ -1,4 +1,4 @@
-package awsregister
+package awsrepository
 
 import (
 	"aws-poc/internal/protocol"
@@ -7,7 +7,7 @@ import (
 
 type (
 	locker struct {
-		register
+		repository
 	}
 	lockerRecord struct {
 		protocol.Dispute
