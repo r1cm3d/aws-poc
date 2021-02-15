@@ -2,6 +2,10 @@ package awsstorage
 
 import (
 	"aws-poc/internal/attachment"
+	"fmt"
+	"os"
+
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/client"
@@ -30,4 +34,29 @@ func (a attstorage) list(cid string, bucket string, path string) ([]attachment.F
 
 	// TODO: log here
 	return files, nil
+}
+
+func (a attstorage) get(cid string, bucket string, key string) (*attachment.File, error) {
+	// TODO: log here
+	file, err := os.Create(key)
+	if err != nil {
+		// TODO: log here
+		return nil, err
+	}
+	defer file.Close()
+
+	// TODO: log here
+	downloader := s3manager.NewDownloader(a.session)
+	if numBytes, err := downloader.Download(file,
+		&s3.GetObjectInput{
+			Bucket: aws.String(bucket),
+			Key:    aws.String(key),
+		}); err != nil {
+		// TODO: log here
+		return nil, err
+	} else {
+		fmt.Println("Downloaded", file.Name(), numBytes, "bytes")
+		// TODO: log here
+		return &attachment.File{Key: file.Name()}, nil
+	}
 }
