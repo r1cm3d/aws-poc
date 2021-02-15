@@ -20,9 +20,11 @@ type (
 		ID() string
 	}
 	mapMarshaller   func(in interface{}) (map[string]*dynamodb.AttributeValue, error)
-	registerAdapter interface {
+	mapUnmarshaller func(m map[string]*dynamodb.AttributeValue, out interface{}) error
+	adapter         interface {
 		PutItem(input *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error)
 		DeleteItem(input *dynamodb.DeleteItemInput) (*dynamodb.DeleteItemOutput, error)
+		GetItem(input *dynamodb.GetItemInput) (*dynamodb.GetItemOutput, error)
 	}
 	repository interface {
 		put(rec record) error
@@ -32,12 +34,13 @@ type (
 		sess      *session.Session
 		tableName *string
 		mapMarshaller
-		registerAdapter
+		mapUnmarshaller
+		adapter
 	}
 )
 
 func newRegister(sess *session.Session, tableName *string) dynamoRepository {
-	return dynamoRepository{sess, tableName, dynamodbattribute.MarshalMap, svc()}
+	return dynamoRepository{sess, tableName, dynamodbattribute.MarshalMap, dynamodbattribute.UnmarshalMap, svc()}
 }
 
 func svc() (svc *dynamodb.DynamoDB) {
@@ -83,4 +86,26 @@ func (r dynamoRepository) delete(rec record) error {
 	}
 
 	return nil
+}
+
+func (r dynamoRepository) get(rec record, item interface{}) (interface{}, error) {
+	input := &dynamodb.GetItemInput{
+		TableName: r.tableName,
+		Key: map[string]*dynamodb.AttributeValue{
+			"ID": {
+				S: aws.String(rec.ID()),
+			},
+		},
+	}
+
+	ri, err := r.GetItem(input)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.mapUnmarshaller(ri.Item, &item); err != nil {
+		return nil, err
+	} else {
+		return item, err
+	}
 }

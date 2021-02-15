@@ -61,6 +61,11 @@ func (e Chargeback) ID() string {
 	return fmt.Sprintf("%v::%s", e.DisputeId, e.Cid)
 }
 
+// ID return DisputeID::CorrelationID
+func (e Dispute) ID() string {
+	return fmt.Sprintf("%v::%s", e.DisputeId, e.Cid)
+}
+
 // HasError return true if NetworkError != nil
 func (e Chargeback) HasError() bool {
 	return e.NetworkError != nil

@@ -8,18 +8,6 @@ import (
 	"testing"
 )
 
-var disputeStub = protocol.Dispute{DisputeId: 123, Cid: "cid"}
-
-type errRegister struct{}
-
-func (e errRegister) put(_ record) error {
-	return errPutItem
-}
-
-func (e errRegister) delete(_ record) error {
-	return errDelete
-}
-
 func TestLockIntegration(t *testing.T) {
 	integration.SkipShort(t)
 	setupTable()
@@ -30,8 +18,8 @@ func TestLockIntegration(t *testing.T) {
 		want bool
 		locker
 	}{
-		{"success", disputeStub, true, locker{newRegister(awssession.NewLocalSession(), tableName)}},
-		{"error", disputeStub, false, locker{errRegister{}}},
+		{"success", *disputeStub, true, locker{newRegister(awssession.NewLocalSession(), tableName)}},
+		{"error", *disputeStub, false, locker{errRegister{}}},
 	}
 
 	for _, c := range cases {
@@ -53,8 +41,8 @@ func TestReleaseIntegration(t *testing.T) {
 		want bool
 		locker
 	}{
-		{"success", disputeStub, true, locker{newRegister(awssession.NewLocalSession(), tableName)}},
-		{"error", disputeStub, false, locker{errRegister{}}},
+		{"success", *disputeStub, true, locker{newRegister(awssession.NewLocalSession(), tableName)}},
+		{"error", *disputeStub, false, locker{errRegister{}}},
 	}
 
 	for _, c := range cases {
