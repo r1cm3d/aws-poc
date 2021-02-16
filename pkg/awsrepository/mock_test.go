@@ -8,7 +8,8 @@ import (
 
 type (
 	errPutItemMock struct{}
-	errQueryMock struct{}
+	errQueryMock   struct{}
+	errGetMock	   struct{}
 	Item           struct {
 		DisputeID int
 		Timestamp string
@@ -60,9 +61,29 @@ func (e errQueryMock) Query(_ *dynamodb.QueryInput) (*dynamodb.QueryOutput, erro
 	return nil, queryError
 }
 
+func (e errGetMock) PutItem(_ *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
+	return nil, nil
+}
+
+func (e errGetMock) DeleteItem(_ *dynamodb.DeleteItemInput) (*dynamodb.DeleteItemOutput, error) {
+	return nil, nil
+}
+
+func (e errGetMock) GetItem(_ *dynamodb.GetItemInput) (*dynamodb.GetItemOutput, error) {
+	return nil, getError
+}
+
+func (e errGetMock) Query(_ *dynamodb.QueryInput) (*dynamodb.QueryOutput, error) {
+	return nil, nil
+}
+
 
 func errMarshaller(_ interface{}) (map[string]*dynamodb.AttributeValue, error) {
 	return nil, parserError
+}
+
+func errUnmarshaller(_ map[string]*dynamodb.AttributeValue, _ interface{}) error {
+	return unmarshallerError
 }
 
 func mockUnmarshaller(_ map[string]*dynamodb.AttributeValue, out interface{}) error {

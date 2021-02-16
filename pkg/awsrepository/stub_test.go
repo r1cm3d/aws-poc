@@ -29,8 +29,10 @@ var (
 	parserError                 = errors.New("parseError")
 	putItemError                = errors.New("putItemError")
 	deleteError                 = errors.New("deleteError")
-	queryError					= errors.New("queryError")
+	queryError                  = errors.New("queryError")
+	getError					= errors.New("getError")
 	unmarshallerListOfMapsError = errors.New("UnmarshallerListOfMapsError")
+	unmarshallerError           = errors.New("unmarshallerError")
 
 	disputeStub = &protocol.Dispute{
 		Cid:               cid,

@@ -75,12 +75,15 @@ func TestGetIntegration(t *testing.T) {
 		dynamoRepository
 	}{
 		{"success", disputeStub, protocol.Dispute{}, nil, disputeStub, newRegister(awssession.NewLocalSession(), tableName)},
-		//TODO: add error case
+		{"unmarshallError", disputeStub, protocol.Dispute{}, unmarshallerError, nil, dynamoRepository{sess: awssession.NewLocalSession(), tableName: tableName, unmarshall: errUnmarshaller, adapter: svc()}},
+		{"getError", disputeStub, protocol.Dispute{}, getError, nil, dynamoRepository{sess: awssession.NewLocalSession(), tableName: tableName, adapter: errGetMock{}}},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			c.dynamoRepository.put(c.inRec)
+			if c.outItem != nil {
+				c.dynamoRepository.put(c.inRec)
+			}
 			if gotItem, gotErr := c.dynamoRepository.get(c.inRec, c.inItem); !reflect.DeepEqual(gotItem, c.outItem) && !reflect.DeepEqual(gotErr, c.outErr) {
 				t.Errorf("%s, want: %v %v, got: %v %v", c.name, c.outItem, c.outErr, gotItem, gotErr)
 			}
@@ -103,13 +106,15 @@ func TestQueryIntegration(t *testing.T) {
 		dynamoRepository
 	}{
 		{"success", disputeStub, "ID", disputeStub.ID(), protocol.Dispute{}, nil, disputeStub, newRegister(awssession.NewLocalSession(), tableName)},
-		{"UnmarshallerListOfMapsError", disputeStub, "ID", disputeStub.ID(), protocol.Dispute{}, unmarshallerListOfMapsError, disputeStub, dynamoRepository{awssession.NewLocalSession(), tableName, dynamodbattribute.MarshalMap, dynamodbattribute.UnmarshalMap, errUnmarshallerListOfMaps, svc()}},
-		{"queryError", disputeStub, "ID", disputeStub.ID(), protocol.Dispute{}, queryError, disputeStub, dynamoRepository{awssession.NewLocalSession(), tableName, dynamodbattribute.MarshalMap, dynamodbattribute.UnmarshalMap, dynamodbattribute.UnmarshalListOfMaps, errQueryMock{}}},
+		{"UnmarshallerListOfMapsError", disputeStub, "ID", disputeStub.ID(), protocol.Dispute{}, unmarshallerListOfMapsError, nil, dynamoRepository{sess: awssession.NewLocalSession(), tableName: tableName, unmarshallListOfMaps: errUnmarshallerListOfMaps, adapter: svc()}},
+		{"queryError", disputeStub, "ID", disputeStub.ID(), protocol.Dispute{}, queryError, nil, dynamoRepository{sess: awssession.NewLocalSession(), tableName: tableName, unmarshallListOfMaps: dynamodbattribute.UnmarshalListOfMaps, adapter: errQueryMock{}}},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			c.dynamoRepository.put(c.inItem)
+			if c.outItem != nil {
+				c.dynamoRepository.put(c.inItem)
+			}
 			if gotItem, gotErr := c.dynamoRepository.query(c.inField, c.inValue, c.emptyItem); !reflect.DeepEqual(gotItem, c.outItem) && !reflect.DeepEqual(gotErr, c.outErr) {
 				t.Errorf("%s, want: %v %v, got: %v %v", c.name, c.outItem, c.outErr, gotItem, gotErr)
 			}
