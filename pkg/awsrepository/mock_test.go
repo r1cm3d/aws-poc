@@ -8,6 +8,7 @@ import (
 
 type (
 	errPutItemMock struct{}
+	errQueryMock struct{}
 	Item           struct {
 		DisputeID int
 		Timestamp string
@@ -16,11 +17,11 @@ type (
 )
 
 func (e errRegister) put(_ record) error {
-	return errPutItem
+	return putItemError
 }
 
 func (e errRegister) delete(_ record) error {
-	return errDelete
+	return deleteError
 }
 
 func (i Item) ID() string {
@@ -28,23 +29,40 @@ func (i Item) ID() string {
 }
 
 func (e errPutItemMock) PutItem(_ *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
-	return nil, errPutItem
+	return nil, putItemError
 }
 
 func (e errPutItemMock) DeleteItem(_ *dynamodb.DeleteItemInput) (*dynamodb.DeleteItemOutput, error) {
-	return nil, errPutItem
+	return nil, putItemError
 }
 
 func (e errPutItemMock) GetItem(_ *dynamodb.GetItemInput) (*dynamodb.GetItemOutput, error) {
-	return nil, errPutItem
+	return nil, putItemError
 }
 
 func (e errPutItemMock) Query(_ *dynamodb.QueryInput) (*dynamodb.QueryOutput, error) {
-	return nil, errPutItem
+	return nil, putItemError
 }
 
+func (e errQueryMock) PutItem(_ *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
+	return nil, nil
+}
+
+func (e errQueryMock) DeleteItem(_ *dynamodb.DeleteItemInput) (*dynamodb.DeleteItemOutput, error) {
+	return nil, nil
+}
+
+func (e errQueryMock) GetItem(_ *dynamodb.GetItemInput) (*dynamodb.GetItemOutput, error) {
+	return nil, nil
+}
+
+func (e errQueryMock) Query(_ *dynamodb.QueryInput) (*dynamodb.QueryOutput, error) {
+	return nil, queryError
+}
+
+
 func errMarshaller(_ interface{}) (map[string]*dynamodb.AttributeValue, error) {
-	return nil, errParser
+	return nil, parserError
 }
 
 func mockUnmarshaller(_ map[string]*dynamodb.AttributeValue, out interface{}) error {
@@ -53,4 +71,8 @@ func mockUnmarshaller(_ map[string]*dynamodb.AttributeValue, out interface{}) er
 
 func mockUnmarshallerListOfMaps(l []map[string]*dynamodb.AttributeValue, out interface{}) error {
 	return nil
+}
+
+func errUnmarshallerListOfMaps(_ []map[string]*dynamodb.AttributeValue, _ interface{}) error {
+	return unmarshallerListOfMapsError
 }

@@ -25,8 +25,8 @@ func TestPutIntegration(t *testing.T) {
 		dynamoRepository
 	}{
 		{"success", defaultInput(), nil, newRegister(awssession.NewLocalSession(), tableName)},
-		{"parseError", defaultInput(), errParser, dynamoRepository{awssession.NewLocalSession(), tableName, errMarshaller, mockUnmarshaller, mockUnmarshallerListOfMaps, svc()}},
-		{"putItemError", defaultInput(), errPutItem, dynamoRepository{awssession.NewLocalSession(), tableName, dynamodbattribute.MarshalMap, mockUnmarshaller, mockUnmarshallerListOfMaps, errPutItemMock{}}},
+		{"parseError", defaultInput(), parserError, dynamoRepository{awssession.NewLocalSession(), tableName, errMarshaller, mockUnmarshaller, mockUnmarshallerListOfMaps, svc()}},
+		{"putItemError", defaultInput(), putItemError, dynamoRepository{awssession.NewLocalSession(), tableName, dynamodbattribute.MarshalMap, mockUnmarshaller, mockUnmarshallerListOfMaps, errPutItemMock{}}},
 	}
 
 	for _, c := range cases {
@@ -103,7 +103,8 @@ func TestQueryIntegration(t *testing.T) {
 		dynamoRepository
 	}{
 		{"success", disputeStub, "ID", disputeStub.ID(), protocol.Dispute{}, nil, disputeStub, newRegister(awssession.NewLocalSession(), tableName)},
-		//TODO: add error case
+		{"UnmarshallerListOfMapsError", disputeStub, "ID", disputeStub.ID(), protocol.Dispute{}, unmarshallerListOfMapsError, disputeStub, dynamoRepository{awssession.NewLocalSession(), tableName, dynamodbattribute.MarshalMap, dynamodbattribute.UnmarshalMap, errUnmarshallerListOfMaps, svc()}},
+		{"queryError", disputeStub, "ID", disputeStub.ID(), protocol.Dispute{}, queryError, disputeStub, dynamoRepository{awssession.NewLocalSession(), tableName, dynamodbattribute.MarshalMap, dynamodbattribute.UnmarshalMap, dynamodbattribute.UnmarshalListOfMaps, errQueryMock{}}},
 	}
 
 	for _, c := range cases {
