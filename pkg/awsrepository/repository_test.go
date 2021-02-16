@@ -49,12 +49,14 @@ func TestDeleteIntegration(t *testing.T) {
 		dynamoRepository
 	}{
 		{"success", defaultInput(), nil, newRegister(awssession.NewLocalSession(), tableName)},
-		//TODO: add error case
+		{ "error", defaultInput(), deleteError, dynamoRepository{ adapter: errDeleteItemMock{}}},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			c.dynamoRepository.put(c.in)
+			if c.want == nil {
+				c.dynamoRepository.put(c.in)
+			}
 			if got := c.dynamoRepository.delete(c.in); !reflect.DeepEqual(c.want, got) {
 				t.Errorf("%s, want: %v, got: %v", c.name, c.want, got)
 			}
