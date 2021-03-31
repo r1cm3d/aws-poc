@@ -49,7 +49,7 @@ func TestDeleteIntegration(t *testing.T) {
 		dynamoRepository
 	}{
 		{"success", defaultInput(), nil, newRegister(awssession.NewLocalSession(), tableName)},
-		{ "error", defaultInput(), deleteError, dynamoRepository{ adapter: errDeleteItemMock{}}},
+		{"error", defaultInput(), deleteError, dynamoRepository{adapter: errDeleteItemMock{}}},
 	}
 
 	for _, c := range cases {

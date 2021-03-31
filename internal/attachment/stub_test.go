@@ -27,7 +27,7 @@ const (
 
 var (
 	listError        = errors.New("storage list error")
-	getError         = errors.New("storage get error")
+	getError         = errors.New("storage Get error")
 	unsentFilesError = errors.New("unsent files error")
 	archiverError    = errors.New("archiver error")
 	saveError        = errors.New("save error")

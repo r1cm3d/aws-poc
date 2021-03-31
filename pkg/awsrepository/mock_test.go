@@ -7,11 +7,11 @@ import (
 )
 
 type (
-	errPutItemMock struct{}
-	errQueryMock   struct{}
-	errGetMock	   struct{}
-	errDeleteItemMock struct {}
-	Item           struct {
+	errPutItemMock    struct{}
+	errQueryMock      struct{}
+	errGetMock        struct{}
+	errDeleteItemMock struct{}
+	Item              struct {
 		DisputeID int
 		Timestamp string
 	}

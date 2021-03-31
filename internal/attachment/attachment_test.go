@@ -22,10 +22,10 @@ func TestGetSuccess(t *testing.T) {
 		t.Error("storage list not listCalled")
 	}
 	if !repository.getUnsentFilesCalled {
-		t.Error("repository get unsent files not listCalled")
+		t.Error("repository Get unsent files not listCalled")
 	}
 	if !storage.getCalled(3) {
-		t.Errorf("storage get not listCalled %d times", 3)
+		t.Errorf("storage Get not listCalled %d times", 3)
 	}
 	if !archiver.called {
 		t.Error("archiver not listCalled")

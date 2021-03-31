@@ -76,7 +76,7 @@ func TestGetIntegration(t *testing.T) {
 	if err := s3cli.Upload(bucketName, key, file); err != nil {
 		t.Errorf("error on Upload = %v", err)
 	}
-	if err := s3cli.Get(bucketName, key); err != nil {
+	if file, err := s3cli.Get("cid", bucketName, key); err != nil || file.Key != key {
 		t.Errorf("error on get = %v", err)
 	}
 }

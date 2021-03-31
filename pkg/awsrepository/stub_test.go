@@ -30,7 +30,7 @@ var (
 	putItemError                = errors.New("putItemError")
 	deleteError                 = errors.New("deleteError")
 	queryError                  = errors.New("queryError")
-	getError					= errors.New("getError")
+	getError                    = errors.New("getError")
 	unmarshallerListOfMapsError = errors.New("UnmarshallerListOfMapsError")
 	unmarshallerError           = errors.New("unmarshallerError")
 

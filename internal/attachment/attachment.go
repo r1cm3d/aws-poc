@@ -18,7 +18,7 @@ type (
 
 	storage interface {
 		list(cid string, bucket string, path string) ([]File, error)
-		get(cid string, bucket string, key string) (*File, error)
+		Get(cid string, bucket string, key string) (*File, error)
 	}
 
 	repository interface {
@@ -54,7 +54,7 @@ func (s svc) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 
 	for _, uf := range unsentFiles {
 		var rf *File
-		if rf, err = s.get(dispute.Cid, dispute.OrgId, uf.Key); err != nil {
+		if rf, err = s.storage.Get(dispute.Cid, dispute.OrgId, uf.Key); err != nil {
 			return nil, err
 		}
 		filesToCompact = append(filesToCompact, *rf)

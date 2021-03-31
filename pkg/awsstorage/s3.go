@@ -5,6 +5,8 @@ import (
 	"io"
 	"os"
 
+	"aws-poc/internal/attachment"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/client"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -48,10 +50,10 @@ func (s S3cli) List(bucket, _ string) error {
 }
 
 // Get is not complete implemented yet
-func (s S3cli) Get(bucket, key string) error {
+func (s S3cli) Get(cid string, bucket string, key string) (*attachment.File, error) {
 	file, err := os.Create(key)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer file.Close()
 
@@ -62,9 +64,11 @@ func (s S3cli) Get(bucket, key string) error {
 			Key:    aws.String(key),
 		})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	fmt.Println("Downloaded", file.Name(), numBytes, "bytes")
-	return nil
+	return &attachment.File{
+		Key: file.Name(),
+	}, nil
 }

@@ -29,7 +29,7 @@ func (e errStorageList) list(cid string, bucket string, path string) ([]File, er
 	return nil, listError
 }
 
-func (e errStorageList) get(cid string, bucket string, key string) (*File, error) {
+func (e errStorageList) Get(cid string, bucket string, key string) (*File, error) {
 	return nil, nil
 }
 
@@ -37,7 +37,7 @@ func (e errStorageGet) list(cid string, bucket string, path string) ([]File, err
 	return files, nil
 }
 
-func (e errStorageGet) get(cid string, bucket string, key string) (*File, error) {
+func (e errStorageGet) Get(cid string, bucket string, key string) (*File, error) {
 	return nil, getError
 }
 
@@ -72,7 +72,7 @@ func (m *mockStorage) list(ci string, bucket string, path string) ([]File, error
 	return files, nil
 }
 
-func (m *mockStorage) get(cid string, bucket string, key string) (*File, error) {
+func (m *mockStorage) Get(cid string, bucket string, key string) (*File, error) {
 	if cid == cid && orgId == bucket && m.getFile(key) != nil {
 		m.actGetCalled++
 	}
