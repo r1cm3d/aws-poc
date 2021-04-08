@@ -37,6 +37,12 @@ type (
 	}
 )
 
+func NewFile(key string) File {
+	return File{
+		Key: key,
+	}
+}
+
 func (s svc) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 	var (
 		files          []File

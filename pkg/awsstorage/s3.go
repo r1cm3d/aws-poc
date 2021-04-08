@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"aws-poc/internal/attachment"
 
@@ -31,12 +32,19 @@ func (s S3cli) Upload(bucket, key string, file io.Reader) (err error) {
 }
 
 // List is not complete implemented yet
-func (s S3cli) List(bucket, _ string) error {
+func (s S3cli) List(cid, bucket, path string) ([]attachment.File, error) {
+	fmt.Println(fmt.Sprintf("Listing files at s3 repository. cid: %v", cid))
 	svc := s3.New(s.session)
-	resp, err := svc.ListObjectsV2(&s3.ListObjectsV2Input{Bucket: aws.String(bucket)})
+	bucket = strings.ToLower(bucket)
+	resp, err := svc.ListObjectsV2(&s3.ListObjectsV2Input{
+		Prefix: aws.String(path),
+		Bucket: aws.String(bucket),
+	})
 	if err != nil {
-		return err
+		return nil, err
 	}
+
+	var files []attachment.File
 
 	for _, item := range resp.Contents {
 		fmt.Println("Name:         ", *item.Key)
@@ -44,9 +52,11 @@ func (s S3cli) List(bucket, _ string) error {
 		fmt.Println("Size:         ", *item.Size)
 		fmt.Println("Storage class:", *item.StorageClass)
 		fmt.Println("")
+
+		files = append(files, attachment.NewFile(*item.Key))
 	}
 
-	return err
+	return files, nil
 }
 
 // Get is not complete implemented yet

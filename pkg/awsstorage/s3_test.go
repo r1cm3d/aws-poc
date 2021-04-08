@@ -1,10 +1,13 @@
 package awsstorage
 
 import (
+	"aws-poc/internal/attachment"
 	"aws-poc/pkg/awssession"
 	"aws-poc/pkg/test/integration"
+	"fmt"
 	"log"
 	"os"
+	"reflect"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -49,12 +52,20 @@ func TestListIntegration(t *testing.T) {
 	s3cli := S3cli{
 		sess,
 	}
+	expFiles := [2]attachment.File{{Key: "file1"}, {Key: "file2"}}
 
-	if err := s3cli.Upload(bucketName, key, file); err != nil {
-		t.Errorf("error on Upload = %v", err)
+	for _, f := range expFiles {
+		if err := s3cli.Upload(bucketName, f.Key, file); err != nil {
+			t.Errorf("error on Upload = %v", err)
+		}
 	}
-	if err := s3cli.List(bucketName, key); err != nil {
+
+	if files, err := s3cli.List("cid", bucketName, "file"); err != nil {
 		t.Errorf("error on List = %v", err)
+	} else if reflect.DeepEqual(files, expFiles) {
+		fmt.Printf("files: %v", files)
+	} else {
+		t.Error("files are null")
 	}
 }
 
