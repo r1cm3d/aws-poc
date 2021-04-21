@@ -16,11 +16,11 @@ make run
 ```
 
 ## Prerequisites
-[![Docker](https://img.shields.io/badge/Docker-19.03.9-blue)](https://www.docker.com/)
-[![Docker-compose](https://img.shields.io/badge/Docker--compose-1.28.6-blue)](https://github.com/docker/compose/releases)
+[![Docker](https://img.shields.io/badge/Docker-20.10.2-blue)](https://www.docker.com/)
+[![Docker-compose](https://img.shields.io/badge/Docker--compose-1.29.1-blue)](https://github.com/docker/compose/releases)
 [![GNU Make](https://img.shields.io/badge/GNU%20Make-4.2.1-lightgrey)](https://www.gnu.org/software/make/)
 [![GNU Bash](https://img.shields.io/badge/GNU%20Bash-4.2.1-lightgrey)](https://www.gnu.org/software/bash/)
-[![terraform](https://img.shields.io/badge/terraform-0.14.9-blueviolet)](https://github.com/hashicorp/terraform)
+[![terraform](https://img.shields.io/badge/terraform-0.15.0-blueviolet)](https://github.com/hashicorp/terraform)
 [![shfmt](https://img.shields.io/badge/shfmt-v3.2.4-lightgrey)](https://github.com/mvdan/sh)
 [![aws-cli](https://img.shields.io/badge/aws--cli-2.0.49-yellow)](https://github.com/aws/aws-cli)
 
@@ -35,7 +35,7 @@ make run
 
 ## About The Project
 
-The goal of this project is consume AWS resources with Go programming language. It consumes two SQS queues, persists in DynamoDB tables according some business rules, it downloads and uploads some files in S3 and posts it again in others SQS queues.
+The goal of this project is consume AWS resources with Go programming language. It consumes two SQS queues, persists into DynamoDB tables according some business rules. It also download and upload some files in S3, publish events through SNS topics and schedule tasks with StepFunctions.
 
 ## Getting Started
 
