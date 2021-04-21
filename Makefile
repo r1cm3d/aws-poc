@@ -9,6 +9,10 @@ lint:
 	@echo "\nApplying golint\n"
 	@golint ./...
 
+doc:
+	@echo "\nGenerating documentation at http://localhost:6060\n"
+	@godoc -http=:6060 1>/dev/null
+
 fmt:
 	@echo "\nFormatting scripts\n"
 	@shfmt -w scripts/*sh
