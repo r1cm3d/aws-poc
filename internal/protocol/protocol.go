@@ -7,6 +7,10 @@ import (
 )
 
 type (
+	File struct {
+		Key string
+	}
+
 	Date              time.Time
 	AuthorizationCode string
 	ReasonCode        string

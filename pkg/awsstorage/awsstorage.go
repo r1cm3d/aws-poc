@@ -1,6 +1,7 @@
 package awsstorage
 
 import (
+	"aws-poc/internal/protocol"
 	"fmt"
 	"io"
 	"os"
@@ -32,7 +33,7 @@ func (s S3cli) Upload(bucket, key string, file io.Reader) (err error) {
 }
 
 // List is not complete implemented yet
-func (s S3cli) List(cid, bucket, path string) ([]attachment.File, error) {
+func (s S3cli) List(cid, bucket, path string) ([]protocol.File, error) {
 	fmt.Println(fmt.Sprintf("Listing files at s3 repository. cid: %v", cid))
 	svc := s3.New(s.session)
 	bucket = strings.ToLower(bucket)
@@ -44,7 +45,7 @@ func (s S3cli) List(cid, bucket, path string) ([]attachment.File, error) {
 		return nil, err
 	}
 
-	var files []attachment.File
+	var files []protocol.File
 
 	for _, item := range resp.Contents {
 		fmt.Println("Name:         ", *item.Key)
@@ -60,7 +61,7 @@ func (s S3cli) List(cid, bucket, path string) ([]attachment.File, error) {
 }
 
 // Get is not complete implemented yet
-func (s S3cli) Get(cid string, bucket string, key string) (*attachment.File, error) {
+func (s S3cli) Get(cid string, bucket string, key string) (*protocol.File, error) {
 	file, err := os.Create(key)
 	if err != nil {
 		return nil, err
@@ -78,7 +79,7 @@ func (s S3cli) Get(cid string, bucket string, key string) (*attachment.File, err
 	}
 
 	fmt.Println("Downloaded", file.Name(), numBytes, "bytes")
-	return &attachment.File{
+	return &protocol.File{
 		Key: file.Name(),
 	}, nil
 }

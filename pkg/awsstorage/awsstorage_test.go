@@ -1,13 +1,12 @@
 package awsstorage
 
 import (
-	"aws-poc/internal/attachment"
+	"aws-poc/internal/protocol"
 	"aws-poc/pkg/awssession"
 	"aws-poc/pkg/test/integration"
 	"fmt"
 	"log"
 	"os"
-	"reflect"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -52,7 +51,7 @@ func TestListIntegration(t *testing.T) {
 	s3cli := S3cli{
 		sess,
 	}
-	expFiles := [2]attachment.File{{Key: "file1"}, {Key: "file2"}}
+	expFiles := [2]protocol.File{{Key: "file1"}, {Key: "file2"}}
 
 	for _, f := range expFiles {
 		if err := s3cli.Upload(bucketName, f.Key, file); err != nil {
@@ -62,10 +61,10 @@ func TestListIntegration(t *testing.T) {
 
 	if files, err := s3cli.List("cid", bucketName, "file"); err != nil {
 		t.Errorf("error on List = %v", err)
-	} else if reflect.DeepEqual(files, expFiles) {
-		fmt.Printf("files: %v", files)
+	} else if files[0] == expFiles[0] && files[1] == expFiles[1] {
+		fmt.Printf("file matched %v", files)
 	} else {
-		t.Error("files are null")
+		t.Errorf("files do not match: %v, %v", files, expFiles)
 	}
 }
 
@@ -111,9 +110,13 @@ func setupBucket() {
 func cleanupBucket() {
 	sess := awssession.NewLocalSessionWithS3ForcePathStyle()
 	svc := s3.New(sess)
-	doi := &s3.DeleteObjectInput{Bucket: aws.String(bucketName), Key: aws.String(key)}
-	if _, err := svc.DeleteObject(doi); err != nil {
-		log.Fatal("unable to delete object from bucket")
+
+	files := [3]string{key, "file1", "file2"}
+	for _, f := range files {
+		doi := &s3.DeleteObjectInput{Bucket: aws.String(bucketName), Key: aws.String(f)}
+		if _, err := svc.DeleteObject(doi); err != nil {
+			log.Fatal("unable to delete object from bucket")
+		}
 	}
 
 	hoi := &s3.HeadObjectInput{

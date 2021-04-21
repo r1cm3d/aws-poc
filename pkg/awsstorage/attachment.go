@@ -1,7 +1,7 @@
 package awsstorage
 
 import (
-	"aws-poc/internal/attachment"
+	"aws-poc/internal/protocol"
 	"fmt"
 	"os"
 
@@ -16,7 +16,7 @@ type attstorage struct {
 	session client.ConfigProvider
 }
 
-func (a attstorage) list(cid string, bucket string, path string) ([]attachment.File, error) {
+func (a attstorage) list(cid string, bucket string, path string) ([]protocol.File, error) {
 	// TODO: log here
 	svc := s3.New(a.session)
 	resp, err := svc.ListObjectsV2(&s3.ListObjectsV2Input{Bucket: aws.String(bucket)})
@@ -26,17 +26,17 @@ func (a attstorage) list(cid string, bucket string, path string) ([]attachment.F
 	}
 
 	// TODO: log here
-	var files []attachment.File
+	var files []protocol.File
 	for _, item := range resp.Contents {
 		// TODO: log here
-		files = append(files, attachment.File{Key: *item.Key})
+		files = append(files, protocol.File{Key: *item.Key})
 	}
 
 	// TODO: log here
 	return files, nil
 }
 
-func (a attstorage) get(cid string, bucket string, key string) (*attachment.File, error) {
+func (a attstorage) get(cid string, bucket string, key string) (*protocol.File, error) {
 	// TODO: log here
 	file, err := os.Create(key)
 	if err != nil {
@@ -57,6 +57,6 @@ func (a attstorage) get(cid string, bucket string, key string) (*attachment.File
 	} else {
 		fmt.Println("Downloaded", file.Name(), numBytes, "bytes")
 		// TODO: log here
-		return &attachment.File{Key: file.Name()}, nil
+		return &protocol.File{Key: file.Name()}, nil
 	}
 }
