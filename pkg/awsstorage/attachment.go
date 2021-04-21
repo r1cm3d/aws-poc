@@ -47,16 +47,17 @@ func (a attstorage) get(cid string, bucket string, key string) (*protocol.File, 
 
 	// TODO: log here
 	downloader := s3manager.NewDownloader(a.session)
-	if numBytes, err := downloader.Download(file,
+	numBytes, err := downloader.Download(file,
 		&s3.GetObjectInput{
 			Bucket: aws.String(bucket),
 			Key:    aws.String(key),
-		}); err != nil {
+		})
+	if err != nil {
 		// TODO: log here
 		return nil, err
-	} else {
-		fmt.Println("Downloaded", file.Name(), numBytes, "bytes")
-		// TODO: log here
-		return &protocol.File{Key: file.Name()}, nil
 	}
+
+	fmt.Println("Downloaded", file.Name(), numBytes, "bytes")
+	// TODO: log here
+	return &protocol.File{Key: file.Name()}, nil
 }

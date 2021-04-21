@@ -109,9 +109,8 @@ func (r dynamoRepository) get(rec record, item interface{}) (interface{}, error)
 
 	if err := r.unmarshall(ri.Item, &item); err != nil {
 		return nil, err
-	} else {
-		return item, err
 	}
+	return item, nil
 }
 
 func (r dynamoRepository) query(field string, value string, items interface{}) (interface{}, error) {
@@ -132,7 +131,7 @@ func (r dynamoRepository) query(field string, value string, items interface{}) (
 
 	if err := r.unmarshallListOfMaps(ri.Items, &items); err != nil {
 		return nil, err
-	} else {
-		return items, err
 	}
+
+	return items, nil
 }
