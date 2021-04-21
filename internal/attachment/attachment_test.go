@@ -13,7 +13,7 @@ func TestGetSuccess(t *testing.T) {
 		attStub
 	svc := svc{
 		storage:    storage,
-		archiver:   archiver,
+		Archiver:   archiver,
 		repository: repository,
 	}
 	act, _ := svc.Get(disputeStub)
@@ -28,7 +28,7 @@ func TestGetSuccess(t *testing.T) {
 		t.Errorf("storage Get not listCalled %d times", 3)
 	}
 	if !archiver.called {
-		t.Error("archiver not listCalled")
+		t.Error("Archiver not listCalled")
 	}
 
 	if act != exp {
@@ -57,7 +57,7 @@ func TestGetFail(t *testing.T) {
 		{"compactError", disputeStub, svc{
 			storage:    storageStub,
 			repository: &mockRepository{},
-			archiver:   &errArchiver{},
+			Archiver:   &errArchiver{},
 		}, errArchiverStub},
 	}
 

@@ -10,6 +10,7 @@ type (
 	// A File has information about storage files commonly used as attachments.
 	File struct {
 		Key string
+		Bytes []byte
 	}
 
 	// A Date is a wrapper for time.Time.

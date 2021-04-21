@@ -14,6 +14,11 @@ type (
 		Save(chargeback *protocol.Chargeback) error
 	}
 
+	// A Archiver Compress a slice of protocol.File into a protocol.Attachment
+	Archiver interface {
+		Compress(cid string, files []protocol.File, strToRemove string) (*protocol.Attachment, error)
+	}
+
 	storage interface {
 		list(cid string, bucket string, path string) ([]protocol.File, error)
 		Get(cid string, bucket string, key string) (*protocol.File, error)
@@ -24,18 +29,14 @@ type (
 		save(chargeback *protocol.Chargeback) error
 	}
 
-	archiver interface {
-		compact(cid string, files []protocol.File, strToRemove string) (*protocol.Attachment, error)
-	}
-
 	svc struct {
 		storage
-		archiver
+		Archiver
 		repository
 	}
 )
 
-// NewFile creates and initiliazes a new protocol.File according key argument.
+// NewFile creates and initializes a new protocol.File according key argument.
 func NewFile(key string) protocol.File {
 	return protocol.File{
 		Key: key,
@@ -65,7 +66,7 @@ func (s svc) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 		filesToCompact = append(filesToCompact, *rf)
 	}
 
-	return s.compact(dispute.Cid, filesToCompact, path)
+	return s.Compress(dispute.Cid, filesToCompact, path)
 }
 
 func (s svc) Save(chargeback *protocol.Chargeback) error {

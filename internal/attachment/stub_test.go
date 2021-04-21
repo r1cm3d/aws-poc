@@ -29,7 +29,7 @@ var (
 	errListStub        = errors.New("storage list error")
 	errGetStub         = errors.New("storage Get error")
 	errUnsentFilesStub = errors.New("unsent files error")
-	errArchiverStub    = errors.New("archiver error")
+	errArchiverStub    = errors.New("Archiver error")
 	errSaveStub        = errors.New("save error")
 	path               = fmt.Sprintf("%s/%d/%d", filenameRoot, disputeStub.AccountID, disputeStub.DisputeID)
 	f1                 = protocol.File{Key: "cbk_file1.pdf"}

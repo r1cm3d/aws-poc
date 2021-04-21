@@ -67,6 +67,6 @@ func TestAttGetIntegration(t *testing.T) {
 	if file, err := attsto.get("cid", bucketName, key); err != nil {
 		t.Errorf("error on get = %v", err)
 	} else {
-		fmt.Printf("File %s retrieved", file.Key)
+		fmt.Printf("File %s retrieved. Bytes: %v", file.Key, file.Bytes)
 	}
 }

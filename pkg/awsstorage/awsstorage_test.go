@@ -61,7 +61,7 @@ func TestListIntegration(t *testing.T) {
 
 	if files, err := s3cli.List("cid", bucketName, "file"); err != nil {
 		t.Errorf("error on List = %v", err)
-	} else if files[0] == expFiles[0] && files[1] == expFiles[1] {
+	} else if files[0].Key == expFiles[0].Key && files[1].Key == expFiles[1].Key {
 		fmt.Printf("file matched %v", files)
 	} else {
 		t.Errorf("files do not match: %v, %v", files, expFiles)

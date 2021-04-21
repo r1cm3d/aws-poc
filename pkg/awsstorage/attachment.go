@@ -57,7 +57,25 @@ func (a attstorage) get(cid string, bucket string, key string) (*protocol.File, 
 		return nil, err
 	}
 
+	// TODO: change it to a log
 	fmt.Println("Downloaded", file.Name(), numBytes, "bytes")
+
 	// TODO: log here
-	return &protocol.File{Key: file.Name()}, nil
+	stat, err := file.Stat()
+	if err != nil {
+		// TODO: log here
+		return nil, err
+	}
+
+	size := stat.Size()
+	buffer := make([]byte, size)
+
+	_, err = file.Read(buffer)
+	if err != nil {
+		// TODO: log here
+		return nil, err
+	}
+
+	// TODO: log here
+	return &protocol.File{Key: file.Name(), Bytes: buffer}, nil
 }
