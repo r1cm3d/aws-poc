@@ -12,11 +12,11 @@ func TestMapFromJson(t *testing.T) {
 	cid := cid
 	json := `{
   "disputeId": 611,
-  "accountId": 48448,
+  "accountID": 48448,
   "authorizationCode": "7HSGXW",
   "reasonCode": "848",
-  "cardId": 3123,
-  "orgId": "pismo.io",
+  "cardID": 3123,
+  "orgID": "pismo.io",
   "disputeAmount": 32.32,
   "transactionAmount": 42.65,
   "transactionDate": "2012-04-23",
@@ -27,12 +27,12 @@ func TestMapFromJson(t *testing.T) {
 }`
 	want := protocol.Dispute{
 		Cid:               cid,
-		DisputeId:         611,
-		AccountId:         48448,
+		DisputeID:         611,
+		AccountID:         48448,
 		AuthorizationCode: protocol.AuthorizationCode("7HSGXW"),
 		ReasonCode:        protocol.ReasonCode("848"),
-		CardId:            3123,
-		OrgId:             "pismo.io",
+		CardID:            3123,
+		OrgID:             "pismo.io",
 		DisputeAmount:     32.32,
 		TransactionDate:   protocol.Date(time.Date(2012, 04, 23, 0, 0, 0, 0, time.UTC)),
 		LocalCurrencyCode: protocol.LocalCurrencyCode("986"),

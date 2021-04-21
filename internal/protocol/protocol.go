@@ -24,12 +24,12 @@ type (
 
 	Dispute struct {
 		Cid       string
-		OrgId     string
-		AccountId int
-		DisputeId int
+		OrgID     string
+		AccountID int
+		DisputeID int
 		AuthorizationCode
 		ReasonCode
-		CardId            int
+		CardID            int
 		DisputeAmount     float64
 		TransactionAmount float64
 		TransactionDate   Date
@@ -50,9 +50,9 @@ type (
 
 	Chargeback struct {
 		*Dispute
-		TransactionId string
-		ClaimId       string
-		ChargebackId  string
+		TransactionID string
+		ClaimID       string
+		ChargebackID  string
 		Status
 		Queue
 		Type
@@ -62,12 +62,12 @@ type (
 
 // ID return DisputeID::CorrelationID
 func (e Chargeback) ID() string {
-	return fmt.Sprintf("%v::%s", e.DisputeId, e.Cid)
+	return fmt.Sprintf("%v::%s", e.DisputeID, e.Cid)
 }
 
 // ID return DisputeID::CorrelationID
 func (e Dispute) ID() string {
-	return fmt.Sprintf("%v::%s", e.DisputeId, e.Cid)
+	return fmt.Sprintf("%v::%s", e.DisputeID, e.Cid)
 }
 
 // HasError return true if NetworkError != nil

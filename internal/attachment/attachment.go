@@ -47,8 +47,8 @@ func (s svc) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 		unsentFiles    []protocol.File
 		filesToCompact []protocol.File
 	)
-	path := fmt.Sprintf("%s/%d/%d", filenameRoot, dispute.AccountId, dispute.DisputeId)
-	if files, err = s.list(dispute.Cid, dispute.OrgId, path); err != nil {
+	path := fmt.Sprintf("%s/%d/%d", filenameRoot, dispute.AccountID, dispute.DisputeID)
+	if files, err = s.list(dispute.Cid, dispute.OrgID, path); err != nil {
 		return nil, err
 	}
 	if unsentFiles, err = s.getUnsentFiles(dispute, files); err != nil {
@@ -57,7 +57,7 @@ func (s svc) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 
 	for _, uf := range unsentFiles {
 		var rf *protocol.File
-		if rf, err = s.storage.Get(dispute.Cid, dispute.OrgId, uf.Key); err != nil {
+		if rf, err = s.storage.Get(dispute.Cid, dispute.OrgID, uf.Key); err != nil {
 			return nil, err
 		}
 		filesToCompact = append(filesToCompact, *rf)

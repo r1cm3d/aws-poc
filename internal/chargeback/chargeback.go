@@ -79,12 +79,12 @@ func (s svc) handleMessage(cid, body string) error {
 	}
 
 	if ok := s.locker.lock(d); !ok {
-		return newIdempotenceError(cid, d.DisputeId)
+		return newIdempotenceError(cid, d.DisputeID)
 	}
 
 	if err := s.creator.create(d); err != nil {
 		defer s.locker.release(d)
-		return newChargebackError(err, cid, d.DisputeId)
+		return newChargebackError(err, cid, d.DisputeID)
 	}
 
 	return nil

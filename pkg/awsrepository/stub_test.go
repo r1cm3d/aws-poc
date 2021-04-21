@@ -10,9 +10,9 @@ import (
 const (
 	disputeID         = 666
 	cid               = "e1388e36-1683-4902-b30c-5c5b63f5976c"
-	orgId             = "TN-ed3d9cbf-664e-4044-bc1f-5adee7ff069f"
-	accountId         = 10782
-	cardId            = 27542
+	orgID             = "TN-ed3d9cbf-664e-4044-bc1f-5adee7ff069f"
+	accountID         = 10782
+	cardID            = 27542
 	disputeAmount     = 120.00
 	transactionAmount = 150.00
 	documentIndicator = false
@@ -36,12 +36,12 @@ var (
 
 	disputeStub = &protocol.Dispute{
 		Cid:               cid,
-		OrgId:             orgId,
-		AccountId:         accountId,
-		DisputeId:         disputeID,
+		OrgID:             orgID,
+		AccountID:         accountID,
+		DisputeID:         disputeID,
 		AuthorizationCode: authorizationCode,
 		ReasonCode:        reasonCode,
-		CardId:            cardId,
+		CardID:            cardID,
 		DisputeAmount:     disputeAmount,
 		TransactionAmount: transactionAmount,
 		LocalCurrencyCode: usDollar,

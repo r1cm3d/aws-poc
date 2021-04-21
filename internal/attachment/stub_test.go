@@ -9,9 +9,9 @@ import (
 const (
 	disputeID         = 777
 	cid               = "6489f479-b609-4b3d-ab15-d5947f012c3c"
-	orgId             = "TN-7b90a75d-d094-4498-a3c8-7cec480f216f"
-	accountId         = 10787
-	cardId            = 28542
+	orgID             = "TN-7b90a75d-d094-4498-a3c8-7cec480f216f"
+	accountID         = 10787
+	cardID            = 28542
 	disputeAmount     = 150.00
 	transactionAmount = 200.00
 	documentIndicator = false
@@ -20,9 +20,9 @@ const (
 	usDollar          = protocol.LocalCurrencyCode("840")
 	isPartial         = false
 	textMessage       = "Example message"
-	transactionId     = "26811"
-	claimId           = "5717"
-	chargebackId      = "27202"
+	transactionID     = "26811"
+	claimID           = "5717"
+	chargebackID      = "27202"
 )
 
 var (
@@ -31,7 +31,7 @@ var (
 	unsentFilesError = errors.New("unsent files error")
 	archiverError    = errors.New("archiver error")
 	saveError        = errors.New("save error")
-	path             = fmt.Sprintf("%s/%d/%d", filenameRoot, disputeStub.AccountId, disputeStub.DisputeId)
+	path             = fmt.Sprintf("%s/%d/%d", filenameRoot, disputeStub.AccountID, disputeStub.DisputeID)
 	f1               = protocol.File{Key: "cbk_file1.pdf"}
 	f2               = protocol.File{Key: "cbk_doc.pdf"}
 	f3               = protocol.File{Key: "file3.pdf"}
@@ -47,12 +47,12 @@ var (
 	attStub          = &protocol.Attachment{Name: "cbk666.zip", Base64: "ZmlsZW5hbWUgaW4gYmFzZTY0"}
 	disputeStub      = &protocol.Dispute{
 		Cid:               cid,
-		OrgId:             orgId,
-		AccountId:         accountId,
-		DisputeId:         disputeID,
+		OrgID:             orgID,
+		AccountID:         accountID,
+		DisputeID:         disputeID,
 		AuthorizationCode: authorizationCode,
 		ReasonCode:        reasonCode,
-		CardId:            cardId,
+		CardID:            cardID,
 		DisputeAmount:     disputeAmount,
 		TransactionAmount: transactionAmount,
 		LocalCurrencyCode: usDollar,
@@ -66,9 +66,9 @@ var (
 	}
 	chargebackStub = &protocol.Chargeback{
 		Dispute:       disputeStub,
-		TransactionId: transactionId,
-		ClaimId:       claimId,
-		ChargebackId:  chargebackId,
+		TransactionID: transactionID,
+		ClaimID:       claimID,
+		ChargebackID:  chargebackID,
 		Status:        protocol.Status("CREATED"),
 		Queue:         protocol.Queue("CLOSED"),
 		Type:          protocol.Type("SECOND_PRESENTMENT"),

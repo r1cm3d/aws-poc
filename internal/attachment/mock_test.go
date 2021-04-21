@@ -67,13 +67,13 @@ func (m *mockStorage) getFile(key string) *protocol.File {
 }
 
 func (m *mockStorage) list(ci string, bucket string, path string) ([]protocol.File, error) {
-	m.listCalled = cid == ci && orgId == bucket && m.expPath == path
+	m.listCalled = cid == ci && orgID == bucket && m.expPath == path
 
 	return files, nil
 }
 
 func (m *mockStorage) Get(cid string, bucket string, key string) (*protocol.File, error) {
-	if cid == cid && orgId == bucket && m.getFile(key) != nil {
+	if cid == cid && orgID == bucket && m.getFile(key) != nil {
 		m.actGetCalled++
 	}
 

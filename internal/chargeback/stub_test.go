@@ -8,12 +8,12 @@ import (
 const (
 	disputeID         = 666
 	cid               = "e1388e36-1683-4902-b30c-5c5b63f5976c"
-	orgId             = "TN-ed3d9cbf-664e-4044-bc1f-5adee7ff069f"
-	accountId         = 10782
-	transactionId     = "26811"
-	claimId           = "5717"
-	chargebackId      = "27202"
-	cardId            = 27542
+	orgID             = "TN-ed3d9cbf-664e-4044-bc1f-5adee7ff069f"
+	accountID         = 10782
+	transactionID     = "26811"
+	claimID           = "5717"
+	chargebackID      = "27202"
+	cardID            = 27542
 	disputeAmount     = 120.00
 	transactionAmount = 150.00
 	documentIndicator = false
@@ -34,12 +34,12 @@ var (
 	attSaveError  = errors.New("mocked att save error")
 	disputeStub   = &protocol.Dispute{
 		Cid:               cid,
-		OrgId:             orgId,
-		AccountId:         accountId,
-		DisputeId:         disputeID,
+		OrgID:             orgID,
+		AccountID:         accountID,
+		DisputeID:         disputeID,
 		AuthorizationCode: authorizationCode,
 		ReasonCode:        reasonCode,
-		CardId:            cardId,
+		CardID:            cardID,
 		DisputeAmount:     disputeAmount,
 		TransactionAmount: transactionAmount,
 		LocalCurrencyCode: usDollar,
@@ -50,9 +50,9 @@ var (
 
 	chargebackStub = &protocol.Chargeback{
 		Dispute:       disputeStub,
-		TransactionId: transactionId,
-		ClaimId:       claimId,
-		ChargebackId:  chargebackId,
+		TransactionID: transactionID,
+		ClaimID:       claimID,
+		ChargebackID:  chargebackID,
 		Status:        protocol.Status("CREATED"),
 		Queue:         protocol.Queue("REJECTS"),
 		Type:          protocol.Type("CHARGEBACK"),
@@ -61,9 +61,9 @@ var (
 
 	chargebackWithErrorStub = &protocol.Chargeback{
 		Dispute:       disputeStub,
-		TransactionId: transactionId,
-		ClaimId:       claimId,
-		ChargebackId:  chargebackId,
+		TransactionID: transactionID,
+		ClaimID:       claimID,
+		ChargebackID:  chargebackID,
 		Status:        protocol.Status("CREATED"),
 		Queue:         protocol.Queue("REJECTS"),
 		Type:          protocol.Type("CHARGEBACK"),

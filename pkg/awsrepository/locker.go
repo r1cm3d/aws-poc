@@ -15,7 +15,7 @@ type (
 )
 
 func (l lockerRecord) ID() string {
-	return fmt.Sprintf("%d::%v", l.DisputeId, l.Cid)
+	return fmt.Sprintf("%d::%v", l.DisputeID, l.Cid)
 }
 
 func (l locker) lock(dispute protocol.Dispute) (ok bool) {
