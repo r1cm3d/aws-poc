@@ -43,22 +43,22 @@ func TestGetFail(t *testing.T) {
 		svc
 		want error
 	}{
-		{"listError", disputeStub, svc{
+		{"errListStub", disputeStub, svc{
 			storage: errStorageList{},
-		}, listError},
-		{"unsentFilesError", disputeStub, svc{
+		}, errListStub},
+		{"errUnsentFilesStub", disputeStub, svc{
 			storage:    &mockStorage{},
 			repository: &errUnsentFiles{},
-		}, unsentFilesError},
-		{"getError", disputeStub, svc{
+		}, errUnsentFilesStub},
+		{"errGetStub", disputeStub, svc{
 			storage:    &errStorageGet{},
 			repository: &mockRepository{},
-		}, getError},
+		}, errGetStub},
 		{"compactError", disputeStub, svc{
 			storage:    storageStub,
 			repository: &mockRepository{},
 			archiver:   &errArchiver{},
-		}, archiverError},
+		}, errArchiverStub},
 	}
 
 	for _, c := range cases {
@@ -82,7 +82,7 @@ func TestSave(t *testing.T) {
 		}, nil},
 		{"error", chargebackStub, svc{
 			repository: &errUnsentFiles{},
-		}, saveError},
+		}, errSaveStub},
 	}
 
 	for _, c := range cases {

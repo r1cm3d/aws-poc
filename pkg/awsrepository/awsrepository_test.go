@@ -21,8 +21,8 @@ func TestPutIntegration(t *testing.T) {
 		dynamoRepository
 	}{
 		{"success", defaultInput(), nil, newRegister(awssession.NewLocalSession(), tableName)},
-		{"parseError", defaultInput(), parserError, dynamoRepository{awssession.NewLocalSession(), tableName, errMarshaller, mockUnmarshaller, mockUnmarshallerListOfMaps, svc()}},
-		{"putItemError", defaultInput(), putItemError, dynamoRepository{awssession.NewLocalSession(), tableName, dynamodbattribute.MarshalMap, mockUnmarshaller, mockUnmarshallerListOfMaps, errPutItemMock{}}},
+		{"parseError", defaultInput(), errParserStub, dynamoRepository{awssession.NewLocalSession(), tableName, errMarshaller, mockUnmarshaller, mockUnmarshallerListOfMaps, svc()}},
+		{"errPutItemStub", defaultInput(), errPutItemStub, dynamoRepository{awssession.NewLocalSession(), tableName, dynamodbattribute.MarshalMap, mockUnmarshaller, mockUnmarshallerListOfMaps, errPutItemMock{}}},
 	}
 
 	for _, c := range cases {
@@ -45,7 +45,7 @@ func TestDeleteIntegration(t *testing.T) {
 		dynamoRepository
 	}{
 		{"success", defaultInput(), nil, newRegister(awssession.NewLocalSession(), tableName)},
-		{"error", defaultInput(), deleteError, dynamoRepository{adapter: errDeleteItemMock{}}},
+		{"error", defaultInput(), errDeleteStub, dynamoRepository{adapter: errDeleteItemMock{}}},
 	}
 
 	for _, c := range cases {
@@ -73,8 +73,8 @@ func TestGetIntegration(t *testing.T) {
 		dynamoRepository
 	}{
 		{"success", disputeStub, protocol.Dispute{}, nil, disputeStub, newRegister(awssession.NewLocalSession(), tableName)},
-		{"unmarshallError", disputeStub, protocol.Dispute{}, unmarshallerError, nil, dynamoRepository{sess: awssession.NewLocalSession(), tableName: tableName, unmarshall: errUnmarshaller, adapter: svc()}},
-		{"getError", disputeStub, protocol.Dispute{}, getError, nil, dynamoRepository{sess: awssession.NewLocalSession(), tableName: tableName, adapter: errGetMock{}}},
+		{"unmarshallError", disputeStub, protocol.Dispute{}, errUnmarshallerStub, nil, dynamoRepository{sess: awssession.NewLocalSession(), tableName: tableName, unmarshall: errUnmarshaller, adapter: svc()}},
+		{"errGetStub", disputeStub, protocol.Dispute{}, errGetStub, nil, dynamoRepository{sess: awssession.NewLocalSession(), tableName: tableName, adapter: errGetMock{}}},
 	}
 
 	for _, c := range cases {
@@ -104,8 +104,8 @@ func TestQueryIntegration(t *testing.T) {
 		dynamoRepository
 	}{
 		{"success", disputeStub, "ID", disputeStub.ID(), protocol.Dispute{}, nil, disputeStub, newRegister(awssession.NewLocalSession(), tableName)},
-		{"UnmarshallerListOfMapsError", disputeStub, "ID", disputeStub.ID(), protocol.Dispute{}, unmarshallerListOfMapsError, nil, dynamoRepository{sess: awssession.NewLocalSession(), tableName: tableName, unmarshallListOfMaps: errUnmarshallerListOfMaps, adapter: svc()}},
-		{"queryError", disputeStub, "ID", disputeStub.ID(), protocol.Dispute{}, queryError, nil, dynamoRepository{sess: awssession.NewLocalSession(), tableName: tableName, unmarshallListOfMaps: dynamodbattribute.UnmarshalListOfMaps, adapter: errQueryMock{}}},
+		{"UnmarshallerListOfMapsError", disputeStub, "ID", disputeStub.ID(), protocol.Dispute{}, errUnmarshallerListOfMapsStub, nil, dynamoRepository{sess: awssession.NewLocalSession(), tableName: tableName, unmarshallListOfMaps: errUnmarshallerListOfMaps, adapter: svc()}},
+		{"errQueryStub", disputeStub, "ID", disputeStub.ID(), protocol.Dispute{}, errQueryStub, nil, dynamoRepository{sess: awssession.NewLocalSession(), tableName: tableName, unmarshallListOfMaps: dynamodbattribute.UnmarshalListOfMaps, adapter: errQueryMock{}}},
 	}
 
 	for _, c := range cases {

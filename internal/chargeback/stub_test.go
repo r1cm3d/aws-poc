@@ -25,14 +25,14 @@ const (
 )
 
 var (
-	stubError     = errors.New("mocked error")
-	cardError     = errors.New("mocked card error")
-	attGetError   = errors.New("mocked att get error")
-	openerError   = errors.New("mocked opener error")
-	producerError = errors.New("mocked producer error")
-	scdError      = errors.New("mocked scheduler error")
-	attSaveError  = errors.New("mocked att save error")
-	disputeStub   = &protocol.Dispute{
+	errStub         = errors.New("mocked error")
+	errCardStub     = errors.New("mocked card error")
+	errAttGetStub   = errors.New("mocked att get error")
+	errOpenerStub   = errors.New("mocked opener error")
+	errProducerStub = errors.New("mocked producer error")
+	errScdStub      = errors.New("mocked scheduler error")
+	errAttSaveStub  = errors.New("mocked att save error")
+	disputeStub     = &protocol.Dispute{
 		Cid:               cid,
 		OrgID:             orgID,
 		AccountID:         accountID,

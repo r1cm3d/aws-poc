@@ -19,11 +19,11 @@ type (
 )
 
 func (e errRegister) put(_ record) error {
-	return putItemError
+	return errPutItemStub
 }
 
 func (e errRegister) delete(_ record) error {
-	return deleteError
+	return errDeleteStub
 }
 
 func (i Item) ID() string {
@@ -31,19 +31,19 @@ func (i Item) ID() string {
 }
 
 func (e errPutItemMock) PutItem(_ *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
-	return nil, putItemError
+	return nil, errPutItemStub
 }
 
 func (e errPutItemMock) DeleteItem(_ *dynamodb.DeleteItemInput) (*dynamodb.DeleteItemOutput, error) {
-	return nil, putItemError
+	return nil, errPutItemStub
 }
 
 func (e errPutItemMock) GetItem(_ *dynamodb.GetItemInput) (*dynamodb.GetItemOutput, error) {
-	return nil, putItemError
+	return nil, errPutItemStub
 }
 
 func (e errPutItemMock) Query(_ *dynamodb.QueryInput) (*dynamodb.QueryOutput, error) {
-	return nil, putItemError
+	return nil, errPutItemStub
 }
 
 func (e errQueryMock) PutItem(_ *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
@@ -59,7 +59,7 @@ func (e errQueryMock) GetItem(_ *dynamodb.GetItemInput) (*dynamodb.GetItemOutput
 }
 
 func (e errQueryMock) Query(_ *dynamodb.QueryInput) (*dynamodb.QueryOutput, error) {
-	return nil, queryError
+	return nil, errQueryStub
 }
 
 func (e errGetMock) PutItem(_ *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
@@ -71,7 +71,7 @@ func (e errGetMock) DeleteItem(_ *dynamodb.DeleteItemInput) (*dynamodb.DeleteIte
 }
 
 func (e errGetMock) GetItem(_ *dynamodb.GetItemInput) (*dynamodb.GetItemOutput, error) {
-	return nil, getError
+	return nil, errGetStub
 }
 
 func (e errGetMock) Query(_ *dynamodb.QueryInput) (*dynamodb.QueryOutput, error) {
@@ -83,7 +83,7 @@ func (e errDeleteItemMock) PutItem(_ *dynamodb.PutItemInput) (*dynamodb.PutItemO
 }
 
 func (e errDeleteItemMock) DeleteItem(_ *dynamodb.DeleteItemInput) (*dynamodb.DeleteItemOutput, error) {
-	return nil, deleteError
+	return nil, errDeleteStub
 }
 
 func (e errDeleteItemMock) GetItem(_ *dynamodb.GetItemInput) (*dynamodb.GetItemOutput, error) {
@@ -95,11 +95,11 @@ func (e errDeleteItemMock) Query(_ *dynamodb.QueryInput) (*dynamodb.QueryOutput,
 }
 
 func errMarshaller(_ interface{}) (map[string]*dynamodb.AttributeValue, error) {
-	return nil, parserError
+	return nil, errParserStub
 }
 
 func errUnmarshaller(_ map[string]*dynamodb.AttributeValue, _ interface{}) error {
-	return unmarshallerError
+	return errUnmarshallerStub
 }
 
 func mockUnmarshaller(_ map[string]*dynamodb.AttributeValue, out interface{}) error {
@@ -111,5 +111,5 @@ func mockUnmarshallerListOfMaps(l []map[string]*dynamodb.AttributeValue, out int
 }
 
 func errUnmarshallerListOfMaps(_ []map[string]*dynamodb.AttributeValue, _ interface{}) error {
-	return unmarshallerListOfMapsError
+	return errUnmarshallerListOfMapsStub
 }

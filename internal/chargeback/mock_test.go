@@ -38,7 +38,7 @@ type (
 )
 
 func (e errMapper) fromJSON(string, string) (*protocol.Dispute, error) {
-	return disputeStub, stubError
+	return disputeStub, errStub
 }
 
 func (m mockMapper) fromJSON(string, string) (*protocol.Dispute, error) {
@@ -54,7 +54,7 @@ func (e errRepository) release(*protocol.Dispute) (ok bool) {
 }
 
 func (e errDisputer) create(*protocol.Dispute) error {
-	return stubError
+	return errStub
 }
 
 func (m mockCreator) create(*protocol.Dispute) error {
@@ -94,11 +94,11 @@ func (m *mockNetworkCreator) Create(dispute *protocol.Dispute, card *protocol.Ca
 }
 
 func (m errCardService) Get(dispute *protocol.Dispute) (*protocol.Card, error) {
-	return nil, cardError
+	return nil, errCardStub
 }
 
 func (m errAttGetService) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
-	return nil, attGetError
+	return nil, errAttGetStub
 }
 
 func (m errAttGetService) Save(chargeback *protocol.Chargeback) error {
@@ -110,11 +110,11 @@ func (m errAttSaveService) Get(dispute *protocol.Dispute) (*protocol.Attachment,
 }
 
 func (m errAttSaveService) Save(chargeback *protocol.Chargeback) error {
-	return attSaveError
+	return errAttSaveStub
 }
 
 func (m errNetworkCreator) Create(dispute *protocol.Dispute, card *protocol.Card, attachment *protocol.Attachment) (*protocol.Chargeback, error) {
-	return nil, openerError
+	return nil, errOpenerStub
 }
 
 func (m *mockProducer) Produce(chargeback *protocol.Chargeback) error {
@@ -130,11 +130,11 @@ func (m *mockScheduler) Schedule(chargeback *protocol.Chargeback) error {
 }
 
 func (e errProducer) Produce(chargeback *protocol.Chargeback) error {
-	return producerError
+	return errProducerStub
 }
 
 func (e errScheduler) Schedule(chargeback *protocol.Chargeback) error {
-	return scdError
+	return errScdStub
 }
 
 func (m *mockOpenerWithNetworkError) Create(dispute *protocol.Dispute, card *protocol.Card, attachment *protocol.Attachment) (*protocol.Chargeback, error) {

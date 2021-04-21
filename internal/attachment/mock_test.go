@@ -26,7 +26,7 @@ type (
 )
 
 func (e errStorageList) list(cid string, bucket string, path string) ([]protocol.File, error) {
-	return nil, listError
+	return nil, errListStub
 }
 
 func (e errStorageList) Get(cid string, bucket string, key string) (*protocol.File, error) {
@@ -38,19 +38,19 @@ func (e errStorageGet) list(cid string, bucket string, path string) ([]protocol.
 }
 
 func (e errStorageGet) Get(cid string, bucket string, key string) (*protocol.File, error) {
-	return nil, getError
+	return nil, errGetStub
 }
 
 func (e errUnsentFiles) getUnsentFiles(*protocol.Dispute, []protocol.File) ([]protocol.File, error) {
-	return nil, unsentFilesError
+	return nil, errUnsentFilesStub
 }
 
 func (e errUnsentFiles) save(*protocol.Chargeback) error {
-	return saveError
+	return errSaveStub
 }
 
 func (e errArchiver) compact(cid string, files []protocol.File, strToRemove string) (*protocol.Attachment, error) {
-	return nil, archiverError
+	return nil, errArchiverStub
 }
 
 func (m *mockStorage) getCalled(expGetCalled int) bool {
@@ -103,7 +103,7 @@ func (e *errSave) getUnsentFiles(d *protocol.Dispute, fs []protocol.File) ([]pro
 }
 
 func (e *errSave) save(c *protocol.Chargeback) error {
-	return saveError
+	return errSaveStub
 }
 
 func filesEquals(files1 []protocol.File, files2 []protocol.File) (ok bool) {

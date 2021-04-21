@@ -70,9 +70,9 @@ func TestHandleMessage(t *testing.T) {
 		svc
 	}{
 		{"success", defaultInput, nil, svc{mapper: mockMapper{}, locker: mockRepository{}, creator: mockCreator{}}},
-		{"parseError", defaultInput, newParseError(stubError), svc{locker: mockRepository{}, mapper: errMapper{}}},
+		{"parseError", defaultInput, newParseError(errStub), svc{locker: mockRepository{}, mapper: errMapper{}}},
 		{"idempotenceError", defaultInput, newIdempotenceError(cid, disputeID), svc{mapper: mockMapper{}, locker: errRepository{}}},
-		{"chargebackError", defaultInput, newChargebackError(stubError, cid, disputeID), svc{mapper: mockMapper{}, locker: mockRepository{}, creator: errDisputer{}}},
+		{"chargebackError", defaultInput, newChargebackError(errStub, cid, disputeID), svc{mapper: mockMapper{}, locker: mockRepository{}, creator: errDisputer{}}},
 	}
 
 	for _, c := range cases {
@@ -153,37 +153,37 @@ func TestOpenFail(t *testing.T) {
 		svc  svc
 		want error
 	}{
-		{"cardError", disputeStub, svc{
+		{"errCardStub", disputeStub, svc{
 			cardService: errCardService{},
-		}, cardError},
+		}, errCardStub},
 		{"attachmentGetError", disputeStub, svc{
 			cardService: &mockCardService{},
 			attService:  &errAttGetService{},
-		}, attGetError},
-		{"openerError", disputeStub, svc{
+		}, errAttGetStub},
+		{"errOpenerStub", disputeStub, svc{
 			cardService:    &mockCardService{},
 			attService:     &mockAttService{},
 			networkCreator: errNetworkCreator{},
-		}, openerError},
-		{"producerError", disputeStub, svc{
+		}, errOpenerStub},
+		{"errProducerStub", disputeStub, svc{
 			cardService:    &mockCardService{},
 			attService:     &mockAttService{},
 			networkCreator: &mockNetworkCreator{},
 			Producer:       &errProducer{},
-		}, producerError},
+		}, errProducerStub},
 		{"attachmentSaveError", disputeStub, svc{
 			cardService:    &mockCardService{},
 			attService:     &errAttSaveService{},
 			networkCreator: &mockNetworkCreator{},
 			Producer:       &mockProducer{},
-		}, attSaveError},
+		}, errAttSaveStub},
 		{"scheduleError", disputeStub, svc{
 			cardService:    &mockCardService{},
 			attService:     &mockAttService{},
 			networkCreator: &mockNetworkCreator{},
 			Producer:       &mockProducer{},
 			Scheduler:      &errScheduler{},
-		}, scdError},
+		}, errScdStub},
 	}
 
 	for _, c := range cases {

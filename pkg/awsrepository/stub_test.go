@@ -24,15 +24,15 @@ const (
 )
 
 var (
-	tableName                   = aws.String("Dispute")
-	id                          = aws.String("ID")
-	parserError                 = errors.New("parseError")
-	putItemError                = errors.New("putItemError")
-	deleteError                 = errors.New("deleteError")
-	queryError                  = errors.New("queryError")
-	getError                    = errors.New("getError")
-	unmarshallerListOfMapsError = errors.New("UnmarshallerListOfMapsError")
-	unmarshallerError           = errors.New("unmarshallerError")
+	tableName                     = aws.String("Dispute")
+	id                            = aws.String("ID")
+	errParserStub                 = errors.New("parseError")
+	errPutItemStub                = errors.New("errPutItemStub")
+	errDeleteStub                 = errors.New("errDeleteStub")
+	errQueryStub                  = errors.New("errQueryStub")
+	errGetStub                    = errors.New("errGetStub")
+	errUnmarshallerListOfMapsStub = errors.New("UnmarshallerListOfMapsError")
+	errUnmarshallerStub           = errors.New("errUnmarshallerStub")
 
 	disputeStub = &protocol.Dispute{
 		Cid:               cid,
