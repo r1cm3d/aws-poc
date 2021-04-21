@@ -8,6 +8,7 @@ import (
 const filenameRoot = "disputes"
 
 type (
+	// A Service provides interactions with protocol.Attachments.
 	Service interface {
 		Get(dispute *protocol.Dispute) (*protocol.Attachment, error)
 		Save(chargeback *protocol.Chargeback) error
@@ -34,6 +35,7 @@ type (
 	}
 )
 
+// NewFile creates and initiliazes a new protocol.File according key argument.
 func NewFile(key string) protocol.File {
 	return protocol.File{
 		Key: key,

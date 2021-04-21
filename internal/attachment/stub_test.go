@@ -41,11 +41,11 @@ var (
 	uf1                = protocol.File{Key: fmt.Sprintf("%s/%s", path, f1.Key)}
 	uf2                = protocol.File{Key: fmt.Sprintf("%s/%s", path, f2.Key)}
 	uf3                = protocol.File{Key: fmt.Sprintf("%s/%s", path, f3.Key)}
-	files            = []protocol.File{f1, f2, f3}
-	unsentFiles      = []protocol.File{uf1, uf2, uf3}
-	getFiles         = []protocol.File{fg1, fg2, fg3}
-	attStub          = &protocol.Attachment{Name: "cbk666.zip", Base64: "ZmlsZW5hbWUgaW4gYmFzZTY0"}
-	disputeStub      = &protocol.Dispute{
+	files              = []protocol.File{f1, f2, f3}
+	unsentFiles        = []protocol.File{uf1, uf2, uf3}
+	getFiles           = []protocol.File{fg1, fg2, fg3}
+	attStub            = &protocol.Attachment{Name: "cbk666.zip", Base64: "ZmlsZW5hbWUgaW4gYmFzZTY0"}
+	disputeStub        = &protocol.Dispute{
 		Cid:               cid,
 		OrgID:             orgID,
 		AccountID:         accountID,
