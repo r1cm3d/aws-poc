@@ -29,7 +29,7 @@ var (
 	errListStub        = errors.New("storage list error")
 	errGetStub         = errors.New("storage Get error")
 	errUnsentFilesStub = errors.New("unsent files error")
-	errArchiverStub    = errors.New("Archiver error")
+	errArchiverStub    = errors.New("Compressor error")
 	errSaveStub        = errors.New("save error")
 	path               = fmt.Sprintf("%s/%d/%d", filenameRoot, disputeStub.AccountID, disputeStub.DisputeID)
 	f1                 = protocol.File{Key: "cbk_file1.pdf"}
@@ -44,7 +44,8 @@ var (
 	files              = []protocol.File{f1, f2, f3}
 	unsentFiles        = []protocol.File{uf1, uf2, uf3}
 	getFiles           = []protocol.File{fg1, fg2, fg3}
-	attStub            = &protocol.Attachment{Name: "cbk666.zip", Base64: "ZmlsZW5hbWUgaW4gYmFzZTY0"}
+	attStub            = &protocol.Attachment{Name: "777.zip", Base64: "Wm1sc1pXNWhiV1VnYVc0Z1ltRnpaVFkw"}
+	compactFilesStub   = []byte("ZmlsZW5hbWUgaW4gYmFzZTY0")
 	disputeStub        = &protocol.Dispute{
 		Cid:               cid,
 		OrgID:             orgID,

@@ -49,7 +49,7 @@ func (e errUnsentFiles) save(*protocol.Chargeback) error {
 	return errSaveStub
 }
 
-func (e errArchiver) Compress(cid string, files []protocol.File, strToRemove string) (*protocol.Attachment, error) {
+func (e errArchiver) Compress(_ string, _ []protocol.File, _ string) ([]byte, error) {
 	return nil, errArchiverStub
 }
 
@@ -80,10 +80,10 @@ func (m *mockStorage) Get(cid string, bucket string, key string) (*protocol.File
 	return m.getFile(key), nil
 }
 
-func (m *mockArchiver) Compress(ci string, fs []protocol.File, strToRemove string) (*protocol.Attachment, error) {
+func (m *mockArchiver) Compress(ci string, fs []protocol.File, strToRemove string) ([]byte, error) {
 	m.called = ci == cid && m.strToRemove == strToRemove && filesEquals(fs, getFiles)
 
-	return attStub, nil
+	return compactFilesStub, nil
 }
 
 func (m *mockRepository) getUnsentFiles(d *protocol.Dispute, fs []protocol.File) ([]protocol.File, error) {

@@ -2,6 +2,7 @@ package attachment
 
 import (
 	"aws-poc/internal/protocol"
+	"reflect"
 	"testing"
 )
 
@@ -13,7 +14,7 @@ func TestGetSuccess(t *testing.T) {
 		attStub
 	svc := svc{
 		storage:    storage,
-		Archiver:   archiver,
+		Compressor: archiver,
 		repository: repository,
 	}
 	act, _ := svc.Get(disputeStub)
@@ -28,10 +29,10 @@ func TestGetSuccess(t *testing.T) {
 		t.Errorf("storage Get not listCalled %d times", 3)
 	}
 	if !archiver.called {
-		t.Error("Archiver not listCalled")
+		t.Error("Compressor not listCalled")
 	}
 
-	if act != exp {
+	if !reflect.DeepEqual(act, exp) {
 		t.Errorf("GetSuccess, want: %v, got: %v", act, exp)
 	}
 }
@@ -57,7 +58,7 @@ func TestGetFail(t *testing.T) {
 		{"compactError", disputeStub, svc{
 			storage:    storageStub,
 			repository: &mockRepository{},
-			Archiver:   &errArchiver{},
+			Compressor: &errArchiver{},
 		}, errArchiverStub},
 	}
 

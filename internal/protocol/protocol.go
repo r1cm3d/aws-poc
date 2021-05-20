@@ -9,7 +9,7 @@ import (
 type (
 	// A File has information about storage files commonly used as attachments.
 	File struct {
-		Key string
+		Key   string
 		Bytes []byte
 	}
 

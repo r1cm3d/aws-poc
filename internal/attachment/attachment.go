@@ -2,6 +2,7 @@ package attachment
 
 import (
 	"aws-poc/internal/protocol"
+	"encoding/base64"
 	"fmt"
 )
 
@@ -14,9 +15,9 @@ type (
 		Save(chargeback *protocol.Chargeback) error
 	}
 
-	// A Archiver Compress a slice of protocol.File into a protocol.Attachment
-	Archiver interface {
-		Compress(cid string, files []protocol.File, strToRemove string) (*protocol.Attachment, error)
+	// A Compressor Compress a slice of protocol.File into a protocol.Attachment
+	Compressor interface {
+		Compress(cid string, files []protocol.File, strToRemove string) ([]byte, error)
 	}
 
 	storage interface {
@@ -31,7 +32,7 @@ type (
 
 	svc struct {
 		storage
-		Archiver
+		Compressor
 		repository
 	}
 )
@@ -49,6 +50,7 @@ func (s svc) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 		err            error
 		unsentFiles    []protocol.File
 		filesToCompact []protocol.File
+		compactFiles   []byte
 	)
 	path := fmt.Sprintf("%s/%d/%d", filenameRoot, dispute.AccountID, dispute.DisputeID)
 	if files, err = s.list(dispute.Cid, dispute.OrgID, path); err != nil {
@@ -66,7 +68,16 @@ func (s svc) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 		filesToCompact = append(filesToCompact, *rf)
 	}
 
-	return s.Compress(dispute.Cid, filesToCompact, path)
+	if compactFiles, err = s.Compress(dispute.Cid, filesToCompact, path); err != nil {
+		return nil, err
+	}
+
+	filesInBase64 := base64.StdEncoding.EncodeToString(compactFiles)
+
+	return &protocol.Attachment{
+		Name:   fmt.Sprintf("%d.zip", dispute.DisputeID),
+		Base64: filesInBase64,
+	}, nil
 }
 
 func (s svc) Save(chargeback *protocol.Chargeback) error {
