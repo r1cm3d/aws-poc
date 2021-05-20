@@ -15,7 +15,7 @@ type (
 		Save(chargeback *protocol.Chargeback) error
 	}
 
-	// A Compressor Compress a slice of protocol.File into a protocol.Attachment
+	// A Compressor Compress a slice of protocol.File into a byte[]
 	Compressor interface {
 		Compress(cid string, files []protocol.File, strToRemove string) ([]byte, error)
 	}
