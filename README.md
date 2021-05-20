@@ -17,11 +17,11 @@ make run
 
 ## Prerequisites
 [![Docker](https://img.shields.io/badge/Docker-20.10.2-blue)](https://www.docker.com/)
-[![Docker-compose](https://img.shields.io/badge/Docker--compose-1.29.1-blue)](https://github.com/docker/compose/releases)
+[![Docker-compose](https://img.shields.io/badge/Docker--compose-1.29.2-blue)](https://github.com/docker/compose/releases)
 [![GNU Make](https://img.shields.io/badge/GNU%20Make-4.2.1-lightgrey)](https://www.gnu.org/software/make/)
 [![GNU Bash](https://img.shields.io/badge/GNU%20Bash-4.2.1-lightgrey)](https://www.gnu.org/software/bash/)
-[![terraform](https://img.shields.io/badge/terraform-0.15.0-blueviolet)](https://github.com/hashicorp/terraform)
-[![shfmt](https://img.shields.io/badge/shfmt-v3.2.4-lightgrey)](https://github.com/mvdan/sh)
+[![terraform](https://img.shields.io/badge/terraform-0.15.4-blueviolet)](https://github.com/hashicorp/terraform)
+[![shfmt](https://img.shields.io/badge/shfmt-v3.3.0-lightgrey)](https://github.com/mvdan/sh)
 [![aws-cli](https://img.shields.io/badge/aws--cli-2.0.49-yellow)](https://github.com/aws/aws-cli)
 
 ## Table of Contents
