@@ -9,13 +9,13 @@ import (
 const filenameRoot = "disputes"
 
 type (
-	// A Service provides interactions with protocol.Attachments.
+	// A Service provides interactions with protocol.Attachment
 	Service interface {
 		Get(dispute *protocol.Dispute) (*protocol.Attachment, error)
 		Save(chargeback *protocol.Chargeback) error
 	}
 
-	// A Compressor Compress a slice of protocol.File into a byte[]
+	// A Compressor Compress a slice of protocol.File into a []byte
 	Compressor interface {
 		Compress(cid string, files []protocol.File, strToRemove string) ([]byte, error)
 	}
@@ -25,15 +25,16 @@ type (
 		Get(cid string, bucket string, key string) (*protocol.File, error)
 	}
 
-	repository interface {
-		getUnsentFiles(*protocol.Dispute, []protocol.File) ([]protocol.File, error)
-		save(chargeback *protocol.Chargeback) error
+	// A Repository provides an interface to interact with attachment files
+	Repository interface {
+		// Get retrieves a []protocol.Attachment persisted at database given *protocol.Dispute and []protocol.File
+		Get(*protocol.Dispute, []protocol.File) ([]protocol.Attachment, error)
 	}
 
 	svc struct {
 		storage
 		Compressor
-		repository
+		Repository
 	}
 )
 
@@ -44,10 +45,16 @@ func NewFile(key string) protocol.File {
 	}
 }
 
+// TODO: implement it
+func (s svc) getUnsentFiles(dispute *protocol.Dispute, allFiles []protocol.File, attachments []protocol.Attachment) ([]protocol.File, error) {
+	return nil, nil
+}
+
 func (s svc) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 	var (
 		files          []protocol.File
 		err            error
+		attachments    []protocol.Attachment
 		unsentFiles    []protocol.File
 		filesToCompact []protocol.File
 		compactFiles   []byte
@@ -56,7 +63,13 @@ func (s svc) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 	if files, err = s.list(dispute.Cid, dispute.OrgID, path); err != nil {
 		return nil, err
 	}
-	if unsentFiles, err = s.getUnsentFiles(dispute, files); err != nil {
+
+	// TODO: test it
+	if attachments, err = s.Repository.Get(dispute, files); err != nil {
+		return nil, err
+	}
+
+	if unsentFiles, err = s.getUnsentFiles(dispute, files, attachments); err != nil {
 		return nil, err
 	}
 
@@ -81,5 +94,6 @@ func (s svc) Get(dispute *protocol.Dispute) (*protocol.Attachment, error) {
 }
 
 func (s svc) Save(chargeback *protocol.Chargeback) error {
-	return s.save(chargeback)
+	// FIXME: there is a bug here. It must be implement properly
+	return s.Save(chargeback)
 }

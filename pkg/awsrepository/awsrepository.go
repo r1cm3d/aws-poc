@@ -32,6 +32,7 @@ type (
 	repository interface {
 		put(rec record) error
 		delete(rec record) error
+		query(field string, value string, items interface{}) (interface{}, error)
 	}
 	dynamoRepository struct {
 		sess      *session.Session

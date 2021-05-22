@@ -26,27 +26,31 @@ const (
 )
 
 var (
-	errListStub        = errors.New("storage list error")
-	errGetStub         = errors.New("storage Get error")
-	errUnsentFilesStub = errors.New("unsent files error")
-	errArchiverStub    = errors.New("Compressor error")
-	errSaveStub        = errors.New("save error")
-	path               = fmt.Sprintf("%s/%d/%d", filenameRoot, disputeStub.AccountID, disputeStub.DisputeID)
-	f1                 = protocol.File{Key: "cbk_file1.pdf"}
-	f2                 = protocol.File{Key: "cbk_doc.pdf"}
-	f3                 = protocol.File{Key: "file3.pdf"}
-	fg1                = protocol.File{Key: "cbk_get_file1.pdf"}
-	fg2                = protocol.File{Key: "cbk_get_doc.pdf"}
-	fg3                = protocol.File{Key: "file_get_3.pdf"}
-	uf1                = protocol.File{Key: fmt.Sprintf("%s/%s", path, f1.Key)}
-	uf2                = protocol.File{Key: fmt.Sprintf("%s/%s", path, f2.Key)}
-	uf3                = protocol.File{Key: fmt.Sprintf("%s/%s", path, f3.Key)}
-	files              = []protocol.File{f1, f2, f3}
-	unsentFiles        = []protocol.File{uf1, uf2, uf3}
-	getFiles           = []protocol.File{fg1, fg2, fg3}
-	attStub            = &protocol.Attachment{Name: "777.zip", Base64: "Wm1sc1pXNWhiV1VnYVc0Z1ltRnpaVFkw"}
-	compactFilesStub   = []byte("ZmlsZW5hbWUgaW4gYmFzZTY0")
-	disputeStub        = &protocol.Dispute{
+	errListStub       = errors.New("storage list error")
+	errGetStub        = errors.New("storage Get error")
+	errAttachmentStub = errors.New("attachments files error")
+	errArchiverStub   = errors.New("Compressor error")
+	errSaveStub       = errors.New("Save error")
+	path              = fmt.Sprintf("%s/%d/%d", filenameRoot, disputeStub.AccountID, disputeStub.DisputeID)
+	f1                = protocol.File{Key: "cbk_file1.pdf"}
+	f2                = protocol.File{Key: "cbk_doc.pdf"}
+	f3                = protocol.File{Key: "file3.pdf"}
+	att1              = protocol.Attachment{Name: "cbk_file1.pdf"}
+	att2              = protocol.Attachment{Name: "cbk_doc.pdf"}
+	att3              = protocol.Attachment{Name: "file3.pdf"}
+	fg1               = protocol.File{Key: "cbk_get_file1.pdf"}
+	fg2               = protocol.File{Key: "cbk_get_doc.pdf"}
+	fg3               = protocol.File{Key: "file_get_3.pdf"}
+	uf1               = protocol.File{Key: fmt.Sprintf("%s/%s", path, f1.Key)}
+	uf2               = protocol.File{Key: fmt.Sprintf("%s/%s", path, f2.Key)}
+	uf3               = protocol.File{Key: fmt.Sprintf("%s/%s", path, f3.Key)}
+	files             = []protocol.File{f1, f2, f3}
+	unsentFiles       = []protocol.File{uf1, uf2, uf3}
+	attachments       = []protocol.Attachment{att1, att2, att3}
+	getFiles          = []protocol.File{fg1, fg2, fg3}
+	attStub           = &protocol.Attachment{Name: "777.zip", Base64: "Wm1sc1pXNWhiV1VnYVc0Z1ltRnpaVFkw"}
+	compactFilesStub  = []byte("ZmlsZW5hbWUgaW4gYmFzZTY0")
+	disputeStub       = &protocol.Dispute{
 		Cid:               cid,
 		OrgID:             orgID,
 		AccountID:         accountID,

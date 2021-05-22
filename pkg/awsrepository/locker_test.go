@@ -16,15 +16,15 @@ func TestLockIntegration(t *testing.T) {
 		name string
 		in   protocol.Dispute
 		want bool
-		locker
+		lockerRepository
 	}{
-		{"success", *disputeStub, true, locker{newRegister(awssession.NewLocalSession(), tableName)}},
-		{"error", *disputeStub, false, locker{errRegister{}}},
+		{"success", *disputeStub, true, lockerRepository{newRegister(awssession.NewLocalSession(), tableName)}},
+		{"error", *disputeStub, false, lockerRepository{errRegister{}}},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			if got := c.locker.lock(c.in); !reflect.DeepEqual(c.want, got) {
+			if got := c.lockerRepository.lock(c.in); !reflect.DeepEqual(c.want, got) {
 				t.Errorf("%s, want: %v, got: %v", c.name, c.want, got)
 			}
 		})
@@ -39,15 +39,15 @@ func TestReleaseIntegration(t *testing.T) {
 		name string
 		in   protocol.Dispute
 		want bool
-		locker
+		lockerRepository
 	}{
-		{"success", *disputeStub, true, locker{newRegister(awssession.NewLocalSession(), tableName)}},
-		{"error", *disputeStub, false, locker{errRegister{}}},
+		{"success", *disputeStub, true, lockerRepository{newRegister(awssession.NewLocalSession(), tableName)}},
+		{"error", *disputeStub, false, lockerRepository{errRegister{}}},
 	}
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			if got := c.locker.release(c.in); !reflect.DeepEqual(c.want, got) {
+			if got := c.lockerRepository.release(c.in); !reflect.DeepEqual(c.want, got) {
 				t.Errorf("%s, want: %v, got: %v", c.name, c.want, got)
 			}
 		})

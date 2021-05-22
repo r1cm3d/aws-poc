@@ -20,7 +20,7 @@ type (
 	}
 	errStorageList struct{}
 	errStorageGet  struct{}
-	errUnsentFiles struct{}
+	errAttachments struct{}
 	errSave        struct{}
 	errArchiver    struct{}
 )
@@ -41,11 +41,11 @@ func (e errStorageGet) Get(cid string, bucket string, key string) (*protocol.Fil
 	return nil, errGetStub
 }
 
-func (e errUnsentFiles) getUnsentFiles(*protocol.Dispute, []protocol.File) ([]protocol.File, error) {
-	return nil, errUnsentFilesStub
+func (e errAttachments) Get(*protocol.Dispute, []protocol.File) ([]protocol.Attachment, error) {
+	return nil, errAttachmentStub
 }
 
-func (e errUnsentFiles) save(*protocol.Chargeback) error {
+func (e errAttachments) save(*protocol.Chargeback) error {
 	return errSaveStub
 }
 
@@ -86,10 +86,10 @@ func (m *mockArchiver) Compress(ci string, fs []protocol.File, strToRemove strin
 	return compactFilesStub, nil
 }
 
-func (m *mockRepository) getUnsentFiles(d *protocol.Dispute, fs []protocol.File) ([]protocol.File, error) {
+func (m *mockRepository) Get(d *protocol.Dispute, fs []protocol.File) ([]protocol.Attachment, error) {
 	m.getUnsentFilesCalled = d == disputeStub && filesEquals(fs, files)
 
-	return unsentFiles, nil
+	return attachments, nil
 }
 
 func (m *mockRepository) save(c *protocol.Chargeback) error {
@@ -98,7 +98,7 @@ func (m *mockRepository) save(c *protocol.Chargeback) error {
 	return nil
 }
 
-func (e *errSave) getUnsentFiles(d *protocol.Dispute, fs []protocol.File) ([]protocol.File, error) {
+func (e *errSave) GetUnsentFiles(d *protocol.Dispute, fs []protocol.File) ([]protocol.File, error) {
 	return unsentFiles, nil
 }
 
