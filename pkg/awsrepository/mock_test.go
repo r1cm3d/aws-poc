@@ -26,6 +26,10 @@ func (e errRegister) delete(_ record) error {
 	return errDeleteStub
 }
 
+func (e errRegister) query(_ string, _ string, _ interface{}) (interface{}, error) {
+	return nil, errQueryStub
+}
+
 func (i Item) ID() string {
 	return strconv.Itoa(i.DisputeID)
 }

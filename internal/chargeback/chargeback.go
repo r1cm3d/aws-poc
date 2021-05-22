@@ -45,6 +45,7 @@ type (
 )
 
 func (s svc) create(dispute *protocol.Dispute) error {
+	// TODO: Refact the organization of this method. Should I declare everything at the top or declare them as soon as I use?
 	var err error
 	var c *protocol.Card
 	if c, err = s.cardService.Get(dispute); err != nil {
