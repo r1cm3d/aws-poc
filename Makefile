@@ -9,6 +9,10 @@ lint:
 	@echo "\nApplying golint\n"
 	@golint ./...
 
+vet:
+	@echo "\nApplying go vet\n"
+	@go vet ./...
+
 doc:
 	@echo "\nGenerating documentation at http://localhost:6060\n"
 	@godoc -http=:6060 1>/dev/null
