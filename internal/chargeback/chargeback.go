@@ -45,30 +45,32 @@ type (
 )
 
 func (s svc) create(dispute *protocol.Dispute) error {
-	// TODO: Refact the organization of this method. Should I declare everything at the top or declare them as soon as I use?
-	var err error
-	var c *protocol.Card
-	if c, err = s.cardService.Get(dispute); err != nil {
+	c, err := s.cardService.Get(dispute)
+	if err != nil {
 		return err
 	}
-	var att *protocol.Attachment
-	if att, err = s.attService.Get(dispute); err != nil {
+
+	att, err := s.attService.Get(dispute)
+	if err != nil {
 		return err
 	}
-	var cbk *protocol.Chargeback
-	if cbk, err = s.networkCreator.Create(dispute, c, att); err != nil {
+
+	cbk, err := s.networkCreator.Create(dispute, c, att);
+	if err != nil {
 		return err
 	}
-	if err = s.Produce(cbk); err != nil {
+	if err := s.Produce(cbk); err != nil {
 		return err
 	}
+
 	if cbk.HasError() {
 		return cbk.NetworkError
 	}
-	if err = s.attService.Save(cbk); err != nil {
+
+	if err := s.attService.Save(cbk); err != nil {
 		return err
 	}
-	if err = s.Schedule(cbk); err != nil {
+	if err := s.Schedule(cbk); err != nil {
 		return err
 	}
 
