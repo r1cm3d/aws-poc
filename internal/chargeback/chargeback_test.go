@@ -13,10 +13,10 @@ func TestMapFromJson(t *testing.T) {
 	json := `{
   "disputeId": 611,
   "accountID": 48448,
-  "authorizationCode": "7HSGXW",
+  "authorizationCode": "666FUCKOFF",
   "reasonCode": "848",
   "cardID": 3123,
-  "orgID": "pismo.io",
+  "orgID": "l34v3_m1_gh_4l0n3",
   "disputeAmount": 32.32,
   "transactionAmount": 42.65,
   "transactionDate": "2012-04-23",
